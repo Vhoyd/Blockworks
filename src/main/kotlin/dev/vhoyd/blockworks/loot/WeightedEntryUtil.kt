@@ -1,6 +1,6 @@
-package mininglib.loot
+package dev.vhoyd.blockworks.loot
 
-import mininglib.block.WeightedEntry
+import dev.vhoyd.blockworks.block.WeightedEntry
 
 /**
  * Utility class for quickly generating [WeightedEntry]s, or `List`s of them.

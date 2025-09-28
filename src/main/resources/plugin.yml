@@ -1,5 +1,5 @@
-name: PrisonServerKT
+name: Blockworks
 version: ${version}
-main: dev.vhoyd.prisonServerKT.PrisonServerKT
+main: dev.vhoyd.blockworks.BlockworksPlugin
 api-version: '1.21'
 depend: [ProtocolLib]

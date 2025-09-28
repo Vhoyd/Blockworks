@@ -1,4 +1,4 @@
-package mininglib.nbt
+package dev.vhoyd.blockworks.nbt
 
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack

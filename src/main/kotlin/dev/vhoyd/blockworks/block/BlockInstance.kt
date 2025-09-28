@@ -1,6 +1,6 @@
-package mininglib.block
+package dev.vhoyd.blockworks.block
 
-import mininglib.core.Config
+import dev.vhoyd.blockworks.core.Config
 import org.bukkit.Location
 
 /**
@@ -37,7 +37,7 @@ class BlockInstance {
     /**
      * Yields a range 0-1 for the current breaking stage of the tile.
      * Break stage values are 0-9 if using packts; multiply by 9 if needed.
-     * See [mininglib.internal.task.BlockBreakTick.run] for how this is used
+     * See [dev.vhoyd.blockworks.internal.task.BlockBreakTick.run] for how this is used
      * @return the progress stage of the tile, from 0 to 1.
      */
     fun getProgress(): Float {

@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.2.20"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    `maven-publish`
 }
 
 group = "dev.vhoyd"
@@ -22,18 +23,27 @@ dependencies {
 
 tasks {
     runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("1.21.8")
     }
     shadowJar {
         archiveClassifier.set("")
-        archiveBaseName.set("PrisonServerKT")
+        archiveBaseName.set("Blockworks")
         archiveVersion.set("1.0-SNAPSHOT")
         minimize()
         doLast {
             println("Shadow jar built at: ${archiveFile.get().asFile.absolutePath}")
+        }
+    }
+}
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("mavenJava") {
+                artifact(tasks.named("shadowJar")) {
+                    builtBy(tasks.named("shadowJar"))
+                }
+                println("PUSHED TO MVN")
+            }
         }
     }
 }

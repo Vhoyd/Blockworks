@@ -1,27 +1,27 @@
-package mininglib.internal.task
+package dev.vhoyd.blockworks.internal.task
 
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketContainer
 import com.comphenix.protocol.wrappers.BlockPosition
-import mininglib.core.Config
-import mininglib.core.MiningManager
-import mininglib.block.BlockInstance
-import mininglib.mining.MiningPlayer
-import mininglib.util.EmptyValue
+import dev.vhoyd.blockworks.core.Config
+import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.mining.MiningPlayer
+import dev.vhoyd.blockworks.util.EmptyValue
 import org.bukkit.Location
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
 class BlockBreakTick : BukkitRunnable {
-    private val miningManager : MiningManager
+    private val blockworks : Blockworks
     private val config : Config
     private val manager = ProtocolLibrary.getProtocolManager()
 
-    constructor(miningManager : MiningManager) {
-        this.miningManager = miningManager
-        config = miningManager.config
+    constructor(blockworks : Blockworks) {
+        this.blockworks = blockworks
+        config = blockworks.config
     }
 
     private fun generateBlockBreakPacket(player : Player, location : Location, progress : Float) {
@@ -35,7 +35,7 @@ class BlockBreakTick : BukkitRunnable {
 
 
     private fun calculateDropAmount(baseAmount : Int, fortune: Int) : Int {
-        if (miningManager.config.ignoreMiningFortune) return baseAmount
+        if (blockworks.config.ignoreMiningFortune) return baseAmount
 
         // everyone always has 1x normal drops, intrinsically, so add 1 to multiplier so it's not ever 0
         val fortuneMultiplier = 1 + fortune / 100
@@ -46,7 +46,7 @@ class BlockBreakTick : BukkitRunnable {
 
         val fortuneAsPercentage = bonusFortune.toDouble() / 100
 
-        if (miningManager.config.dynamicFortuneScaling) {
+        if (blockworks.config.dynamicFortuneScaling) {
             val bonus = fortuneAsPercentage * baseAmount
             total += bonus.toInt()
             remainder = (bonus % 1) * 100
@@ -59,32 +59,32 @@ class BlockBreakTick : BukkitRunnable {
     }
 
     override fun run() {
-        for (player : MiningPlayer in miningManager.players) {
-            val currentTile = player.currentBlock
-            if (currentTile != EmptyValue.BLOCKINSTANCE) {
+        for (player : MiningPlayer in blockworks.players) {
+            val currentBlock = player.currentBlock
+            if (currentBlock != EmptyValue.BLOCKINSTANCE) {
                 //increase damage progress
-                currentTile.damage += player.miningSpeed
-                player.minecraftPlayer.server.consoleSender.sendMessage(currentTile.damage.toString())
-                player.minecraftPlayer.server.consoleSender.sendMessage(currentTile.strength.toString())
+                currentBlock.damage += player.miningSpeed
+                player.minecraftPlayer.server.consoleSender.sendMessage(currentBlock.damage.toString())
+                player.minecraftPlayer.server.consoleSender.sendMessage(currentBlock.strength.toString())
                 /*
                  * getProgress returns 0-9, break stage values are 0-9
                  * since blocks start off with no animation, an extraneous value (I used -1) is needed
                  */
-                generateBlockBreakPacket(player.minecraftPlayer, currentTile.location, currentTile.getProgress())
+                generateBlockBreakPacket(player.minecraftPlayer, currentBlock.location, currentBlock.getProgress())
 
-                if (currentTile.isBroken() && currentTile.canDrop) {
+                if (currentBlock.isBroken() && currentBlock.canDrop) {
 
                     //remove block
-                    currentTile.canDrop = false
+                    currentBlock.canDrop = false
 
-                    currentTile.location.block.type = currentTile.block.brokenMaterial
-                    generateBlockBreakPacket(player.minecraftPlayer, currentTile.location, 0f)
+                    currentBlock.location.block.type = currentBlock.block.brokenMaterial
+                    generateBlockBreakPacket(player.minecraftPlayer, currentBlock.location, 0f)
 
                     //play registered action at broken block
-                    currentTile.block.brokenAction.run(currentTile, player)
+                    currentBlock.block.brokenAction.run(currentBlock, player)
 
                     //create loot for drops
-                    for (conditionalDrop in currentTile.block.possibleDrops) {
+                    for (conditionalDrop in currentBlock.block.possibleDrops) {
 
                         if (conditionalDrop.condition(player)) {
 
@@ -92,7 +92,7 @@ class BlockBreakTick : BukkitRunnable {
                             val expValue = conditionalDrop.exp.pickRandom()
                             if (expValue > 0) {
                                 val orb = player.minecraftPlayer.world.spawn(
-                                    currentTile.location.clone().add(0.5, 0.5, 0.5),
+                                    currentBlock.location.add(conditionalDrop.locationOffset),
                                     ExperienceOrb::class.java
                                 )
                                 orb.experience = expValue
@@ -107,21 +107,21 @@ class BlockBreakTick : BukkitRunnable {
                                     quantity -= 64
                                     droppedItem.amount = 64
                                     player.minecraftPlayer.world.dropItemNaturally(
-                                        currentTile.location,
+                                        currentBlock.location,
                                         droppedItem.clone()
                                     )
                                 }
 
                                 if (quantity > 0) {
                                     droppedItem.amount = quantity
-                                    player.minecraftPlayer.world.dropItemNaturally(currentTile.location, droppedItem)
+                                    player.minecraftPlayer.world.dropItemNaturally(currentBlock.location.add(conditionalDrop.locationOffset), droppedItem)
                                 }
                             }
                         }
                     }
-                    val newBlock = miningManager.getBlock(currentTile.location.block.type)
+                    val newBlock = blockworks.getBlock(currentBlock.location.block.type)
                     if (newBlock != EmptyValue.BLOCKDEFINITION) {
-                        player.currentBlock = BlockInstance(newBlock, currentTile.location, miningManager.config)
+                        player.currentBlock = BlockInstance(newBlock, currentBlock.location, blockworks.config)
                     }
                 }
 

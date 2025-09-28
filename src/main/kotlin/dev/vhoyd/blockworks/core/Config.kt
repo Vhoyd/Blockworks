@@ -1,7 +1,7 @@
-package mininglib.core
+package dev.vhoyd.blockworks.core
 
-import mininglib.block.BlockDataLoader
-import mininglib.block.BlockDefinition
+import dev.vhoyd.blockworks.block.BlockDataLoader
+import dev.vhoyd.blockworks.block.BlockDefinition
 import org.bukkit.Material
 
 /**
@@ -18,7 +18,7 @@ import org.bukkit.Material
  *
  * If `false`, fortune is applied as a raw % odds for a bonus drop. Using 70 fortune and 3 drops again,
  * 70% of the time this would be +3 drops and 30% of the time it would be +0 drops.
- * @see mininglib.internal.task.BlockBreakTick.calculateDropAmount
+ * @see dev.vhoyd.blockworks.internal.task.BlockBreakTick.calculateDropAmount
  */
 class Config {
     val blockDataLoader : BlockDataLoader

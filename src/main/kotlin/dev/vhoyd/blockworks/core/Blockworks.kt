@@ -1,13 +1,13 @@
-package mininglib.core
+package dev.vhoyd.blockworks.core
 
-import mininglib.block.BlockDefinition
-import mininglib.internal.event.MiningEventHandler
-import mininglib.mining.MiningPlayer
-import mininglib.mining.MiningTool
-import mininglib.nbt.PersistentDataUtil
-import mininglib.internal.task.BlockBreakTick
-import mininglib.util.EmptyValue
-import mininglib.text.TextComponentWrapper
+import dev.vhoyd.blockworks.block.BlockDefinition
+import dev.vhoyd.blockworks.internal.event.MiningEventHandler
+import dev.vhoyd.blockworks.mining.MiningPlayer
+import dev.vhoyd.blockworks.mining.MiningTool
+import dev.vhoyd.blockworks.nbt.PersistentDataUtil
+import dev.vhoyd.blockworks.internal.task.BlockBreakTick
+import dev.vhoyd.blockworks.util.EmptyValue
+import dev.vhoyd.blockworks.text.TextComponentWrapper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Material
@@ -16,17 +16,19 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 
-class MiningManager {
+
+/**
+ * Entry point class for working with the library.
+ */
+class Blockworks {
     val plugin : Plugin
     val players = ArrayList<MiningPlayer>()
     val config : Config
-    val emptyHand: MiningTool
     val testStick: MiningTool
 
     constructor(plugin: Plugin, config : Config) {
         this.plugin = plugin
         this.config = config
-        emptyHand = MiningTool(this, 1, 0, 0, EmptyValue.ITEMSTACK)
         val stickItem = TextComponentWrapper.createTextedItem(ItemStack(Material.STICK, 1), "§6§lGod Stick", "§d§oFor testing purposes only)")
 
         testStick = MiningTool(this, 25000000, 500, 10, stickItem)
@@ -60,10 +62,10 @@ class MiningManager {
     /**
      * Checks for an existing MiningTool represented by the given [ItemStack]
      * @param item the [ItemStack] to filter by
-     * @return the matching [MiningTool], or the data for the empty hand if none is found
+     * @return the matching [MiningTool], or null if no mining data is found for the ItemStack
      */
-    fun evaluateItem(item: ItemStack?): MiningTool {
-        if (item == null) return emptyHand
+    fun evaluateItem(item: ItemStack?): MiningTool? {
+        if (item == null) return null
         try {
             if (PersistentDataUtil.getTag(plugin, item, "isMiningItem", PersistentDataType.BOOLEAN)) {
                 return MiningTool(
@@ -76,10 +78,10 @@ class MiningManager {
                 )
             }
         } catch (_ : NullPointerException) {
-            return emptyHand
+            return null
         }
 
-        return emptyHand
+        return null
     }
 
     fun getBlock(material: Material) : BlockDefinition {

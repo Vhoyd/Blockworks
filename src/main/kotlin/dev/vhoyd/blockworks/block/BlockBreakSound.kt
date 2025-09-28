@@ -1,6 +1,6 @@
-package mininglib.block
+package dev.vhoyd.blockworks.block
 
-import mininglib.mining.MiningPlayer
+import dev.vhoyd.blockworks.mining.MiningPlayer
 import org.bukkit.Sound
 
 

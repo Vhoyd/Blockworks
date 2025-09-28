@@ -1,10 +1,9 @@
-package mininglib.internal.event
+package dev.vhoyd.blockworks.internal.event
 
-import mininglib.core.MiningManager
-import mininglib.block.BlockInstance
-import mininglib.mining.MiningTool
-import mininglib.mining.MiningPlayer
-import mininglib.util.EmptyValue
+import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.mining.MiningPlayer
+import dev.vhoyd.blockworks.util.EmptyValue
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockDamageAbortEvent
@@ -16,10 +15,10 @@ import org.bukkit.potion.PotionEffectType
 
 
 class MiningEventHandler : Listener {
-    private val miningManager : MiningManager
+    private val blockworks : Blockworks
 
-    constructor(miningManager : MiningManager) {
-        this.miningManager = miningManager
+    constructor(blockworks : Blockworks) {
+        this.blockworks = blockworks
     }
 
     /**
@@ -52,11 +51,11 @@ class MiningEventHandler : Listener {
 
 
         //create new MiningPlayer object to handle unregistered players
-        if (miningManager.getMiningPlayer(e.getPlayer()) == null) {
-            miningManager.registerPlayer(MiningPlayer(e.player, miningManager))
+        if (blockworks.getMiningPlayer(e.getPlayer()) == null) {
+            blockworks.registerPlayer(MiningPlayer(e.player, blockworks))
 
             //testing only
-            e.getPlayer().inventory.addItem(miningManager.testStick.itemStack.clone())
+            e.getPlayer().inventory.addItem(blockworks.testStick.itemStack.clone())
         }
     }
 
@@ -68,25 +67,25 @@ class MiningEventHandler : Listener {
     @EventHandler
     fun onPlayerSwitchItem(e: PlayerItemHeldEvent) {
         val item = e.getPlayer().inventory.getItem(e.newSlot)
-        val miningTool: MiningTool = miningManager.evaluateItem(item) //defaults to hand stats if no custom item is found
-        val mp: MiningPlayer? = miningManager.getMiningPlayer(e.getPlayer())
+        val miningTool  = blockworks.evaluateItem(item) //defaults to hand stats if no custom item is found
+        val mp: MiningPlayer? = blockworks.getMiningPlayer(e.getPlayer())
         mp?.heldItem = miningTool
     }
 
     @EventHandler
     fun onPlayerHitBlock(e : BlockDamageEvent) {
         e.isCancelled = true
-        val player = miningManager.getMiningPlayer(e.player)
-        val block = miningManager.getBlock(e.block.type)
+        val player = blockworks.getMiningPlayer(e.player)
+        val block = blockworks.getBlock(e.block.type)
         if (block != EmptyValue.BLOCKDEFINITION && player?.currentBlock?.location != e.block.location) {
-            player?.currentBlock = BlockInstance(block, e.block.location, miningManager.config)
+            player?.currentBlock = BlockInstance(block, e.block.location, blockworks.config)
         }
 
     }
 
     @EventHandler
     fun onPlayerStopHittingBlock(e : BlockDamageAbortEvent) {
-        val player = miningManager.getMiningPlayer(e.player)
+        val player = blockworks.getMiningPlayer(e.player)
         player?.currentBlock = EmptyValue.BLOCKINSTANCE
     }
 }

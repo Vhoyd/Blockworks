@@ -1,4 +1,4 @@
-package mininglib.text
+package dev.vhoyd.blockworks.text
 
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack

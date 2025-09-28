@@ -1,7 +1,8 @@
-package mininglib.loot
+package dev.vhoyd.blockworks.loot
 
-import mininglib.block.WeightedEntry
-import mininglib.mining.MiningPlayer
+import dev.vhoyd.blockworks.block.WeightedEntry
+import dev.vhoyd.blockworks.mining.MiningPlayer
+import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -14,43 +15,49 @@ class ConditionalDrop {
     val drops : WeightedEntryPool<ItemStack>
     val exp : WeightedEntryPool<Int>
     val condition : (player : MiningPlayer) -> Boolean
+    val locationOffset : Location
 
     /**
      * @param expYield the amount of exp yielded when breaking the block, picked at random, exclusive.
      * @param drops the drops to reward a player with when the block is broken, picked at random, exclusive.
      * @param condition the condition under which this `ConditionalDrop` yields its xp and drops
+     * @param locationOffset an amount to shift the drop coordinates by, relative to the block broken. Defaults to `(0,5, 0,5, 0,5)`
      */
-    constructor(expYield: List<WeightedEntry<Int>>, drops: List<WeightedEntry<ItemStack>>, condition: (player : MiningPlayer) -> Boolean = { true } ) :
-            this(WeightedEntryPool(expYield), WeightedEntryPool(drops), condition)
+    constructor(expYield: List<WeightedEntry<Int>>, drops: List<WeightedEntry<ItemStack>>, locationOffset: Location = Location(null, 0.5, 0.5, 0.5), condition: (player : MiningPlayer) -> Boolean = { true } ) :
+            this(WeightedEntryPool(expYield), WeightedEntryPool(drops), locationOffset, condition)
 
 
     /**
      * @param expYield the amount of exp yielded when breaking the block
      * @param drop the drop to reward a player with when the block is broken
      * @param condition the condition under which this `ConditionalDrop` yields its xp and drops
+     * @param locationOffset an amount to shift the drop coordinates by, relative to the block broken. Defaults to `(0,5, 0,5, 0,5)`
      */
-    constructor(expYield: WeightedEntry<Int>, drop: WeightedEntry<ItemStack>, condition: (player : MiningPlayer) -> Boolean = { true } ) :
-            this(WeightedEntryPool(listOf(expYield)), WeightedEntryPool(listOf(drop)), condition)
+    constructor(expYield: WeightedEntry<Int>, drop: WeightedEntry<ItemStack>, locationOffset: Location = Location(null, 0.5, 0.5, 0.5), condition: (player : MiningPlayer) -> Boolean = { true } ) :
+            this(WeightedEntryPool(listOf(expYield)), WeightedEntryPool(listOf(drop)), locationOffset, condition)
 
 
     /**
      * @param expYield the amount of exp yielded when breaking the block, picked at random, exclusive.
      * @param drops the drops to reward a player with when the block is broken, picked at random, exclusive.
      * @param condition the condition under which this `ConditionalDrop` yields its xp and drops
+     * @param locationOffset an amount to shift the drop coordinates by, relative to the block broken. Defaults to `(0,5, 0,5, 0,5)`
      */
-    constructor(expYield: WeightedEntryPool<Int>, drops: WeightedEntryPool<ItemStack>, condition: (player : MiningPlayer) -> Boolean = { true }) {
+    constructor(expYield: WeightedEntryPool<Int>, drops: WeightedEntryPool<ItemStack>, locationOffset: Location = Location(null, 0.5, 0.5, 0.5),  condition: (player : MiningPlayer) -> Boolean = { true }) {
         this.drops = drops
         exp = expYield
         this.condition = condition
+        this.locationOffset = locationOffset
     }
 
     /**
      * @param expYield the amount of exp yielded when breaking the block
      * @param drop the drop to reward a player with when the block is broken
      * @param condition the condition under which this `ConditionalDrop` yields its xp and drops
+     * @param locationOffset an amount to shift the drop coordinates by, relative to the block broken. Defaults to `(0,5, 0,5, 0,5)`
      */
-    constructor(expYield: Int, drop: ItemStack, condition: (player : MiningPlayer) -> Boolean) :
-            this(WeightedEntryUtil.single(expYield), WeightedEntryUtil.single(drop), condition)
+    constructor(expYield: Int, drop: ItemStack, locationOffset: Location = Location(null, 0.5, 0.5, 0.5), condition: (player : MiningPlayer) -> Boolean) :
+            this(WeightedEntryUtil.single(expYield), WeightedEntryUtil.single(drop), locationOffset, condition)
 
     /**
      * @return the list of possible item drops from this `ConditionalDrop`

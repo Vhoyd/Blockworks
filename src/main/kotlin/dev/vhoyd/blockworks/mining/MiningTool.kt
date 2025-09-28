@@ -1,7 +1,7 @@
-package mininglib.mining
+package dev.vhoyd.blockworks.mining
 
-import mininglib.core.MiningManager
-import mininglib.nbt.PersistentDataUtil
+import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.nbt.PersistentDataUtil
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -24,16 +24,16 @@ class MiningTool {
      * [org.bukkit.persistence.PersistentDataContainer]. This is highly recommended as that is how items are evaluated when players
      * switch held items, but can be skipped to protect existing values under special circumstances.
      */
-    constructor(miningManager: MiningManager, speed: Int, fortune: Int, power: Int, item: ItemStack, writeData : Boolean = true) {
+    constructor(blockworks: Blockworks, speed: Int, fortune: Int, power: Int, item: ItemStack, writeData : Boolean = true) {
         this.miningSpeed = speed
         this.breakingPower = power
         this.miningFortune = fortune
         itemStack = item
         if (item.type == Material.AIR || !writeData) return
-        PersistentDataUtil.setTag(miningManager.plugin, itemStack, "isMiningItem", PersistentDataType.BOOLEAN, true)
-        PersistentDataUtil.setTag(miningManager.plugin, itemStack, "speed", PersistentDataType.INTEGER, speed)
-        PersistentDataUtil.setTag(miningManager.plugin, itemStack, "fortune", PersistentDataType.INTEGER, fortune)
-        PersistentDataUtil.setTag(miningManager.plugin, itemStack, "power", PersistentDataType.INTEGER, power)
+        PersistentDataUtil.setTag(blockworks.plugin, itemStack, "isMiningItem", PersistentDataType.BOOLEAN, true)
+        PersistentDataUtil.setTag(blockworks.plugin, itemStack, "speed", PersistentDataType.INTEGER, speed)
+        PersistentDataUtil.setTag(blockworks.plugin, itemStack, "fortune", PersistentDataType.INTEGER, fortune)
+        PersistentDataUtil.setTag(blockworks.plugin, itemStack, "power", PersistentDataType.INTEGER, power)
     }
 
 
