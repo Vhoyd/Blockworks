@@ -1,8 +1,5 @@
 package dev.vhoyd.blockworks
 
-import net.kyori.adventure.bossbar.BossBar
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextColor
 import org.bukkit.plugin.java.JavaPlugin
 
 class BlockworksPlugin : JavaPlugin() {

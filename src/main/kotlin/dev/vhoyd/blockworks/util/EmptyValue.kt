@@ -5,15 +5,11 @@ import dev.vhoyd.blockworks.block.BlockBreakAction
 import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.loot.ConditionalDrop
 import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.mining.MiningPlayer
 import dev.vhoyd.blockworks.loot.WeightedEntryUtil
-import dev.vhoyd.blockworks.mining.MiningTool
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import org.bukkit.plugin.Plugin
-import org.bukkit.plugin.java.JavaPlugin
 
 /**
  * Utility class for null-safe "null" values of various types.
