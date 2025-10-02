@@ -1,9 +1,10 @@
-package dev.vhoyd.blockworks.internal.event
+package dev.vhoyd.blockworks.listener
 
-import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.event.BlockInstanceBreakAbortEvent
+import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
 import dev.vhoyd.blockworks.mining.MiningPlayer
-import dev.vhoyd.blockworks.util.EmptyValue
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockDamageAbortEvent
@@ -13,8 +14,11 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-
-class MiningEventHandler : Listener {
+/**
+ * Internal API class for handling most of the server -> plugin interactions. Should not be tinkered with under
+ * most circumstances; not inheritable.
+ */
+class SpigotEventListener : Listener {
     private val blockworks : Blockworks
 
     constructor(blockworks : Blockworks) {
@@ -54,11 +58,8 @@ class MiningEventHandler : Listener {
         if (blockworks.getMiningPlayer(e.getPlayer()) == null) {
             blockworks.registerPlayer(MiningPlayer(e.player, blockworks))
 
-            //testing only
-            e.getPlayer().inventory.addItem(blockworks.testStick.itemStack.clone())
         }
     }
-
 
     //update mining stats to reflect new item when switching items
     /**
@@ -72,20 +73,22 @@ class MiningEventHandler : Listener {
         mp?.heldItem = miningTool
     }
 
+
     @EventHandler
-    fun onPlayerHitBlock(e : BlockDamageEvent) {
-        e.isCancelled = true
-        val player = blockworks.getMiningPlayer(e.player)
-        val block = blockworks.getBlock(e.block.type)
-        if (block != EmptyValue.BLOCKDEFINITION && player?.currentBlock?.location != e.block.location) {
-            player?.currentBlock = BlockInstance(block, e.block.location, blockworks.config)
-        }
+    fun onBlockHit(e : BlockDamageEvent) {
+        val miningPlayer = blockworks.getMiningPlayer(e.player) ?: return
+        val blockDefinition = blockworks.getBlock(e.block.type)
+        val blockInstance = BlockInstance(blockDefinition, e.block.location, miningPlayer)
+        e.player.server.pluginManager.callEvent(BlockInstanceStartBreakEvent(blockInstance,miningPlayer))
 
     }
 
     @EventHandler
     fun onPlayerStopHittingBlock(e : BlockDamageAbortEvent) {
-        val player = blockworks.getMiningPlayer(e.player)
-        player?.currentBlock = EmptyValue.BLOCKINSTANCE
+        val miningPlayer = blockworks.getMiningPlayer(e.player) ?: return
+        val blockDefinition = blockworks.getBlock(e.block.type)
+        val blockInstance = BlockInstance(blockDefinition, e.block.location, miningPlayer)
+        e.player.server.pluginManager.callEvent(BlockInstanceBreakAbortEvent(blockInstance,miningPlayer))
     }
+
 }

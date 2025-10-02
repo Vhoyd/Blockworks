@@ -10,7 +10,7 @@ class WeightedEntryUtil{
     companion object {
 
         /**
-         * Generates a `List` containing exactly 1 [WeightedEntry]. The caller can specify the weight.
+         * Generates a `List<`[WeightedEntry]`>` of size 1. The caller can specify the weight for the created entry.
          */
         fun <V> single(value : V, weight : Int = 1) : List<WeightedEntry<V>> {
             val out = ArrayList<WeightedEntry<V>>()
@@ -19,7 +19,7 @@ class WeightedEntryUtil{
         }
 
         /**
-         * Generates a `List` of [WeightedEntry]s based on a given `Iterable`, such as a `List`, where
+         * Generates a `List<`[WeightedEntry]`>` based on a given `Iterable`, such as a `List`, where
          * each entry has the same exact weight. The caller can specify the weight.
          */
         fun <V> uniformWeight(data : Iterable<V>, weight : Int = 1) : List<WeightedEntry<V>> {

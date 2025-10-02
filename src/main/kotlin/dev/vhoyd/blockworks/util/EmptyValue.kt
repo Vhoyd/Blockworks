@@ -1,6 +1,5 @@
 package dev.vhoyd.blockworks.util
 
-import dev.vhoyd.blockworks.core.Config
 import dev.vhoyd.blockworks.block.BlockBreakAction
 import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.loot.ConditionalDrop
@@ -12,22 +11,20 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 /**
- * Utility class for null-safe "null" values of various types.
+ * Utility class for `null`-safe "null" values of various types.
  */
 class EmptyValue {
     private constructor()
     companion object {
-        val ITEMSTACK = ItemStack(Material.AIR, 1)
         val BLOCKBREAKACTION : BlockBreakAction = BlockBreakAction { _ : BlockInstance, _ : MiningPlayer -> }
         val CONDITIONALDROP = ConditionalDrop(
             WeightedEntryUtil.single(0), WeightedEntryUtil.single(ItemStack(
             Material.AIR))) { true }
-        val BLOCKDEFINITION = BlockDefinition(Material.AIR, CONDITIONALDROP, -1, -1, BLOCKBREAKACTION )
-        val CONFIG = Config({ listOf(BLOCKDEFINITION) }, miningSpeedScale = 0.0)
+        val BLOCKDEFINITION = BlockDefinition(Material.AIR, CONDITIONALDROP, breakCondition =  { false } )
         val BLOCKINSTANCE = BlockInstance(
             BLOCKDEFINITION,
             location = Location(null, -1.0, -1.0, -1.0),
-            config = CONFIG
-        )
+            TODO())
     }
+    
 }

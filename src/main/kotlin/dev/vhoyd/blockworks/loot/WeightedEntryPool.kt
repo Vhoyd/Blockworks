@@ -4,7 +4,7 @@ import dev.vhoyd.blockworks.block.WeightedEntry
 import kotlin.random.Random
 
 /**
- * This class takes a `List` of [WeightedEntry]s and attaches a few extra methods for getting random/specific
+ * This class takes a `List<`[WeightedEntry]`>` and attaches a few extra methods for getting random/specific
  * contents out of that list.
  * When instantiated, an object of this class computes the cumulative weight of all entries and stores it for
  * later use with fetching entries.
@@ -23,7 +23,7 @@ class WeightedEntryPool<T> {
     }
 
     /**
-     * Picks a random number between up to [totalWeight] and uses weighted indexing to return the resulting entry.
+     * Picks a random number from 0 up to the cumulative weight  and uses weighted indexing to return the resulting entry.
      */
     fun pickRandom(): T {
         var randomNumber = Random.nextInt(totalWeight)
@@ -38,7 +38,7 @@ class WeightedEntryPool<T> {
 
     /**
      * Returns a specific entry for a specific weight. Since weight is handled based on the order of the
-     * underlying `List`, it is neccesary to compute the inputted weight based on cumulative weight in
+     * underlying `List`, it is necessary to compute the inputted weight based on cumulative weight in
      * ascending index order, 0 -> `list.size`
      */
     fun pickExact(value : Int) : T {
