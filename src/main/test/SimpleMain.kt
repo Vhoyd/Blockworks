@@ -27,9 +27,9 @@ class SimpleMain {
             val blockworks = Blockworks(config)
             testStick = MiningTool(blockworks, stickItem,
                 mapOf(
-                    SimpleMiningAttribute.Companion.MINING_SPEED to 10,
-                    SimpleMiningAttribute.Companion.MINING_FORTUNE to 158,
-                    SimpleMiningAttribute.Companion.BREAKING_POWER to 1
+                    SimpleMiningAttribute.MINING_SPEED to 10,
+                    SimpleMiningAttribute.MINING_FORTUNE to 158,
+                    SimpleMiningAttribute.BREAKING_POWER to 1
                     )
                 )
             val simpleListener = SimpleBlockworksListener(blockworks)

@@ -19,10 +19,10 @@ object SimpleBlockDefinitionListCreator {
         val entry = BlockDefinition(
             Material.BUDDING_AMETHYST,
             listOf(drop),
-            attributes = mapOf(SimpleMiningAttribute.Companion.BLOCK_STRENGTH to 100),
+            attributes = mapOf(SimpleMiningAttribute.BLOCK_STRENGTH to 100),
             breakCondition = { it : BlockInstance ->
-                val dmg = it[SimpleMiningAttribute.Companion.BLOCK_DAMAGE].toFloat()
-                val str = it[SimpleMiningAttribute.Companion.BLOCK_STRENGTH].toFloat()
+                val dmg = it[SimpleMiningAttribute.BLOCK_DAMAGE].toFloat()
+                val str = it[SimpleMiningAttribute.BLOCK_STRENGTH].toFloat()
                 dmg/str >= 1
 
             }

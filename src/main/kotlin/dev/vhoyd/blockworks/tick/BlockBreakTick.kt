@@ -4,7 +4,6 @@ import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.event.BlockInstanceBreakEvent
 import dev.vhoyd.blockworks.event.BlockInstanceTickEvent
-import dev.vhoyd.blockworks.mining.MiningPlayer
 import org.bukkit.scheduler.BukkitRunnable
 
 /**

@@ -12,8 +12,6 @@ import org.bukkit.event.block.BlockDamageAbortEvent
 import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
 
 /**
  * Internal API class for handling most of the server -> plugin interactions. Should not be tinkered with under
