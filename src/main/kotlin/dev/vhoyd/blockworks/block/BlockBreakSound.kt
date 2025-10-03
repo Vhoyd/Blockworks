@@ -1,25 +1,16 @@
 package dev.vhoyd.blockworks.block
 
-import dev.vhoyd.blockworks.mining.MiningPlayer
+import dev.vhoyd.blockworks.core.BlockBreakAction
 import org.bukkit.Sound
 
 
 /**
- * Implementation of the [BlockBreakAction] interface for playing a sound at a location.
+ * Implementation of [BlockBreakAction] for playing a sound at a location.
  */
-class BlockBreakSound : BlockBreakAction {
-    val sound: Sound
-    val volume : Float
-    val pitch : Float
+class BlockBreakSound(val sound: Sound, val volume: Float, val pitch: Float)  : BlockBreakAction {
 
-    constructor(sound: Sound, volume: Float, pitch: Float) {
-        this.sound = sound
-        this.volume = volume
-        this.pitch = pitch
-    }
-
-    override fun run(tile: BlockInstance, player: MiningPlayer) {
-        tile.location.world.playSound(tile.location, sound, volume, pitch)
+    override fun invoke(p1: BlockInstance) {
+        p1.location.world.playSound(p1.location, sound, volume, pitch)
     }
 
 }

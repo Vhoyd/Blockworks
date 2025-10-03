@@ -1,5 +1,3 @@
-package dev.vhoyd.blockworks.simple
-
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketContainer
@@ -11,7 +9,6 @@ import dev.vhoyd.blockworks.event.BlockInstanceBreakEvent
 import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
 import dev.vhoyd.blockworks.event.BlockInstanceTickEvent
 import dev.vhoyd.blockworks.loot.ConditionalDrop
-import dev.vhoyd.blockworks.util.EmptyValue
 import org.bukkit.Location
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
@@ -21,32 +18,26 @@ import org.bukkit.event.player.PlayerJoinEvent
 import kotlin.math.ceil
 import kotlin.math.round
 
-class SimpleBlockworksListener : Listener {
+class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
 
-    val blockworks : Blockworks
     val manager = ProtocolLibrary.getProtocolManager()
 
-    constructor(blockworks: Blockworks) {
-        this.blockworks = blockworks
-    }
 
     @EventHandler
     fun onBlockStart(e : BlockInstanceStartBreakEvent) {
-        e.isCancelled = true
-        if (e.blockInstance != EmptyValue.BLOCKINSTANCE) {
-            e.miningPlayer.currentBlock = e.blockInstance
-        }
+        e.cancelled = true
+        e.miningPlayer.currentBlock = e.blockInstance
     }
 
     @EventHandler
     fun onBlockStop(e : BlockInstanceBreakAbortEvent) {
-        e.miningPlayer.currentBlock = EmptyValue.BLOCKINSTANCE
+        e.miningPlayer.currentBlock = null
     }
 
     @EventHandler
     fun onBlockTick(e : BlockInstanceTickEvent) {
         var totalDamage = e.miningPlayer[SimpleMiningAttribute.MINING_SPEED]
-        totalDamage += e.miningPlayer.heldItem?.get(SimpleMiningAttribute.MINING_SPEED) ?: 0f
+        totalDamage += e.miningPlayer.heldTool[SimpleMiningAttribute.MINING_SPEED] ?: 0f
         totalDamage *= blockworks.config[SimpleConfigProperty.MINING_RATE_SCALE]
         e.blockInstance[SimpleMiningAttribute.BLOCK_DAMAGE] += totalDamage.toInt()
         val damage = e.blockInstance[SimpleMiningAttribute.BLOCK_DAMAGE].toFloat()
@@ -66,25 +57,23 @@ class SimpleBlockworksListener : Listener {
     @EventHandler
     fun onBlockBreak(e : BlockInstanceBreakEvent) {
         var fortune = e.miningPlayer[SimpleMiningAttribute.MINING_FORTUNE]
-        val toolFortune = e.miningPlayer.heldItem?.get(SimpleMiningAttribute.MINING_FORTUNE) ?: 0f
+        val toolFortune = e.miningPlayer.heldTool[SimpleMiningAttribute.MINING_FORTUNE] ?: 0f
         fortune += toolFortune
 
         for (drop in e.blockInstance.definition.possibleDrops) {
-            if (!drop.condition(e.miningPlayer)) continue
+            if (!drop.condition(e.blockInstance)) continue
             dropExp(drop, e.blockInstance)
             dropReward(drop, fortune, e.blockInstance)
 
         }
 
         val newBlock = blockworks.getBlock(e.blockInstance.location.block.type)
-        if (newBlock != EmptyValue.BLOCKDEFINITION) {
-            e.miningPlayer.currentBlock = BlockInstance(newBlock, e.blockInstance.location, e.miningPlayer)
-        }
+            e.miningPlayer.currentBlock = if (newBlock != null) BlockInstance(newBlock, e.blockInstance.location, e.miningPlayer) else null
     }
 
 
     private fun dropReward(drop : ConditionalDrop, fortune : Float, currentBlock : BlockInstance) {
-        val reward = drop.drops.pickRandom().clone()
+        val reward = drop.dropPool.pickRandom().clone()
         if (reward.amount > 0) {
             var quantity = calculateDropAmount(reward.amount, fortune)
             while (quantity > 64) {
@@ -106,7 +95,7 @@ class SimpleBlockworksListener : Listener {
 
     private fun dropExp(drop : ConditionalDrop, currentBlock : BlockInstance) {
         // drop exp if any
-        val expValue = drop.exp.pickRandom()
+        val expValue = drop.expPool.pickRandom()
         if (expValue > 0) {
             val orb = currentBlock.location.world.spawn(
                 currentBlock.location.add(drop.locationOffset),

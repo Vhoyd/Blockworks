@@ -5,6 +5,7 @@ import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.event.BlockInstanceBreakAbortEvent
 import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
 import dev.vhoyd.blockworks.mining.MiningPlayer
+import dev.vhoyd.blockworks.mining.MiningTool
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockDamageAbortEvent
@@ -18,12 +19,7 @@ import org.bukkit.potion.PotionEffectType
  * Internal API class for handling most of the server -> plugin interactions. Should not be tinkered with under
  * most circumstances; not inheritable.
  */
-class SpigotEventListener : Listener {
-    private val blockworks : Blockworks
-
-    constructor(blockworks : Blockworks) {
-        this.blockworks = blockworks
-    }
+class SpigotEventListener(private val blockworks : Blockworks) : Listener {
 
     /**
      * Ensures a MiningPlayer object exists for any joining Player entity, and applies two potion effects:
@@ -32,33 +28,8 @@ class SpigotEventListener : Listener {
      */
     @EventHandler
     fun onPlayerJoin(e: PlayerJoinEvent) {
-        e.getPlayer().addPotionEffect(
-            PotionEffect(
-                PotionEffectType.MINING_FATIGUE,
-                Int.MAX_VALUE,
-                5,
-                true,
-                false,
-                false
-            )
-        )
-        e.getPlayer().addPotionEffect(
-            PotionEffect(
-                PotionEffectType.HASTE,
-                Int.MAX_VALUE,
-                1,
-                true,
-                false,
-                false
-            )
-        )
-
-
-        //create new MiningPlayer object to handle unregistered players
-        if (blockworks.getMiningPlayer(e.getPlayer()) == null) {
-            blockworks.registerPlayer(MiningPlayer(e.player, blockworks))
-
-        }
+        if (blockworks.applyAllPlayers)
+        blockworks.applyBehavior(e.player)
     }
 
     //update mining stats to reflect new item when switching items
@@ -68,27 +39,28 @@ class SpigotEventListener : Listener {
     @EventHandler
     fun onPlayerSwitchItem(e: PlayerItemHeldEvent) {
         val item = e.getPlayer().inventory.getItem(e.newSlot)
-        val miningTool  = blockworks.evaluateItem(item) //defaults to hand stats if no custom item is found
+        val miningTool  = MiningTool(blockworks, item) //defaults to hand stats if no custom item is found
         val mp: MiningPlayer? = blockworks.getMiningPlayer(e.getPlayer())
-        mp?.heldItem = miningTool
+        mp?.heldTool = miningTool
     }
 
 
     @EventHandler
     fun onBlockHit(e : BlockDamageEvent) {
         val miningPlayer = blockworks.getMiningPlayer(e.player) ?: return
-        val blockDefinition = blockworks.getBlock(e.block.type)
+        val blockDefinition = blockworks.getBlock(e.block.type) ?: return
         val blockInstance = BlockInstance(blockDefinition, e.block.location, miningPlayer)
         e.player.server.pluginManager.callEvent(BlockInstanceStartBreakEvent(blockInstance,miningPlayer))
-
+        blockworks.breakTick.subscribe(blockInstance)
     }
 
     @EventHandler
     fun onPlayerStopHittingBlock(e : BlockDamageAbortEvent) {
         val miningPlayer = blockworks.getMiningPlayer(e.player) ?: return
-        val blockDefinition = blockworks.getBlock(e.block.type)
+        val blockDefinition = blockworks.getBlock(e.block.type) ?: return
         val blockInstance = BlockInstance(blockDefinition, e.block.location, miningPlayer)
         e.player.server.pluginManager.callEvent(BlockInstanceBreakAbortEvent(blockInstance,miningPlayer))
+        blockworks.breakTick.unsubscribe(blockInstance)
     }
 
 }

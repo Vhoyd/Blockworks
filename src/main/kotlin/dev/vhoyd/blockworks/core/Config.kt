@@ -4,32 +4,12 @@ import dev.vhoyd.blockworks.block.BlockDefinition
 import org.bukkit.Material
 import org.bukkit.plugin.Plugin
 
-typealias ConfigProperty<T> = Pair<String, Class<T>>
-
-open class Config {
-    val plugin : Plugin
-    val blockList : List<BlockDefinition>
-    val materialList : List<Material>
-    val properties : Map<ConfigProperty<*>, *>
-
-
-    /**
-     * @param blockDefinitionList a `List<`[BlockDefinition]`>` describing how certain blocks should behave
-     * under this config.
-     * @param properties a `Map<`[ConfigProperty]`, Any>` that documents what properties this config should have.
-     */
-
-    constructor(
-        plugin : Plugin,
-        blockDefinitionList : List<BlockDefinition>,
-        properties: Map<ConfigProperty<*>, Any>
-    ) {
-        this.plugin = plugin
-        blockList = blockDefinitionList
-        materialList = blockList.map { it.material }
-        this.properties = properties
-
-    }
+data class Config(
+    val plugin : Plugin,
+    val blockDefinitions : List<BlockDefinition>,
+    val properties: Map<ConfigProperty<*>, Any>
+) {
+    val materialList : List<Material> = blockDefinitions.map { it.material }
 
     /**
      * @return the value of the specified property.

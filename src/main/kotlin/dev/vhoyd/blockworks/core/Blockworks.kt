@@ -3,34 +3,57 @@ package dev.vhoyd.blockworks.core
 import dev.vhoyd.blockworks.block.BlockDefinition
 import dev.vhoyd.blockworks.listener.SpigotEventListener
 import dev.vhoyd.blockworks.mining.MiningPlayer
-import dev.vhoyd.blockworks.mining.MiningTool
-import dev.vhoyd.blockworks.nbt.PersistentDataUtil
 import dev.vhoyd.blockworks.tick.BlockBreakTick
-import dev.vhoyd.blockworks.util.EmptyValue
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 
 /**
  * Entry point class for working with the API.
+ * @param applyAllPlayers whether to immediately apply plugin behavior to all players on the server.
+ * If this is false, this plugin will only work if you manually call [registerPlayer].
  */
-class Blockworks {
-    val plugin : Plugin
-    val players = ArrayList<MiningPlayer>()
-    val config : Config
+class Blockworks(val config: Config, val applyAllPlayers : Boolean = true, val applyBehavior : (Player) -> Unit = {applyPotionEffects(it)})  {
 
-    constructor(config : Config) {
-        this.plugin = config.plugin
-        this.config = config
+    companion object {
+        fun applyPotionEffects(player : Player) {
+            player.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.MINING_FATIGUE,
+                    Int.MAX_VALUE,
+                    5,
+                    true,
+                    false,
+                    false
+                )
+            )
+            player.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.HASTE,
+                    Int.MAX_VALUE,
+                    1,
+                    true,
+                    false,
+                    false
+                )
+            )
+        }
+    }
 
-        val breakTick = BlockBreakTick(this)
+    val plugin : Plugin = config.plugin
+    val players = mutableSetOf<MiningPlayer>()
+    val breakTick = BlockBreakTick(this)
+
+    init {
+
         val eventHandler = SpigotEventListener(this)
         breakTick.runTaskTimer(plugin, 0, 0)
 
         plugin.server.pluginManager.registerEvents(eventHandler, plugin)
+        if (applyAllPlayers) plugin.server.onlinePlayers.forEach {applyBehavior(it)}
         plugin.logger.info("Blockworks (via ${plugin.name}) is running!")
 
     }
@@ -47,49 +70,16 @@ class Blockworks {
         return null
     }
 
-    fun registerPlayer(miningPlayer: MiningPlayer) {
-        players.add(miningPlayer)
-    }
-
-
+    fun registerPlayer(player : Player) = players.add(MiningPlayer(player, this))
 
     /**
-     * Checks for an existing [MiningTool] represented by the given [ItemStack]
-     * @param item the [ItemStack] to filter by
-     * @return the matching [MiningTool], or `null` if no mining data is found for the [ItemStack]
-     */
-    fun evaluateItem(item: ItemStack?): MiningTool? {
-        if (item == null) return null
-        try {
-            if (PersistentDataUtil.getTag(plugin, item.itemMeta, "isMiningItem", PersistentDataType.BOOLEAN)) {
-                return MiningTool(
-                    this,
-                    item,
-                    emptyMap(),
-                    false
-                )
-            }
-        } catch (_ : NullPointerException) {
-            return null
-        }
-
-        return null
-    }
-
-
-    /**
-     * @return the [BlockDefinition] that overrides block behavior of the given [Material], or [EmptyValue.BLOCKDEFINITION]
+     * @return the [BlockDefinition] that overrides block behavior of the given [Material], or `null``
      * if no behavior is assigned to it.
      */
-    fun getBlock(material: Material) : BlockDefinition {
+    fun getBlock(material: Material) : BlockDefinition? {
         val index = config.materialList.indexOf(material)
-        if (index == -1) return EmptyValue.BLOCKDEFINITION
-        return config.blockList[index]
+        if (index == -1) return null
+        return config.blockDefinitions[index]
     }
-
-
-
-
-
 
 }

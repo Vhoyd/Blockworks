@@ -1,5 +1,3 @@
-package dev.vhoyd.blockworks.simple
-
 import dev.vhoyd.blockworks.mining.MiningAttribute
 import org.bukkit.persistence.PersistentDataType
 

@@ -1,6 +1,6 @@
 package dev.vhoyd.blockworks.loot
 
-import dev.vhoyd.blockworks.block.WeightedEntry
+import dev.vhoyd.blockworks.core.WeightedEntry
 import kotlin.random.Random
 
 /**
@@ -9,12 +9,10 @@ import kotlin.random.Random
  * When instantiated, an object of this class computes the cumulative weight of all entries and stores it for
  * later use with fetching entries.
  */
-class WeightedEntryPool<T> {
-    val entries : List<WeightedEntry<T>>
+class WeightedEntryPool<T>(val entries : List<WeightedEntry<T>>)  {
     private val totalWeight : Int
 
-    constructor(entries : List<WeightedEntry<T>>) {
-        this.entries = entries
+    init {
         var sum = 0
         for (entry in entries) {
             sum += entry.second

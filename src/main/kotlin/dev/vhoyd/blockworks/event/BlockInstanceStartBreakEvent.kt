@@ -8,19 +8,12 @@ import org.bukkit.event.HandlerList
 /**
  * Event class for when a player starts breaking some [BlockInstance]
  */
-class BlockInstanceStartBreakEvent : Event {
-    var isCancelled : Boolean = false
+class BlockInstanceStartBreakEvent(val blockInstance: BlockInstance, val miningPlayer: MiningPlayer) : Event() {
+    var cancelled : Boolean = false
     private val handlers : HandlerList = HandlerList()
-    val blockInstance : BlockInstance
-    val miningPlayer : MiningPlayer
 
     override fun getHandlers(): HandlerList {
         return handlers
-    }
-
-    constructor(blockInstance: BlockInstance, miningPlayer: MiningPlayer) {
-        this.blockInstance = blockInstance
-        this.miningPlayer = miningPlayer
     }
 
 

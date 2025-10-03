@@ -8,18 +8,12 @@ import org.bukkit.event.HandlerList
 /**
  * Event class called each tick of a player breaking some [BlockInstance]
  */
-class BlockInstanceTickEvent : Event {
-    var isCancelled : Boolean = false
+class BlockInstanceTickEvent(val blockInstance: BlockInstance, val miningPlayer: MiningPlayer) : Event() {
+    var cancelled : Boolean = false
     private val handlers : HandlerList = HandlerList()
-    val blockInstance : BlockInstance
-    val miningPlayer : MiningPlayer
 
     override fun getHandlers(): HandlerList {
         return handlers
     }
 
-    constructor(blockInstance: BlockInstance, miningPlayer: MiningPlayer) {
-        this.blockInstance = blockInstance
-        this.miningPlayer = miningPlayer
-    }
 }
