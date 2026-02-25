@@ -19,7 +19,6 @@ import kotlin.experimental.and
  */
 class BukkitEventListener(private val blockworks : Blockworks) : Listener {
 
-    private val handSwitch = blockworks.logger.context("Bukkit-PlayerItemHeldEvent")
     private val blockDamage = blockworks.logger.context("Bukkit-BlockDamageEvent")
     private val damageAbort = blockworks.logger.context("Bukkit-BlockDamageAbortEvent")
     private val blockBreak = blockworks.logger.context("Bukkit-BlockBreakEvent")
