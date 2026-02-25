@@ -1,7 +1,6 @@
 package dev.vhoyd.blockworks.loot
 
 import dev.vhoyd.blockworks.block.BlockInstance
-import org.bukkit.entity.ExperienceOrb
 import org.bukkit.inventory.ItemStack
 
 /**

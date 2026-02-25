@@ -1,6 +1,6 @@
 package dev.vhoyd.blockworks.mining
 
-abstract class Element<T>(
+abstract class AttributedElement<T>(
     delegate: T,
     data : Map<Attribute<*,*>, Any>
 ) : Attributable, Wrapper<T>(delegate) {

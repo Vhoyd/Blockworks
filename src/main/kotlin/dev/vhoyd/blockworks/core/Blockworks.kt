@@ -3,10 +3,8 @@ package dev.vhoyd.blockworks.core
 import dev.vhoyd.blockworks.block.BlockDefinition
 import dev.vhoyd.blockworks.listener.BukkitEventListener
 import dev.vhoyd.blockworks.mining.BlockBreaker
-import dev.vhoyd.blockworks.mining.MiningPlayer
 import dev.vhoyd.blockworks.tick.BlockBreakTick
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 
 
@@ -46,7 +44,7 @@ class Blockworks(val config: Config, val applyAllBreakers : Boolean = true, val 
     }
 
 
-    fun  registerBlockBreaker(breaker : BlockBreaker<*>, ) {
+    fun  registerBlockBreaker(breaker : BlockBreaker<*> ) {
         breakers.add(breaker)
         if (!applyAllBreakers) applyBehavior(breaker)
     }

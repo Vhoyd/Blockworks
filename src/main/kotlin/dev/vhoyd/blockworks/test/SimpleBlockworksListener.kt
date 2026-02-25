@@ -10,6 +10,7 @@ import dev.vhoyd.blockworks.event.BlockInstanceBreakAbortEvent
 import dev.vhoyd.blockworks.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
 import dev.vhoyd.blockworks.event.BlockInstanceTickEvent
+import dev.vhoyd.blockworks.mining.Tool
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -39,7 +40,7 @@ class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
         val block = e.blockInstance
         val player = block.breaker
         var totalDamage = player[SimpleMiningAttribute.MINING_SPEED]
-        totalDamage += player.heldTool[SimpleMiningAttribute.MINING_SPEED] ?: 0f
+        totalDamage += player.getElement<Tool>()[SimpleMiningAttribute.MINING_SPEED] ?: 0f
         totalDamage *= blockworks.config[SimpleConfigProperty.MINING_RATE_SCALE]
         block[SimpleMiningAttribute.BLOCK_DAMAGE] += totalDamage.toInt()
         val damage = block[SimpleMiningAttribute.BLOCK_DAMAGE].toFloat()
@@ -57,12 +58,12 @@ class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
     }
 
     @EventHandler
-    fun <T> onBlockBreak(e : BlockInstanceBrokenEvent) {
+    fun onBlockBreak(e : BlockInstanceBrokenEvent) {
         val instance = e.lootYield.blockInstance
         val breaker = instance.breaker
         if (blockworks.config[SimpleConfigProperty.IGNORE_MINING_FORTUNE]) {
             var fortune = breaker[SimpleMiningAttribute.MINING_FORTUNE]
-            val toolFortune = breaker.elementContainer.fet[SimpleMiningAttribute.MINING_FORTUNE]
+            val toolFortune = breaker.getElement<Tool>()[SimpleMiningAttribute.MINING_FORTUNE]
             fortune += toolFortune
             val fortuneScalar = fortune / 100
 
@@ -116,7 +117,7 @@ class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
 
     @EventHandler
     fun onPlayerJoin(e : PlayerJoinEvent) {
-        e.player.inventory.addItem(SimpleMain.testStick.itemStack)
+        e.player.inventory.addItem(SimpleMain.testStick.delegate)
     }
 
 }

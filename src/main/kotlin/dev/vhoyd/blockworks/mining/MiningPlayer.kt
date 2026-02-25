@@ -13,8 +13,8 @@ class MiningPlayer(
     delegate: Player,
     blockworks: Blockworks,
     data : Map<Attribute<*,*>, Any>,
-    objects: ElementContainer
-    ) : BlockBreaker<Player>(delegate, blockworks, data, objects) {
+    elements: MutableMap<Class<AttributedElement<*>>, Any>
+    ) : BlockBreaker<Player>(delegate, blockworks, data, elements) {
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
         PersistentDataUtil.setTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType, value)

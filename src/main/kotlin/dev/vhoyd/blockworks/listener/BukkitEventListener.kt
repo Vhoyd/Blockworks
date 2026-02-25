@@ -38,14 +38,14 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
 
         blockDamage.debug("${e.player.name} started mining at ${e.block.location}")
 
-        val miningPlayer = blockworks.getBlockBreaker(e.player) ?: run {
+        val blockBreaker = blockworks.getBlockBreaker(e.player) ?: run {
             blockDamage.warn("No MiningPlayer object found for ${e.player.name}")
             return
         }
 
-        if (miningPlayer.currentBlock != null) {
-            blockDamage.debug("unsubscribing previous BlockInstance at ${miningPlayer}")
-            blockworks.breakTick.unsubscribe(miningPlayer.currentBlock!!)
+        if (blockBreaker.currentBlock != null) {
+            blockDamage.debug("unsubscribing previous BlockInstance at $blockBreaker")
+            blockworks.breakTick.unsubscribe(blockBreaker.currentBlock!!)
         } else {
             blockDamage.debug("Player was not previously mining any BlockInstance.")
         }
@@ -56,7 +56,7 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
             return
         }
 
-        val blockInstance = BlockInstance(blockDefinition, e.block.location, miningPlayer as MiningPlayer)
+        val blockInstance = BlockInstance(blockDefinition, e.block.location, blockBreaker as MiningPlayer)
         e.player.server.pluginManager.callEvent(BlockInstanceStartBreakEvent(blockInstance))
         blockworks.breakTick.subscribe(blockInstance)
     }
@@ -65,11 +65,11 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
     fun onPlayerStopHittingBlock(e : BlockDamageAbortEvent) {
 
         val miningPlayer = blockworks.getBlockBreaker(e.player) ?: run {
-            damageAbort.warn("No MiningPlayer object found for ${e.player.name}")
+            damageAbort.warn("No BlockBreaker object found for ${e.player.name}")
             return
         }
         val instance = miningPlayer.currentBlock ?: run {
-            damageAbort.warn("MiningPlayer was not mining any BlockInstance.")
+            damageAbort.warn("BlockBreaker was not mining any BlockInstance.")
             return
         }
         e.player.server.pluginManager.callEvent(BlockInstanceBreakAbortEvent(instance))
@@ -88,7 +88,7 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
         val foundMatch = blockworks.breakTick.applyVanillaBreak(e.block.location)
         if (foundMatch != null ) {
             if (eventMask and Config.EventMaskType.BLOCK_BREAK_MATCH.mask == zero) {
-                blockBreak.debug("Event ignored : BLOCK_BREAK_MATCH.")
+                blockBreak.debug("Event ignored.")
                 e.isCancelled = true
                 return
             }

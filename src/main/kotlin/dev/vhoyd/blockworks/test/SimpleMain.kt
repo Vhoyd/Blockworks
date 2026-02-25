@@ -1,8 +1,8 @@
 package dev.vhoyd.blockworks.test
 
-import MiningTool
 import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.core.Config
+import dev.vhoyd.blockworks.mining.Tool
 import dev.vhoyd.blockworks.text.TextComponentWrapper
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -11,7 +11,7 @@ import org.bukkit.plugin.Plugin
 class SimpleMain {
     companion object {
         val stickItem = TextComponentWrapper.createTextedItem(ItemStack(Material.STICK, 1), "§6§lGod Stick", "§d§oFor testing purposes only)")
-        lateinit var testStick : MiningTool
+        lateinit var testStick : Tool
 
         fun go(plugin : Plugin) {
             val config = Config(
@@ -28,7 +28,7 @@ class SimpleMain {
                 )
             )
             val blockworks = Blockworks(config)
-            testStick = MiningTool(blockworks, stickItem,
+            testStick = Tool(blockworks, stickItem,
                 mapOf(
                     SimpleMiningAttribute.MINING_SPEED to 10f,
                     SimpleMiningAttribute.MINING_FORTUNE to 158f,

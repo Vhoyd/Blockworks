@@ -51,11 +51,10 @@ data class Config(
     }
 
     enum class EventMaskType(val mask : Byte) {
-        ALL(15), // 1111
-        BLOCK_BREAK_MATCH(8), // 1000
-        ITEM_SWITCH(4), // 0100
-        BLOCK_DAMAGE(2), // 0010
-        BLOCK_BREAK(1), // 0001
-        NONE(0); // 0000
+        ALL(7), // 111
+        BLOCK_BREAK_MATCH(4), // 100
+        BLOCK_DAMAGE(2), // 010
+        BLOCK_BREAK(1), // 001
+        NONE(0); // 000
     }
 }

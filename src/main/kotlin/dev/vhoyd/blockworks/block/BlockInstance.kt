@@ -49,4 +49,5 @@ class BlockInstance(val definition: BlockDefinition, val location: Location, val
     override fun hashCode(): Int {
         return super.hashCode()
     }
+
 }

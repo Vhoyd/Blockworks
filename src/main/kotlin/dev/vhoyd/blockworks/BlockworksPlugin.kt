@@ -1,6 +1,5 @@
 package dev.vhoyd.blockworks
 
-import dev.vhoyd.blockworks.test.SimpleMain
 import org.bukkit.plugin.java.JavaPlugin
 
 class BlockworksPlugin : JavaPlugin() {

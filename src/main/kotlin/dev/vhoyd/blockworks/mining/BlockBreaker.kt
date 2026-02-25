@@ -8,7 +8,7 @@ abstract class BlockBreaker<T>(
     delegate : T,
     val blockworks: Blockworks,
     defaultAttributes : Map<Attribute<*,*>, Any>,
-    val elementContainer : ElementContainer
+    val elements : MutableMap<Class<AttributedElement<*>>, Any>
 
 ) : Attributable, Wrapper<T>(delegate) {
     var currentBlock: BlockInstance? = null
@@ -16,21 +16,18 @@ abstract class BlockBreaker<T>(
     init {
         defaultAttributes.forEach { (key, value) -> set(key as Attribute<Any, Any>, value) }
     }
-
-    class ElementContainer(
-        val map : Map<Class<Element<*>>, Any>
-    ) {
-        inline fun <reified V : Element<*>> retrieve() : V {
-            return map[V::class.java as Class<*>] as V
-
-        }
-
-        inline fun <reified V: Element<*>> retrieveChecked() : V? {
-            return map[V::class.java as Class<*>] as? V
-
-        }
-
-
+    inline fun <reified V : AttributedElement<*>> getElement() : V {
+        return elements[V::class.java as Class<*>] as V
     }
+
+    inline fun <reified V: AttributedElement<*>> getElementChecked() : V? {
+        return elements[V::class.java as Class<*>] as? V
+    }
+
+    inline fun <reified V : AttributedElement<*>> setElement(element : V) {
+        elements[V::class.java as Class<AttributedElement<*>>] = element
+    }
+
+    inline fun <reified V: AttributedElement<*>> removeElement() : V? = elements.remove(V::class.java as Class<*>) as? V
 
 }

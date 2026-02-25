@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 /**
  * Class for adding plugin-unique information about an ItemStack.
  */
-class Tool(val blockworks: Blockworks, val item: ItemStack?, data: Map<Attribute<*,*>, Any>, writeData: Boolean = true) : Element<ItemStack>(item ?: ItemStack(Material.AIR), data) {
+class Tool(val blockworks: Blockworks, item: ItemStack?, data: Map<Attribute<*,*>, Any>, writeData: Boolean = true) : AttributedElement<ItemStack>(item ?: ItemStack(Material.AIR), data) {
 
 
     /**

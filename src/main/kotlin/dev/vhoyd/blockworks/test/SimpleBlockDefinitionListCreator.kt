@@ -17,7 +17,7 @@ object SimpleBlockDefinitionListCreator {
         val drop = ConditionalDrop(
             WeightedEntryPool(WeightedEntryUtil.uniformWeight(2..5)),
             WeightedEntryPool(WeightedEntryUtil.single(ItemStack(Material.BUDDING_AMETHYST, 1)))
-        ) { it.breaker.elementContainer.retrieve<Tool>().delegate.enchantments.contains(Enchantment.SILK_TOUCH)}
+        ) { it.breaker.getElement<Tool>().delegate.enchantments.contains(Enchantment.SILK_TOUCH)}
 
         val entry = BlockDefinition(
             Material.BUDDING_AMETHYST,

@@ -60,7 +60,7 @@ data class BlockDefinition(
     companion object {
         val VANILLA_BREAK_CONDITION : (BlockInstance) -> Boolean = { _ -> false}
 
-        fun Vanilla(material : Material) : BlockDefinition {
+        fun vanilla(material : Material) : BlockDefinition {
        return BlockDefinition(
                 material,
                 listOf(),
