@@ -1,3 +1,5 @@
+package dev.vhoyd.blockworks.test
+
 import dev.vhoyd.blockworks.core.ConfigProperty
 
 class SimpleConfigProperty {

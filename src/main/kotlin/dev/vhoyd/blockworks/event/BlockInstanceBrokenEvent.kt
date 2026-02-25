@@ -1,13 +1,15 @@
 package dev.vhoyd.blockworks.event
 
 import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.loot.DeterminedDrop
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 /**
- * Event class called each tick of a player breaking some [BlockInstance]
+ * Event class for when a player breaks some [BlockInstance]
  */
-class BlockInstanceTickEvent(val blockInstance: BlockInstance) : Event() {
+class BlockInstanceBrokenEvent(val lootYield : DeterminedDrop) : Event() {
+
     var isCancelled : Boolean = false
 
 
@@ -25,3 +27,5 @@ class BlockInstanceTickEvent(val blockInstance: BlockInstance) : Event() {
     }
 
 }
+
+

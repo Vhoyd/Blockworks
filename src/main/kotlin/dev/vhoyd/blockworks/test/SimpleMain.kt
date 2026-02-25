@@ -1,6 +1,8 @@
+package dev.vhoyd.blockworks.test
+
+import MiningTool
 import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.core.Config
-import dev.vhoyd.blockworks.mining.MiningTool
 import dev.vhoyd.blockworks.text.TextComponentWrapper
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -12,10 +14,11 @@ class SimpleMain {
         lateinit var testStick : MiningTool
 
         fun go(plugin : Plugin) {
-
             val config = Config(
                 plugin,
                 blockDefinitions = SimpleBlockDefinitionListCreator.getList(),
+                loggingLevel = Config.LoggingLevel.DEBUG,
+                eventMask = Config.createEventMask(Config.EventMaskType.ALL),
                 properties = mapOf(
                     SimpleConfigProperty.IGNORE_BREAKING_POWER to false,
                     SimpleConfigProperty.IGNORE_MINING_FORTUNE to false,
@@ -27,10 +30,9 @@ class SimpleMain {
             val blockworks = Blockworks(config)
             testStick = MiningTool(blockworks, stickItem,
                 mapOf(
-                    SimpleMiningAttribute.MINING_SPEED to 10,
-                    SimpleMiningAttribute.MINING_FORTUNE to 158,
-                    SimpleMiningAttribute.BREAKING_POWER to 1,
-                    SimpleMiningAttribute.SILK_TOUCH to true
+                    SimpleMiningAttribute.MINING_SPEED to 10f,
+                    SimpleMiningAttribute.MINING_FORTUNE to 158f,
+                    SimpleMiningAttribute.BREAKING_POWER to 1f
                     )
                 )
             val simpleListener = SimpleBlockworksListener(blockworks)

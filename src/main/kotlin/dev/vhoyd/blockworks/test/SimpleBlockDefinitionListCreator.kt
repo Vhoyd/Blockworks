@@ -1,8 +1,11 @@
+package dev.vhoyd.blockworks.test
+
 import dev.vhoyd.blockworks.block.BlockDefinition
 import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.loot.ConditionalDrop
 import dev.vhoyd.blockworks.loot.WeightedEntryPool
 import dev.vhoyd.blockworks.loot.WeightedEntryUtil
+import dev.vhoyd.blockworks.mining.Tool
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
@@ -14,7 +17,7 @@ object SimpleBlockDefinitionListCreator {
         val drop = ConditionalDrop(
             WeightedEntryPool(WeightedEntryUtil.uniformWeight(2..5)),
             WeightedEntryPool(WeightedEntryUtil.single(ItemStack(Material.BUDDING_AMETHYST, 1)))
-        ) { it.breaker.heldTool[SimpleMiningAttribute.SILK_TOUCH]}
+        ) { it.breaker.elementContainer.retrieve<Tool>().delegate.enchantments.contains(Enchantment.SILK_TOUCH)}
 
         val entry = BlockDefinition(
             Material.BUDDING_AMETHYST,

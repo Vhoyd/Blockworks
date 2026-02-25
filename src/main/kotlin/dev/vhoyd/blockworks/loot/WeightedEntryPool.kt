@@ -14,25 +14,14 @@ class WeightedEntryPool<T>(val entries : List<WeightedEntry<T>>)  {
 
     init {
         var sum = 0
-        for (entry in entries) {
-            sum += entry.second
-        }
+        entries.forEach { sum += it.second }
         totalWeight = sum
     }
 
     /**
      * Picks a random number from 0 up to the cumulative weight  and uses weighted indexing to return the resulting entry.
      */
-    fun pickRandom(): T {
-        var randomNumber = Random.nextInt(totalWeight)
-        var item : WeightedEntry<T> = entries[0]
-        val iterator = entries.iterator()
-        while (randomNumber >= 0) {
-            item = iterator.next()
-            randomNumber -= item.second
-        }
-        return item.first
-    }
+    fun pickRandom(): T = pickExact(Random.nextInt(totalWeight))
 
     /**
      * Returns a specific entry for a specific weight. Since weight is handled based on the order of the

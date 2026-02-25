@@ -1,19 +1,28 @@
 package dev.vhoyd.blockworks.event
 
 import dev.vhoyd.blockworks.block.BlockInstance
-import dev.vhoyd.blockworks.mining.MiningPlayer
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 /**
  * Event class for when a player stops breaking some [BlockInstance]
  */
-class BlockInstanceBreakAbortEvent(val blockInstance: BlockInstance, val miningPlayer: MiningPlayer) : Event() {
-    var cancelled : Boolean = false
-    private val handlers : HandlerList = HandlerList()
+class BlockInstanceBreakAbortEvent(val blockInstance: BlockInstance) : Event() {
+
+    var isCancelled : Boolean = false
+
+
+    companion object {
+        private val handlerList = HandlerList()
+
+        @JvmStatic
+        fun getHandlerList() : HandlerList {
+            return handlerList
+        }
+    }
 
     override fun getHandlers(): HandlerList {
-        return handlers
+        return handlerList
     }
 
 }

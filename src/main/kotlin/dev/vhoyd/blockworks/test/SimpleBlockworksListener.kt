@@ -1,3 +1,5 @@
+package dev.vhoyd.blockworks.test
+
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketContainer
@@ -18,12 +20,12 @@ import kotlin.math.round
 
 class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
 
-    val manager = ProtocolLibrary.getProtocolManager()
+    val manager = ProtocolLibrary.getProtocolManager()!!
 
 
     @EventHandler
-    fun onBlockStart(e : BlockInstanceStartBreakEvent) {
-        e.cancelled = true
+    fun <T> onBlockStart(e : BlockInstanceStartBreakEvent) {
+        e.isCancelled = true
         e.blockInstance.breaker.currentBlock = e.blockInstance
     }
 
@@ -42,7 +44,7 @@ class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
         block[SimpleMiningAttribute.BLOCK_DAMAGE] += totalDamage.toInt()
         val damage = block[SimpleMiningAttribute.BLOCK_DAMAGE].toFloat()
         val strength = block[SimpleMiningAttribute.BLOCK_STRENGTH]
-        generateBlockBreakPacket(player.minecraftPlayer, block.location, damage/strength)
+        generateBlockBreakPacket(player.delegateAs<Player>(), block.location, damage/strength)
 
     }
 
@@ -55,12 +57,12 @@ class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
     }
 
     @EventHandler
-    fun onBlockBreak(e : BlockInstanceBrokenEvent) {
+    fun <T> onBlockBreak(e : BlockInstanceBrokenEvent) {
         val instance = e.lootYield.blockInstance
-        val player = instance.breaker
+        val breaker = instance.breaker
         if (blockworks.config[SimpleConfigProperty.IGNORE_MINING_FORTUNE]) {
-            var fortune = player[SimpleMiningAttribute.MINING_FORTUNE]
-            val toolFortune = player.heldTool[SimpleMiningAttribute.MINING_FORTUNE]
+            var fortune = breaker[SimpleMiningAttribute.MINING_FORTUNE]
+            val toolFortune = breaker.elementContainer.fet[SimpleMiningAttribute.MINING_FORTUNE]
             fortune += toolFortune
             val fortuneScalar = fortune / 100
 
@@ -79,7 +81,7 @@ class SimpleBlockworksListener(val blockworks: Blockworks) : Listener {
 
 
         val newBlock = blockworks.getBlock(instance.location.block.type)
-            player.currentBlock = if (newBlock != null) BlockInstance(newBlock, instance.location, player) else null
+            breaker.currentBlock = if (newBlock != null) BlockInstance(newBlock, instance.location, breaker) else null
     }
 
 

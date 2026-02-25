@@ -1,0 +1,101 @@
+package dev.vhoyd.blockworks.listener
+
+import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.core.Config
+import dev.vhoyd.blockworks.event.BlockInstanceBreakAbortEvent
+import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
+import dev.vhoyd.blockworks.mining.MiningPlayer
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockDamageAbortEvent
+import org.bukkit.event.block.BlockDamageEvent
+import kotlin.experimental.and
+
+/**
+ * Internal API class for handling most of the server -> plugin interactions. Should not be tinkered with under
+ * most circumstances; not inheritable.
+ */
+class BukkitEventListener(private val blockworks : Blockworks) : Listener {
+
+    private val handSwitch = blockworks.logger.context("Bukkit-PlayerItemHeldEvent")
+    private val blockDamage = blockworks.logger.context("Bukkit-BlockDamageEvent")
+    private val damageAbort = blockworks.logger.context("Bukkit-BlockDamageAbortEvent")
+    private val blockBreak = blockworks.logger.context("Bukkit-BlockBreakEvent")
+    private val eventMask = blockworks.config.eventMask
+    private val zero : Byte = 0
+
+
+    @EventHandler
+    fun onBlockHit(e : BlockDamageEvent) {
+
+        if (eventMask and Config.EventMaskType.BLOCK_DAMAGE.mask == zero) {
+            e.isCancelled = true
+            blockDamage.debug("Event ignored.")
+            return
+        }
+
+        blockDamage.debug("${e.player.name} started mining at ${e.block.location}")
+
+        val miningPlayer = blockworks.getBlockBreaker(e.player) ?: run {
+            blockDamage.warn("No MiningPlayer object found for ${e.player.name}")
+            return
+        }
+
+        if (miningPlayer.currentBlock != null) {
+            blockDamage.debug("unsubscribing previous BlockInstance at ${miningPlayer}")
+            blockworks.breakTick.unsubscribe(miningPlayer.currentBlock!!)
+        } else {
+            blockDamage.debug("Player was not previously mining any BlockInstance.")
+        }
+
+        val blockDefinition = blockworks.getBlock(e.block.type) ?: run {
+
+            blockDamage.warn("Definition for type ${e.block.type} not found.")
+            return
+        }
+
+        val blockInstance = BlockInstance(blockDefinition, e.block.location, miningPlayer as MiningPlayer)
+        e.player.server.pluginManager.callEvent(BlockInstanceStartBreakEvent(blockInstance))
+        blockworks.breakTick.subscribe(blockInstance)
+    }
+
+    @EventHandler
+    fun onPlayerStopHittingBlock(e : BlockDamageAbortEvent) {
+
+        val miningPlayer = blockworks.getBlockBreaker(e.player) ?: run {
+            damageAbort.warn("No MiningPlayer object found for ${e.player.name}")
+            return
+        }
+        val instance = miningPlayer.currentBlock ?: run {
+            damageAbort.warn("MiningPlayer was not mining any BlockInstance.")
+            return
+        }
+        e.player.server.pluginManager.callEvent(BlockInstanceBreakAbortEvent(instance))
+        blockworks.breakTick.unsubscribe(instance)
+    }
+
+    @EventHandler
+    fun onBreak( e : BlockBreakEvent) {
+
+        if (eventMask and Config.EventMaskType.BLOCK_BREAK.mask == zero) {
+            blockBreak.debug("Event ignored.")
+            e.isCancelled = true
+            return
+        }
+
+        val foundMatch = blockworks.breakTick.applyVanillaBreak(e.block.location)
+        if (foundMatch != null ) {
+            if (eventMask and Config.EventMaskType.BLOCK_BREAK_MATCH.mask == zero) {
+                blockBreak.debug("Event ignored : BLOCK_BREAK_MATCH.")
+                e.isCancelled = true
+                return
+            }
+            blockworks.breakTick.handleBreakLogic(foundMatch)
+        } else {
+            blockBreak.debug("Event ignored due to no matching vanilla block.")
+        }
+    }
+
+}

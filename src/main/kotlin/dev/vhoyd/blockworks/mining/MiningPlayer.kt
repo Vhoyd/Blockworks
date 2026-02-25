@@ -1,7 +1,6 @@
 package dev.vhoyd.blockworks.mining
 
 import dev.vhoyd.blockworks.core.Blockworks
-import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.nbt.PersistentDataUtil
 import org.bukkit.entity.Player
 
@@ -11,25 +10,18 @@ import org.bukkit.entity.Player
  * like mining speed, etc.
  */
 class MiningPlayer(
-    val minecraftPlayer : Player,
-    val blockworks: Blockworks,
-    data : Map<MiningAttribute<*,*>, Any> = emptyMap()
-) : BlockworksAttributable {
-    var currentBlock: BlockInstance? = null
-    var heldTool = MiningTool(blockworks, null)
+    delegate: Player,
+    blockworks: Blockworks,
+    data : Map<Attribute<*,*>, Any>,
+    objects: ElementContainer
+    ) : BlockBreaker<Player>(delegate, blockworks, data, objects) {
 
-
-    init {
-        @Suppress("UNCHECKED_CAST")
-        data.forEach { (key, value) -> set<Any, Any>(key as MiningAttribute<Any, Any>, value) }
+    override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
+        PersistentDataUtil.setTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType, value)
     }
 
-    override fun <P : Any, C : Any> setAttribute(miningAttribute: MiningAttribute<P, C>, value : C) {
-        PersistentDataUtil.setTag(blockworks.plugin, minecraftPlayer, "blockworks-${miningAttribute.name}", miningAttribute.persistentDataType, value)
-    }
-
-    override fun <P : Any, C : Any> getAttribute(miningAttribute: MiningAttribute<P, C>) : C {
-        return PersistentDataUtil.getTag(blockworks.plugin, minecraftPlayer, "blockworks-${miningAttribute.name}", miningAttribute.persistentDataType)
+    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>) : C {
+        return PersistentDataUtil.getTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType)
     }
 
 }

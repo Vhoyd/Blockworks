@@ -21,6 +21,7 @@ dependencies {
     compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
 }
 
+
 tasks {
     runServer {
         minecraftVersion("1.21.8")
@@ -42,7 +43,6 @@ afterEvaluate {
                 artifact(tasks.named("shadowJar")) {
                     builtBy(tasks.named("shadowJar"))
                 }
-                println("PUSHED TO MVN")
             }
         }
     }
@@ -71,7 +71,7 @@ tasks.jar {
 
 }
 
-
+// Hacked this together just so that I can test the plugin quicker without needing a file manager open.
 val exportPluginThingy by tasks.registering(Copy::class) {
     dependsOn(tasks.build)
     from(tasks.shadowJar)

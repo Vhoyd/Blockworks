@@ -5,7 +5,7 @@ import org.bukkit.Sound
 
 
 /**
- * Implementation of [BlockBreakAction] for playing a sound at a location.
+ * Convenience implementation of [BlockBreakAction] for playing a sound at a location.
  */
 class BlockBreakSound(val sound: Sound, val volume: Float, val pitch: Float)  : BlockBreakAction {
 

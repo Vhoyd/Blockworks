@@ -8,6 +8,7 @@ class SimpleMiningAttribute {
         val BREAKING_POWER = MiningAttribute("breakingPower", PersistentDataType.FLOAT)
         val BLOCK_STRENGTH = MiningAttribute("blockStrength", PersistentDataType.INTEGER)
         val BLOCK_DAMAGE = MiningAttribute("blockDamage", PersistentDataType.INTEGER)
+        val SILK_TOUCH = MiningAttribute("silkTouch", PersistentDataType.BOOLEAN)
     }
 
 }
