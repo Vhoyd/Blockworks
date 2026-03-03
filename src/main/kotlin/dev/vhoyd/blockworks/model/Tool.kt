@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.mining
+package dev.vhoyd.blockworks.model
 
 import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.nbt.PersistentDataUtil
@@ -23,7 +23,6 @@ class Tool(val blockworks: Blockworks, item: ItemStack?, data: Map<Attribute<*,*
     init {
         if (delegate.type != Material.AIR && writeData) {
             val meta = delegate.itemMeta
-
             delegate.itemMeta = meta
         }
     }

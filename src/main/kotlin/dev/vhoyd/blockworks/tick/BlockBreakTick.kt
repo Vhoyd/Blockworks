@@ -82,12 +82,12 @@ class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
         }
         val event = BlockInstanceBrokenEvent(DeterminedDrop(instance,list, sumXp))
         eventTarget.callEvent(event)
-        instance.location.block.type = instance.definition.brokenMaterial
+        instance.location.block.type = instance.replacementMaterial
         unsubscribe(instance)
         log.debug("Calling block break behavior.")
         instance.breakBlock()
         log.debug("Calling block drop behavior.")
-        instance.definition.dropBehavior(event.lootYield, instance)
+        instance.dropBehavior(event.lootYield, instance)
         log.debug("End of break logic.")
     }
 }

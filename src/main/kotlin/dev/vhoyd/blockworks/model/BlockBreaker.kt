@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.mining
+package dev.vhoyd.blockworks.model
 
 import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.core.Blockworks
@@ -8,8 +8,7 @@ abstract class BlockBreaker<T>(
     delegate : T,
     val blockworks: Blockworks,
     defaultAttributes : Map<Attribute<*,*>, Any>,
-    val elements : MutableMap<Class<AttributedElement<*>>, Any>
-
+    val elements : MutableMap<Class<AttributedElement<*>>, Any>,
 ) : Attributable, Wrapper<T>(delegate) {
     var currentBlock: BlockInstance? = null
 

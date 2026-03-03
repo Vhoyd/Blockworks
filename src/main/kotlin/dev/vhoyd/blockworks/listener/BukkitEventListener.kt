@@ -5,7 +5,7 @@ import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.core.Config
 import dev.vhoyd.blockworks.event.BlockInstanceBreakAbortEvent
 import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
-import dev.vhoyd.blockworks.mining.MiningPlayer
+import dev.vhoyd.blockworks.model.MiningPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -30,7 +30,7 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
     fun onBlockHit(e : BlockDamageEvent) {
 
         if (eventMask and Config.EventMaskType.BLOCK_DAMAGE.mask == zero) {
-            e.isCancelled = true
+            e.isCancelled = false
             blockDamage.debug("Event ignored.")
             return
         }
@@ -49,7 +49,7 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
             blockDamage.debug("Player was not previously mining any BlockInstance.")
         }
 
-        val blockDefinition = blockworks.getBlock(e.block.type) ?: run {
+        val blockDefinition = blockworks.getDefinition(e.block) ?: run {
 
             blockDamage.warn("Definition for type ${e.block.type} not found.")
             return
@@ -80,7 +80,7 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
 
         if (eventMask and Config.EventMaskType.BLOCK_BREAK.mask == zero) {
             blockBreak.debug("Event ignored.")
-            e.isCancelled = true
+            e.isCancelled = false
             return
         }
 
@@ -88,9 +88,10 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
         if (foundMatch != null ) {
             if (eventMask and Config.EventMaskType.BLOCK_BREAK_MATCH.mask == zero) {
                 blockBreak.debug("Event ignored.")
-                e.isCancelled = true
+                e.isCancelled = false
                 return
             }
+            e.isCancelled = true
             blockworks.breakTick.handleBreakLogic(foundMatch)
         } else {
             blockBreak.debug("Event ignored due to no matching vanilla block.")

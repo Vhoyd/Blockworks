@@ -16,15 +16,14 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
 }
 
 
 tasks {
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("1.21.11")
     }
     shadowJar {
         archiveClassifier.set("")
@@ -75,6 +74,6 @@ tasks.jar {
 val exportPluginThingy by tasks.registering(Copy::class) {
     dependsOn(tasks.build)
     from(tasks.shadowJar)
-    into(File(System.getProperty("user.home"), "Desktop/Paper 1.21.8 server/plugins/"))
+    into(File(System.getProperty("user.home"), "Desktop/Paper 1.21.11 server/plugins/"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }

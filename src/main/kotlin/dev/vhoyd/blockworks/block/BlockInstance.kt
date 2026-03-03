@@ -1,10 +1,12 @@
 package dev.vhoyd.blockworks.block
 
-import dev.vhoyd.blockworks.mining.BlockBreaker
-import dev.vhoyd.blockworks.mining.Attributable
-import dev.vhoyd.blockworks.mining.Attribute
-import dev.vhoyd.blockworks.mining.MiningPlayer
+import dev.vhoyd.blockworks.model.BlockBreaker
+import dev.vhoyd.blockworks.model.Attributable
+import dev.vhoyd.blockworks.model.Attribute
+import dev.vhoyd.blockworks.model.MiningPlayer
+import dev.vhoyd.blockworks.model.Tool
 import org.bukkit.Location
+import org.bukkit.entity.Player
 
 /**
  * Class for handling interaction between a [BlockDefinition]'s data and actual gameplay.
@@ -12,14 +14,21 @@ import org.bukkit.Location
  * @property definition the [BlockDefinition] that models this custom block instance.
  * @property location the [Location] of the instance. This is also the only thing used to check if two
  * `BlockInstance`s are equal to each other via [BlockInstance.equals]
- * @property breaker the [MiningPlayer] currently mining this `BlockInstance`.
+ * @property breaker the [BlockBreaker] currently mining this `BlockInstance`.
  * @property broken whether this instance has been broken.
  * @property drops a shorthand for `definition.possibleDrops`
  * @property attributes the attribute data assigned to this instance. Copies `definition.attributes` initially.
  */
-class BlockInstance(val definition: BlockDefinition, val location: Location, val breaker : BlockBreaker<*>) : Attributable {
+class BlockInstance(
+    val definition: BlockDefinition,
+    val location: Location,
+    val breaker : BlockBreaker<*>
+) : Attributable {
+    val breakCondition = definition.breakCondition ?: breaker.blockworks.config.defaultBreakCondition
+    val replacementMaterial = definition.brokenMaterial ?: breaker.blockworks.config.defaultReplacementMaterial
+    val dropBehavior = definition.dropBehavior ?: breaker.blockworks.config.defaultDropBehavior
     val broken : Boolean
-        get() = definition.breakCondition(this)
+        get() = breakCondition(this)
     val drops = definition.possibleDrops
     val attributes: MutableMap<Attribute<*,*>, Any> = definition.attributes.toMutableMap()
 
@@ -36,7 +45,6 @@ class BlockInstance(val definition: BlockDefinition, val location: Location, val
     }
 
     override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C {
-
         @Suppress("UNCHECKED_CAST")
         return attributes[attribute] as C
     }

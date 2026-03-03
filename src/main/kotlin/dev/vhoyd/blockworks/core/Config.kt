@@ -1,6 +1,8 @@
 package dev.vhoyd.blockworks.core
 
 import dev.vhoyd.blockworks.block.BlockDefinition
+import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.loot.DeterminedDrop
 import org.bukkit.Material
 import org.bukkit.plugin.Plugin
 import kotlin.experimental.or
@@ -18,8 +20,11 @@ data class Config(
     val eventMask : Byte,
     val blockDefinitions : List<BlockDefinition>,
     val properties: Map<ConfigProperty<*>, Any>,
+    val defaultReplacementMaterial : Material = Material.AIR,
+    val defaultBreakCondition : (BlockInstance) -> Boolean,
+    val defaultDropBehavior : (DeterminedDrop, BlockInstance) -> Unit = BlockDefinition.DEFAULT_DROP_BEHAVIOR,
 ) {
-    val materialList : List<Material> = blockDefinitions.map { it.material }
+
 
     companion object {
         fun createEventMask(vararg strategies : EventMaskType) : Byte {

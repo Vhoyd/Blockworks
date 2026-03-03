@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.mining
+package dev.vhoyd.blockworks.model
 
 abstract class Wrapper<T>(val delegate: T) {
     inline fun <reified V> delegateAs(): V = delegate as V

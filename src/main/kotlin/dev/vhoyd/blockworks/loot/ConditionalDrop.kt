@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack
  * `ConditionalDrop`. If you want more than one drop, simply make more `ConditionalDrop` objects.
  */
 data class ConditionalDrop(
-    val expPool: WeightedEntryPool<Int>,
-    val dropPool: WeightedEntryPool<ItemStack>,
+    val expPool: EntryPool<Int>,
+    val dropPool: EntryPool<ItemStack>,
     val condition: (BlockInstance) -> Boolean = { true },
 
 )

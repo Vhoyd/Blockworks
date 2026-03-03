@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.mining
+package dev.vhoyd.blockworks.model
 
 abstract class AttributedElement<T>(
     delegate: T,

@@ -5,27 +5,27 @@ import dev.vhoyd.blockworks.core.WeightedEntry
 /**
  * Utility class for quickly generating [WeightedEntry]s, or `List`s of them.
  */
-object WeightedEntryUtil{
+object EntryPoolUtil{
 
     /**
      * Generates a `List<`[WeightedEntry]`>` of size 1. The caller can specify the weight for the created entry.
      */
-    fun <V> single(value : V, weight : Int = 1) : List<WeightedEntry<V>> {
+    fun <V> single(value : V, weight : Int = 1) : EntryPool<V> {
         val out = ArrayList<WeightedEntry<V>>()
         out.add(WeightedEntry(value, weight))
-        return out
+        return UniformEntryPool(out)
     }
 
     /**
      * Generates a `List<`[WeightedEntry]`>` based on a given `Iterable`, such as a `List`, where
      * each entry has the same exact weight. The caller can specify the weight.
      */
-    fun <V> uniformWeight(data : Iterable<V>, weight : Int = 1) : List<WeightedEntry<V>> {
+    fun <V> uniformWeight(data : Iterable<V>, weight : Int = 1) : EntryPool<V> {
         val createdList = ArrayList<WeightedEntry<V>>()
         for (entry in data) {
             createdList.add(WeightedEntry(entry, weight))
         }
-        return createdList
+        return UniformEntryPool(createdList)
     }
 
 }

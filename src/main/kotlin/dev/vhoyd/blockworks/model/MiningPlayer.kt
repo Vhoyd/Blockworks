@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.mining
+package dev.vhoyd.blockworks.model
 
 import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.nbt.PersistentDataUtil

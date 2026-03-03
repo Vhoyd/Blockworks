@@ -9,7 +9,8 @@ import kotlin.random.Random
  * When instantiated, an object of this class computes the cumulative weight of all entries and stores it for
  * later use with fetching entries.
  */
-class WeightedEntryPool<T>(val entries : List<WeightedEntry<T>>)  {
+
+class WeightedEntryPool<T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(entries) {
     private val totalWeight : Int
 
     init {
@@ -21,14 +22,14 @@ class WeightedEntryPool<T>(val entries : List<WeightedEntry<T>>)  {
     /**
      * Picks a random number from 0 up to the cumulative weight  and uses weighted indexing to return the resulting entry.
      */
-    fun pickRandom(): T = pickExact(Random.nextInt(totalWeight))
+    override fun pickRandom(): T = pickExact(Random.nextInt(totalWeight))
 
     /**
      * Returns a specific entry for a specific weight. Since weight is handled based on the order of the
      * underlying `List`, it is necessary to compute the inputted weight based on cumulative weight in
      * ascending index order, 0 -> `list.size`
      */
-    fun pickExact(value : Int) : T {
+    override fun pickExact(value : Int) : T {
         var number = value
         var item : WeightedEntry<T> = entries[0]
         val iterator = entries.iterator()

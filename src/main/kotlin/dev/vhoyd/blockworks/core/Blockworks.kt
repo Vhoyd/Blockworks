@@ -2,9 +2,9 @@ package dev.vhoyd.blockworks.core
 
 import dev.vhoyd.blockworks.block.BlockDefinition
 import dev.vhoyd.blockworks.listener.BukkitEventListener
-import dev.vhoyd.blockworks.mining.BlockBreaker
+import dev.vhoyd.blockworks.model.BlockBreaker
 import dev.vhoyd.blockworks.tick.BlockBreakTick
-import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.plugin.Plugin
 
 
@@ -15,19 +15,18 @@ import org.bukkit.plugin.Plugin
  * @property config a [Config] object created by the user of this plugin.
  * @property applyBehavior called inside of [registerBlockBreaker] and allows for modifying the initial state of the [BlockBreaker.delegate].
  * @property plugin the [Plugin] using this Blockworks instance.
- * @property logger a [BlockworksLogger] used for a pass-around debug output, not very necessary in this class itself.
+ * @property logger a [Logger] used for a pass-around debug output, not very necessary in this class itself.
  * This is internal, please use your own logging object.
  * @property breakers a list of [BlockBreaker]s that keeps track of what [BlockBreaker.delegate]s will experience custom behavior.
  */
 class Blockworks(val config: Config, val applyAllBreakers : Boolean = true, val applyBehavior : (BlockBreaker<*>) -> Unit = {})  {
 
     val plugin : Plugin = config.plugin
-    val logger = BlockworksLogger(this, source = "Main", level = config.loggingLevel)
+    val logger = Logger(this, source = "Main", level = config.loggingLevel)
     val breakers = mutableSetOf<BlockBreaker<*>>()
     internal val breakTick = BlockBreakTick(this)
 
     init {
-
         val eventHandler = BukkitEventListener(this)
         breakTick.runTaskTimer(plugin, 0, 0)
         plugin.server.pluginManager.registerEvents(eventHandler, plugin)
@@ -50,12 +49,9 @@ class Blockworks(val config: Config, val applyAllBreakers : Boolean = true, val 
     }
 
     /**
-     * @return the [BlockDefinition] that overrides block behavior of the given [Material], or `null`
-     * if no behavior is assigned to it.
+     * @return the [BlockDefinition] that overrides block behavior of the given [Block], or `null`
+     * if no behavior is assigned to it. \nThis method returns a potentially valid [BlockDefinition] based
+     * on the behavior of [BlockDefinition.isValidInstance]
      */
-    fun getBlock(material: Material) : BlockDefinition? {
-        val index = config.materialList.indexOf(material)
-        if (index == -1) return null
-        return config.blockDefinitions[index]
-    }
+    fun getDefinition(block : Block) : BlockDefinition? = config.blockDefinitions.find { it.isValidInstance(block)}
 }
