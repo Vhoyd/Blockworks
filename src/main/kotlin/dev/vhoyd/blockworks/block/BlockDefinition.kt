@@ -1,6 +1,5 @@
 package dev.vhoyd.blockworks.block
 
-import dev.vhoyd.blockworks.core.BlockBreakAction
 import dev.vhoyd.blockworks.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.loot.ConditionalDrop
 import dev.vhoyd.blockworks.loot.DeterminedDrop
@@ -8,20 +7,18 @@ import dev.vhoyd.blockworks.model.Attributable
 import dev.vhoyd.blockworks.model.Attribute
 import dev.vhoyd.blockworks.model.BlockBreaker
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
-import org.bukkit.generator.WorldInfo
-import org.bukkit.util.BoundingBox
+import java.util.function.BiPredicate
+import java.util.function.Consumer
+import java.util.function.Predicate
 
 /**
  * Objects of this class act as a blueprint for custom block behavior.
- * This acts like a behavior change towards a block with the matching material.
- * @property material the vanilla [Material] type of this block.
- * @property region a `BoundingBox` outlining the coordinate region that this definition applies to. If left null,
- * this will apply to all blocks at any coordinate.
- * @property world a `WorldInfo` describing what world this definition's behavior applies to. If left null,
- * this will apply to all blocks in any world.
+ * This acts like a behavior change towards a block with the matching material and conditions.
+ * @property requirements the conditions under which a valid [BlockInstance] is allowed.
  * @property possibleDrops a `List<`[ConditionalDrop]`>` used to determine what could drop when a
  * block of this definition is broken. For multiple drops at once, use multiple `ConditionalDrop`s.
  * @property attributes a `Map<`[Attribute]`,Any>` that defines the baseline properties for any instance of this
@@ -40,23 +37,24 @@ import org.bukkit.util.BoundingBox
  */
 @ConsistentCopyVisibility
 data class BlockDefinition private constructor(
-    val material: Material,
-    val region: BoundingBox?,
-    val world: WorldInfo?,
+    val requirements : BiPredicate<Block, BlockBreaker<*>>,
     val possibleDrops: List<ConditionalDrop>,
     val attributes: Map<Attribute<*,*>, Any>,
-    val breakCondition : ((BlockInstance) -> Boolean)?,
+    val breakCondition : Predicate<BlockInstance>?,
     val brokenMaterial : Material?,
-    val breakBehavior : BlockBreakAction = { },
-    val dropBehavior : ((DeterminedDrop, BlockInstance) -> Unit)?
+    val breakBehavior : Consumer<BlockInstance>,
+    val dropBehavior : Consumer<DeterminedDrop>?,
+    val breakSound : Sound,
 ) : Attributable {
 
     companion object {
-        val VANILLA_BREAK_CONDITION : (BlockInstance) -> Boolean = { _ -> false}
-        val DEFAULT_DROP_BEHAVIOR : (DeterminedDrop, BlockInstance) -> Unit = { drop, instance ->
+        private val airBreak = Material.AIR.createBlockData().soundGroup.breakSound
+        private val emptyBreakConsumer = Consumer<BlockInstance> { }
+        val VANILLA_BREAK_CONDITION = Predicate<BlockInstance> { _ -> false}
+        val DEFAULT_DROP_BEHAVIOR : Consumer<DeterminedDrop> = Consumer { drop ->
 
-            val world = instance.location.world
-            val location = instance.location.add(0.5, 0.5, 0.5)
+            val world = drop.blockInstance.location.world
+            val location = drop.blockInstance.location.add(0.5, 0.5, 0.5)
             drop.exp.forEach {
                 if (it > 0) {
                     val orb = world.spawn(
@@ -81,22 +79,19 @@ data class BlockDefinition private constructor(
          * and no custom dropBehavior (handled by the `breakNaturally` method called in breakBehavior)
          */
         fun vanilla(
-            material : Material,
-            region: BoundingBox? = null,
-            world: WorldInfo? = null
+            requirements: BiPredicate<Block, BlockBreaker<*>>,
         ) : BlockDefinition {
        return BlockDefinition(
-           material,
-           region,
-           world,
+           requirements,
            listOf(),
            attributes = emptyMap(),
            breakCondition = VANILLA_BREAK_CONDITION,
-           breakBehavior = { instance: BlockInstance ->
+           breakBehavior = { instance ->
                instance.location.block.breakNaturally(instance.breaker.delegateAs<Player>().equipment.itemInMainHand)
            },
-           dropBehavior = { _, _ -> },
-           brokenMaterial = Material.AIR
+           dropBehavior = { _ -> },
+           brokenMaterial = Material.AIR,
+           breakSound = airBreak
        )
         }
     }
@@ -120,16 +115,11 @@ data class BlockDefinition private constructor(
     }
 
     /**
-     * Evaluates the data of the given `Block` against the settings of this `BlockDefinition` to evaluate whether
-     * the `Material`, `WorldInfo.name`, and `Location` are valid.
-     * @return `true` if the checks all pass, otherwise `false`.
+     * Evaluates the data of the given `Block` and [BlockBreaker] against the settings of this `BlockDefinition` to
+     * evaluate whether the conditions are valid, as determined by the behavior assigned to [requirements]
+     * @return `true` if the internal `BiPredicate` assigned at construction passes, otherwise `false`.
      */
-    fun isValidInstance(block : Block) : Boolean {
-        if (block.blockData.material !== material) return false
-        if (region != null && !region.contains(block.location.toVector())) return false
-        if (world != null && block.world.name != world.name) return false
-        return true
-    }
+    fun isValidInstance(block : Block, breaker: BlockBreaker<*>) = requirements.test(block, breaker)
 
     /**
      * Creates a new [BlockInstance] using data from the provided `Block`, so long as it meets the requirements
@@ -137,32 +127,31 @@ data class BlockDefinition private constructor(
      * @return the created [BlockInstance] if conditions are appropriate, otherwise `null`.
      */
     fun createInstance(block : Block, breaker: BlockBreaker<*>) : BlockInstance? {
-        if (isValidInstance((block))) return BlockInstance(this, block.location, breaker)
+        if (requirements.test(block, breaker)) return BlockInstance(this, block.location, breaker)
         return null
     }
 
-    class Builder(val material: Material) {
+    @Suppress("Unused")
+    class Builder(private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
 
-        private var region: BoundingBox? = null
-        private var world: WorldInfo? = null
 
         private var possibleDrops: List<ConditionalDrop> = listOf()
         private var attributes: Map<Attribute<*,*>, Any> = emptyMap()
-        private var breakCondition : ((BlockInstance) -> Boolean)? = null
+        private var breakCondition : Predicate<BlockInstance>? = null
         private var brokenMaterial : Material? = null
-        private var breakBehavior : BlockBreakAction = { }
-        private var dropBehavior : ((DeterminedDrop, BlockInstance) -> Unit)? = null
+        private var breakBehavior : Consumer<BlockInstance> = emptyBreakConsumer
+        private var dropBehavior : Consumer<DeterminedDrop>? = null
+        private var breakSound : Sound = airBreak
 
-        fun region(region: BoundingBox?) = apply { this.region = region }
-        fun world(world: WorldInfo?) = apply { this.world = world }
         fun possibleDrops(drops: List<ConditionalDrop>) = apply { this.possibleDrops = drops }
         fun attributes(attributes: Map<Attribute<*,*>, Any>) = apply { this.attributes = attributes }
-        fun breakCondition(breakCondition : (BlockInstance) -> Boolean) = apply { this.breakCondition = breakCondition}
+        fun breakCondition(breakCondition : Predicate<BlockInstance>) = apply { this.breakCondition = breakCondition}
         fun brokenMaterial(material : Material) = apply { this.brokenMaterial = material }
-        fun breakBehavior(breakBehavior : BlockBreakAction) = apply { this.breakBehavior = breakBehavior}
-        fun dropBehavior(dropBehavior : (DeterminedDrop, BlockInstance) -> Unit) = apply {this.dropBehavior = dropBehavior}
+        fun breakBehavior(breakBehavior : Consumer<BlockInstance>) = apply { this.breakBehavior = breakBehavior}
+        fun dropBehavior(dropBehavior : Consumer<DeterminedDrop>) = apply {this.dropBehavior = dropBehavior}
+        fun breakSound(sound : Sound) = apply { this.breakSound = sound }
         fun build() : BlockDefinition {
-            return BlockDefinition(material,region, world, possibleDrops, attributes, breakCondition, brokenMaterial, breakBehavior, dropBehavior)
+            return BlockDefinition(requirements, possibleDrops, attributes, breakCondition, brokenMaterial, breakBehavior, dropBehavior, breakSound)
         }
     }
 

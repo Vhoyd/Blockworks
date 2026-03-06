@@ -1,11 +1,8 @@
-package dev.vhoyd.blockworks.listener
+package dev.vhoyd.blockworks.core
 
 import dev.vhoyd.blockworks.block.BlockInstance
-import dev.vhoyd.blockworks.core.Blockworks
-import dev.vhoyd.blockworks.core.Config
 import dev.vhoyd.blockworks.event.BlockInstanceBreakAbortEvent
 import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
-import dev.vhoyd.blockworks.model.MiningPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -38,7 +35,7 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
         blockDamage.debug("${e.player.name} started mining at ${e.block.location}")
 
         val blockBreaker = blockworks.getBlockBreaker(e.player) ?: run {
-            blockDamage.warn("No MiningPlayer object found for ${e.player.name}")
+            blockDamage.warn("No BlockworksPlayer object found for ${e.player.name}")
             return
         }
 
@@ -46,16 +43,16 @@ class BukkitEventListener(private val blockworks : Blockworks) : Listener {
             blockDamage.debug("unsubscribing previous BlockInstance at $blockBreaker")
             blockworks.breakTick.unsubscribe(blockBreaker.currentBlock!!)
         } else {
-            blockDamage.debug("Player was not previously mining any BlockInstance.")
+            blockDamage.debug("BlockworksPlayer was not previously mining any BlockInstance.")
         }
 
-        val blockDefinition = blockworks.getDefinition(e.block) ?: run {
+        val blockDefinition = blockworks.getDefinition(e.block, blockBreaker) ?: run {
 
             blockDamage.warn("Definition for type ${e.block.type} not found.")
             return
         }
 
-        val blockInstance = BlockInstance(blockDefinition, e.block.location, blockBreaker as MiningPlayer)
+        val blockInstance = BlockInstance(blockDefinition, e.block.location, blockBreaker)
         e.player.server.pluginManager.callEvent(BlockInstanceStartBreakEvent(blockInstance))
         blockworks.breakTick.subscribe(blockInstance)
     }

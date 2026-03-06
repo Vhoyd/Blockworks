@@ -22,15 +22,5 @@ object PersistentDataUtil{
         val nsk = NamespacedKey(plugin, tagName)
         return pdc.get(nsk, type) as Z
     }
-
-    fun <T : Any, Z : Any> setTag(plugin: Plugin, target : PersistentDataContainer, tagName: String, type: PersistentDataType<T, Z>, value: Z) {
-        val nsk = NamespacedKey(plugin, tagName)
-        target.set<T, Z>(nsk, type, value)
-    }
-
-    fun <T : Any, Z : Any> getTag(plugin: Plugin, target: PersistentDataContainer, tagName: String, type: PersistentDataType<T, Z>): Z {
-        val nsk = NamespacedKey(plugin, tagName)
-        return target.get(nsk, type) as Z
-    }
 }
 

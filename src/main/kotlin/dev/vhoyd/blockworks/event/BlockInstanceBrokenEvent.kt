@@ -8,7 +8,7 @@ import org.bukkit.event.HandlerList
 /**
  * Event class for when a player breaks some [BlockInstance]
  */
-class BlockInstanceBrokenEvent(val lootYield : DeterminedDrop) : Event() {
+class BlockInstanceBrokenEvent(val drops : DeterminedDrop) : Event() {
 
     var isCancelled : Boolean = false
 

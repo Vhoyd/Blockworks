@@ -3,30 +3,31 @@ package dev.vhoyd.blockworks.model
 import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.core.Blockworks
 
-@Suppress("Unchecked_cast")
+
+/**
+ * Defines behavior for anything targeting a [BlockInstance]. Can hold various [Attribute]s and various [AttributedImplement]s
+ * for parsing and logic.
+ * @see dev.vhoyd.blockworks.impl.BlockworksPlayer
+ */
+@Suppress("Unchecked_cast", "unused")
 abstract class BlockBreaker<T>(
     delegate : T,
     val blockworks: Blockworks,
     defaultAttributes : Map<Attribute<*,*>, Any>,
-    val elements : MutableMap<Class<AttributedElement<*>>, Any>,
+    val implements : MutableMap<Class<AttributedImplement<*>>, Any>,
 ) : Attributable, Wrapper<T>(delegate) {
     var currentBlock: BlockInstance? = null
 
     init {
         defaultAttributes.forEach { (key, value) -> set(key as Attribute<Any, Any>, value) }
+        blockworks.registerBlockBreaker(this)
     }
-    inline fun <reified V : AttributedElement<*>> getElement() : V {
-        return elements[V::class.java as Class<*>] as V
-    }
+    inline fun <reified V : AttributedImplement<*>> getImplement() = implements[V::class.java as Class<*>] as V
 
-    inline fun <reified V: AttributedElement<*>> getElementChecked() : V? {
-        return elements[V::class.java as Class<*>] as? V
-    }
+    inline fun <reified V: AttributedImplement<*>> getImplementOrNull() = implements[V::class.java as Class<*>] as? V
 
-    inline fun <reified V : AttributedElement<*>> setElement(element : V) {
-        elements[V::class.java as Class<AttributedElement<*>>] = element
-    }
+    inline fun <reified V : AttributedImplement<*>> setImplement(element : V) = implements.set(V::class.java as Class<AttributedImplement<*>>, element)
 
-    inline fun <reified V: AttributedElement<*>> removeElement() : V? = elements.remove(V::class.java as Class<*>) as? V
+    inline fun <reified V: AttributedImplement<*>> removeImplement() = implements.remove(V::class.java as Class<*>) as? V
 
 }

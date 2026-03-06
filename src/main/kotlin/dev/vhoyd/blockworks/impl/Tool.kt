@@ -1,15 +1,18 @@
-package dev.vhoyd.blockworks.model
+package dev.vhoyd.blockworks.impl
 
 import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.model.Attribute
+import dev.vhoyd.blockworks.model.AttributedImplement
 import dev.vhoyd.blockworks.nbt.PersistentDataUtil
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-
 /**
  * Class for adding plugin-unique information about an ItemStack.
  */
-class Tool(val blockworks: Blockworks, item: ItemStack?, data: Map<Attribute<*,*>, Any>, writeData: Boolean = true) : AttributedElement<ItemStack>(item ?: ItemStack(Material.AIR), data) {
+class Tool(val blockworks: Blockworks, item: ItemStack?, data: Map<Attribute<*, *>, Any>, writeData: Boolean = true) : AttributedImplement<ItemStack>(item ?: ItemStack(
+    Material.AIR
+), data) {
 
 
     /**

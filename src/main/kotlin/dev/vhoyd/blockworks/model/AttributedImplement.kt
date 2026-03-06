@@ -1,6 +1,9 @@
 package dev.vhoyd.blockworks.model
 
-abstract class AttributedElement<T>(
+/**
+ *
+ */
+abstract class AttributedImplement<T>(
     delegate: T,
     data : Map<Attribute<*,*>, Any>
 ) : Attributable, Wrapper<T>(delegate) {
@@ -9,6 +12,8 @@ abstract class AttributedElement<T>(
         @Suppress("UNCHECKED_CAST")
         data.forEach { (key, value) -> setAttribute(key as Attribute<Any, Any>, value) }
     }
+
+
 
 
 

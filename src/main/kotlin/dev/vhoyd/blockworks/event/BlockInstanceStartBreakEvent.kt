@@ -7,7 +7,7 @@ import org.bukkit.event.HandlerList
 /**
  * Event class for when a player starts breaking some [BlockInstance]
  */
-class BlockInstanceStartBreakEvent(val blockInstance: BlockInstance) : Event() {
+class BlockInstanceStartBreakEvent(val target: BlockInstance) : Event() {
 
     var isCancelled : Boolean = false
 

@@ -1,8 +1,7 @@
-package dev.vhoyd.blockworks.tick
+package dev.vhoyd.blockworks.core
 
 import dev.vhoyd.blockworks.block.BlockDefinition
 import dev.vhoyd.blockworks.block.BlockInstance
-import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.event.BlockInstanceTickEvent
 import dev.vhoyd.blockworks.loot.DeterminedDrop
@@ -13,57 +12,67 @@ import org.bukkit.scheduler.BukkitRunnable
 
 /**
  * Internal API class for updating blocks being broken by players each tick, as Minecraft does not natively
- * trigger an event each tick for this. Cannot be extended; do not tamper with.
+ * trigger an event each tick for this. Attempting to tamper with is ill-advised.
  */
-class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
-    val eventTarget = blockworks.plugin.server.pluginManager
+internal class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
+    val manager = blockworks.plugin.server.pluginManager
+
+    // set, so that duplicates aren't ticked twice (end-users could implement manually)
     val subscribedInstances = mutableSetOf<BlockInstance>()
+
     val log = blockworks.logger.context("BlockBreakTick")
 
     override fun run() {
         for (instance : BlockInstance in subscribedInstances) {
-            eventTarget.callEvent(BlockInstanceTickEvent(instance))
-            if (instance.broken) {
-                handleBreakLogic(instance)
-            }
+            manager.callEvent(BlockInstanceTickEvent(instance))
+            if (instance.broken) handleBreakLogic(instance)
         }
 
     }
 
+    // add new instance to set
     fun subscribe(blockInstance : BlockInstance) {
-        log.debug("BlockInstance of type ${blockInstance.definition.material} subscribed")
+        log.debug("BlockInstance of type ${blockInstance.location.block.blockData.material} subscribed")
         subscribedInstances.add(blockInstance)
     }
 
+    // remove instance from set (probably because it was broken)
     fun unsubscribe(blockInstance: BlockInstance) {
         val removed = subscribedInstances.remove(blockInstance)
-        if (!removed) {
-            log.warn("Instance was not removed.")
-        } else {
-            log.debug("BlockInstance of type ${blockInstance.definition.material} unsubscribed")
-        }
+
+        // TODO: figure out why this happens way more often than it should
+        if (!removed) log.warn("Instance was not removed.")
+
+        else log.debug("BlockInstance of type ${blockInstance.location.block.blockData.material} unsubscribed")
     }
 
+
+    // break block like vanilla Minecraft
     fun applyVanillaBreak(location : Location) : BlockInstance? {
+
         if (subscribedInstances.isEmpty()) {
             log.warn("No subscribed blocks to break.")
             return null
+
         } else {
             var entry : BlockInstance? = null
-            for (it : BlockInstance in subscribedInstances) {
-                if (it.definition.breakCondition != BlockDefinition.VANILLA_BREAK_CONDITION || it.location != location) return null
+            subscribedInstances.forEach {
+
+                // either block was not meant to be vanilla or it's not at the spot the block was broken
+                if (it.definition.breakCondition != BlockDefinition.VANILLA_BREAK_CONDITION || it.location != location) return@forEach
+
+                // if the above checked didn't return, the block has been found
                 log.debug("Found matching vanilla block break condition at ${location}.")
                 entry = it
             }
             if (entry == null) {
                 log.warn("No BlockInstance found at $location")
                 return null
-            } else {
-                return entry
-            }
+            } else return entry
         }
     }
 
+    // do all the fun stuff related to breaking the block
     fun handleBreakLogic(instance : BlockInstance) {
         val list = mutableListOf<ItemStack>()
         val sumXp = mutableListOf<Int>()
@@ -80,14 +89,14 @@ class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
                 sumXp += it.expPool.pickRandom()
             } else { log.debug("Condition failed") }
         }
-        val event = BlockInstanceBrokenEvent(DeterminedDrop(instance,list, sumXp))
-        eventTarget.callEvent(event)
+        val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, list, sumXp))
+        manager.callEvent(event)
         instance.location.block.type = instance.replacementMaterial
         unsubscribe(instance)
         log.debug("Calling block break behavior.")
         instance.breakBlock()
         log.debug("Calling block drop behavior.")
-        instance.dropBehavior(event.lootYield, instance)
+        instance.dropBehavior(event.drops, instance)
         log.debug("End of break logic.")
     }
 }

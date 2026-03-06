@@ -1,10 +1,12 @@
 package dev.vhoyd.blockworks.core
 
+import com.google.common.base.Predicate
 import dev.vhoyd.blockworks.block.BlockDefinition
 import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.loot.DeterminedDrop
 import org.bukkit.Material
 import org.bukkit.plugin.Plugin
+import java.util.function.Consumer
 import kotlin.experimental.or
 
 
@@ -19,10 +21,9 @@ data class Config(
     val loggingLevel: LoggingLevel = LoggingLevel.WARN,
     val eventMask : Byte,
     val blockDefinitions : List<BlockDefinition>,
-    val properties: Map<ConfigProperty<*>, Any>,
     val defaultReplacementMaterial : Material = Material.AIR,
-    val defaultBreakCondition : (BlockInstance) -> Boolean,
-    val defaultDropBehavior : (DeterminedDrop, BlockInstance) -> Unit = BlockDefinition.DEFAULT_DROP_BEHAVIOR,
+    val defaultBreakCondition : Predicate<BlockInstance>,
+    val defaultDropBehavior : Consumer<DeterminedDrop> = BlockDefinition.DEFAULT_DROP_BEHAVIOR,
 ) {
 
 
@@ -34,18 +35,6 @@ data class Config(
         }
     }
 
-    /**
-     * @return the value of the specified property.
-     * @throws ClassCastException if the property value cannot be cast to the specified type.
-     * @throws NullPointerException if the property doesn't exist.
-     */
-    fun <T> getProperty(property: ConfigProperty<T>) : T {
-
-        @Suppress("UNCHECKED_CAST")
-        return properties[property] as T
-    }
-
-    operator fun <T> get(property : ConfigProperty<T>) : T = getProperty(property)
 
     enum class LoggingLevel(val level : Byte) {
         DEBUG(4),

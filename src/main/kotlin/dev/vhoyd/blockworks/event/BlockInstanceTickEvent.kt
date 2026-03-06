@@ -7,7 +7,7 @@ import org.bukkit.event.HandlerList
 /**
  * Event class called each tick of a player breaking some [BlockInstance]
  */
-class BlockInstanceTickEvent(val blockInstance: BlockInstance) : Event() {
+class BlockInstanceTickEvent(val target: BlockInstance) : Event() {
     var isCancelled : Boolean = false
 
 

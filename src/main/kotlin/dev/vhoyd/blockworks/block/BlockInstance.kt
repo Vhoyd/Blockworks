@@ -3,10 +3,7 @@ package dev.vhoyd.blockworks.block
 import dev.vhoyd.blockworks.model.BlockBreaker
 import dev.vhoyd.blockworks.model.Attributable
 import dev.vhoyd.blockworks.model.Attribute
-import dev.vhoyd.blockworks.model.MiningPlayer
-import dev.vhoyd.blockworks.model.Tool
 import org.bukkit.Location
-import org.bukkit.entity.Player
 
 /**
  * Class for handling interaction between a [BlockDefinition]'s data and actual gameplay.
@@ -28,14 +25,14 @@ class BlockInstance(
     val replacementMaterial = definition.brokenMaterial ?: breaker.blockworks.config.defaultReplacementMaterial
     val dropBehavior = definition.dropBehavior ?: breaker.blockworks.config.defaultDropBehavior
     val broken : Boolean
-        get() = breakCondition(this)
+        get() = breakCondition.test(this)
     val drops = definition.possibleDrops
     val attributes: MutableMap<Attribute<*,*>, Any> = definition.attributes.toMutableMap()
 
     /**
      * Shorthand for `definition.breakBehavior(this)`; does not set this instance's state to broken.
       */
-    fun breakBlock() = definition.breakBehavior(this)
+    fun breakBlock() = definition.breakBehavior.accept(this)
 
     override fun <P : Any, C : Any> setAttribute(
         attribute: Attribute<P, C>,

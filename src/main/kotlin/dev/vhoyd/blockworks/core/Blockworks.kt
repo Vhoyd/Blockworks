@@ -1,9 +1,9 @@
 package dev.vhoyd.blockworks.core
 
 import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.listener.BukkitEventListener
+import dev.vhoyd.blockworks.core.BukkitEventListener
 import dev.vhoyd.blockworks.model.BlockBreaker
-import dev.vhoyd.blockworks.tick.BlockBreakTick
+import dev.vhoyd.blockworks.core.BlockBreakTick
 import org.bukkit.block.Block
 import org.bukkit.plugin.Plugin
 
@@ -43,9 +43,13 @@ class Blockworks(val config: Config, val applyAllBreakers : Boolean = true, val 
     }
 
 
-    fun  registerBlockBreaker(breaker : BlockBreaker<*> ) {
-        breakers.add(breaker)
-        if (!applyAllBreakers) applyBehavior(breaker)
+    /**
+     * @return `true` if the given [BlockBreaker] was registered, or `false` if it was already registered.
+     */
+    fun  registerBlockBreaker(breaker : BlockBreaker<*> ) : Boolean {
+        val new = breakers.add(breaker)
+        if (!applyAllBreakers && new) applyBehavior(breaker)
+        return new
     }
 
     /**
@@ -53,5 +57,5 @@ class Blockworks(val config: Config, val applyAllBreakers : Boolean = true, val 
      * if no behavior is assigned to it. \nThis method returns a potentially valid [BlockDefinition] based
      * on the behavior of [BlockDefinition.isValidInstance]
      */
-    fun getDefinition(block : Block) : BlockDefinition? = config.blockDefinitions.find { it.isValidInstance(block)}
+    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = config.blockDefinitions.find { it.isValidInstance(block, breaker)}
 }

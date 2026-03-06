@@ -3,9 +3,7 @@ package dev.vhoyd.blockworks.model
 import org.bukkit.persistence.PersistentDataType
 
 /**
- * Outlines a certain attribute some [Attributable] will have. It is recommended to create a list of
- * constants of this class for clarity. For an example, see the [SimpleMiningAttribute] class in the test folder.
- * @see SimpleMiningAttribute
+ * Outlines a certain typed attribute some [Attributable] will have.
  */
 data class Attribute<P : Any, C : Any>(
     val name : String,
