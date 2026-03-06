@@ -1,6 +1,5 @@
 package dev.vhoyd.blockworks.loot
 
-import dev.vhoyd.blockworks.core.WeightedEntry
 
 class UniformEntryPool<T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(entries) {
     override fun pickRandom(): T {

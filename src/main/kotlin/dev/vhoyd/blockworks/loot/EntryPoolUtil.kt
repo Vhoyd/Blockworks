@@ -1,7 +1,5 @@
 package dev.vhoyd.blockworks.loot
 
-import dev.vhoyd.blockworks.core.WeightedEntry
-
 /**
  * Utility class for quickly generating [WeightedEntry]s, or `List`s of them.
  */

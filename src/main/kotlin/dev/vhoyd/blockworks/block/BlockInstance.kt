@@ -22,11 +22,11 @@ class BlockInstance(
     val breaker : BlockBreaker<*>
 ) : Attributable {
     val breakCondition = definition.breakCondition ?: breaker.blockworks.config.defaultBreakCondition
-    val replacementMaterial = definition.brokenMaterial ?: breaker.blockworks.config.defaultReplacementMaterial
+    val replacementMaterial = definition.replacementMaterial ?: breaker.blockworks.config.defaultReplacementMaterial
     val dropBehavior = definition.dropBehavior ?: breaker.blockworks.config.defaultDropBehavior
     val broken : Boolean
         get() = breakCondition.test(this)
-    val drops = definition.possibleDrops
+    val drops = definition.drops
     val attributes: MutableMap<Attribute<*,*>, Any> = definition.attributes.toMutableMap()
 
     /**

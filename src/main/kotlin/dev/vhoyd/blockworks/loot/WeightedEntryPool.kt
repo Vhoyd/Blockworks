@@ -1,6 +1,5 @@
 package dev.vhoyd.blockworks.loot
 
-import dev.vhoyd.blockworks.core.WeightedEntry
 import kotlin.random.Random
 
 /**

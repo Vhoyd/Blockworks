@@ -11,6 +11,7 @@ import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
+import org.bukkit.util.Vector
 import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -18,15 +19,16 @@ import java.util.function.Predicate
 /**
  * Objects of this class act as a blueprint for custom block behavior.
  * This acts like a behavior change towards a block with the matching material and conditions.
- * @property requirements the conditions under which a valid [BlockInstance] is allowed.
- * @property possibleDrops a `List<`[ConditionalDrop]`>` used to determine what could drop when a
+ * @property requirements the conditions under which a valid [BlockInstance] is allowed, provided context of its `Block`
+ * and the `BlockBreaker` attempting to mine it.
+ * @property drops a `List<`[ConditionalDrop]`>` used to determine what could drop when a
  * block of this definition is broken. For multiple drops at once, use multiple `ConditionalDrop`s.
  * @property attributes a `Map<`[Attribute]`,Any>` that defines the baseline properties for any instance of this
  * block definition. Cannot be modified directly through the definition; instead modify the instance's attributes.
  * @property breakCondition the condition under which this block should be flagged as "broken". This is called
  * by [BlockInstance]s that use this definition, providing themselves as context during evaluation. If left null,
  * instances will assume the default break condition declared via [dev.vhoyd.blockworks.core.Config.defaultBreakCondition]
- * @property brokenMaterial the vanilla [Material] block type to replace this block type when broken. If left null,
+ * @property replacementMaterial the vanilla [Material] block type to replace this block type when broken. If left null,
  * instances will assume the default material declared via [dev.vhoyd.blockworks.core.Config.defaultReplacementMaterial]
  * @property breakBehavior behavior to be called upon breaking a block of this type. Called
  * after its corresponding [BlockInstanceBrokenEvent] and before its [dropBehavior]
@@ -38,10 +40,10 @@ import java.util.function.Predicate
 @ConsistentCopyVisibility
 data class BlockDefinition private constructor(
     val requirements : BiPredicate<Block, BlockBreaker<*>>,
-    val possibleDrops: List<ConditionalDrop>,
+    val drops: List<ConditionalDrop>,
     val attributes: Map<Attribute<*,*>, Any>,
     val breakCondition : Predicate<BlockInstance>?,
-    val brokenMaterial : Material?,
+    val replacementMaterial : Material?,
     val breakBehavior : Consumer<BlockInstance>,
     val dropBehavior : Consumer<DeterminedDrop>?,
     val breakSound : Sound,
@@ -50,7 +52,9 @@ data class BlockDefinition private constructor(
     companion object {
         private val airBreak = Material.AIR.createBlockData().soundGroup.breakSound
         private val emptyBreakConsumer = Consumer<BlockInstance> { }
-        val VANILLA_BREAK_CONDITION = Predicate<BlockInstance> { _ -> false}
+
+        val VANILLA_BREAK_CONDITION = Predicate<BlockInstance> { false }
+
         val DEFAULT_DROP_BEHAVIOR : Consumer<DeterminedDrop> = Consumer { drop ->
 
             val world = drop.blockInstance.location.world
@@ -62,11 +66,23 @@ data class BlockDefinition private constructor(
                         ExperienceOrb::class.java
                     )
                     orb.experience = it
+
+                    // using Math.random() in this day and age? How exploitable! Someone could predict the
+                    // path of the experience orbs spawned...
+                    val pitch = Math.random() * 2 * Math.PI
+                    val yaw = Math.random() * 2 * Math.PI
+                    val roll = Math.random() * 2 * Math.PI
+
+                    // velocity is in blocks/sec so this throws it ~1.5 blocks in tha direction accounting for friction
+                    val vector = Vector(pitch,yaw, roll).normalize().multiply(0.1)
+
+
+                    orb.velocity = vector
                 }
             }
 
             drop.splitDrops.forEach {
-                world.dropItemNaturally(location, it)
+                world.dropItemNaturally(location, it.clone())
             }
 
 
@@ -90,7 +106,7 @@ data class BlockDefinition private constructor(
                instance.location.block.breakNaturally(instance.breaker.delegateAs<Player>().equipment.itemInMainHand)
            },
            dropBehavior = { _ -> },
-           brokenMaterial = Material.AIR,
+           replacementMaterial = Material.AIR,
            breakSound = airBreak
        )
         }
