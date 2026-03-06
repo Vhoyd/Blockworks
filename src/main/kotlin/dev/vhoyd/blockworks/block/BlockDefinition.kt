@@ -28,7 +28,7 @@ import java.util.function.Predicate
  * instances will assume the default break condition declared via [dev.vhoyd.blockworks.core.Config.defaultBreakCondition]
  * @property brokenMaterial the vanilla [Material] block type to replace this block type when broken. If left null,
  * instances will assume the default material declared via [dev.vhoyd.blockworks.core.Config.defaultReplacementMaterial]
- * @property breakBehavior the [BlockBreakAction] to be triggered upon breaking a block of this type. Called
+ * @property breakBehavior behavior to be called upon breaking a block of this type. Called
  * after its corresponding [BlockInstanceBrokenEvent] and before its [dropBehavior]
  * @property dropBehavior an optionally overridable behavior for what happens when this `BlockDefinition`
  * generates its reward(s). By default, this mimics vanilla behavior of dropping exp and items at block location;
