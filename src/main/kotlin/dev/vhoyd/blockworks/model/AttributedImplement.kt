@@ -32,6 +32,20 @@ abstract class AttributedImplement<T>(
             val obj = constructor.apply(blockworks, source)
             return if (obj.getAttribute(flag) == expectedId) obj else null
         }
+
+        @JvmStatic
+        fun <T : Any, V : AttributedImplement<T>> ofOrNew(
+            blockworks: Blockworks,
+            source : T,
+            expectedId: String,
+            ofConstructor: BiFunction<Blockworks, T, V>,
+            newConstructor: BiFunction<Blockworks, T, V>
+        ) : AttributedImplement<T> {
+            val obj = ofConstructor.apply(blockworks, source)
+            val newObj = newConstructor.apply(blockworks, source)
+            newObj.setAttribute(flag, expectedId)
+            return if (obj.getAttribute(flag) == expectedId) obj else newObj
+        }
     }
 
 }
