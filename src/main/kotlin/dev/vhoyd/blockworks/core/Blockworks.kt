@@ -1,9 +1,7 @@
 package dev.vhoyd.blockworks.core
 
 import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.core.BukkitEventListener
 import dev.vhoyd.blockworks.model.BlockBreaker
-import dev.vhoyd.blockworks.core.BlockBreakTick
 import org.bukkit.block.Block
 import org.bukkit.plugin.Plugin
 

@@ -96,7 +96,7 @@ internal class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
         log.debug("Calling block break behavior.")
         instance.breakBlock()
         log.debug("Calling block drop behavior.")
-        instance.dropBehavior(event.drops, instance)
+        instance.dropBehavior.accept(event.drops)
         log.debug("End of break logic.")
     }
 }

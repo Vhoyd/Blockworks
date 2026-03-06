@@ -1,7 +1,6 @@
 package dev.vhoyd.blockworks.nbt
 
 import org.bukkit.NamespacedKey
-import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
