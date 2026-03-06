@@ -14,9 +14,11 @@ import kotlin.experimental.or
  * Data class for setting up a lot of miscellaneous behavior for Blockworks.
  * @property plugin the [Plugin] spawning the Blockworks object.
  * @property loggingLevel the severity of alerts that the user wants output to server logs.
- * @property eventMask the types of events
+ * @property eventMask the types of events to ignore handling. See [createEventMask]
  */
-data class Config(
+
+
+data class Config @JvmOverloads constructor(
     val plugin : Plugin,
     val loggingLevel: LoggingLevel = LoggingLevel.WARN,
     val eventMask : Byte,
@@ -28,9 +30,13 @@ data class Config(
 
 
     companion object {
-        fun createEventMask(vararg strategies : EventMaskType) : Byte {
+        /**
+         * @return a Byte based on the provided [EventMaskType]s
+         */
+        @JvmStatic
+        fun createEventMask(vararg masks : EventMaskType) : Byte {
             var mask : Byte = 0
-            strategies.forEach { mask = mask.or(it.mask) }
+            masks.forEach { mask = mask.or(it.mask) }
             return mask
         }
     }
@@ -44,7 +50,7 @@ data class Config(
         NONE(0)
     }
 
-    enum class EventMaskType(val mask : Byte) {
+    enum class EventMaskType(internal val mask : Byte) {
         ALL(7), // 111
         BLOCK_BREAK_MATCH(4), // 100
         BLOCK_DAMAGE(2), // 010

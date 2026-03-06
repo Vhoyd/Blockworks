@@ -8,16 +8,13 @@ import org.bukkit.plugin.Plugin
 
 /**
  * Entry point class for working with the API.
- * @property applyAllBreakers whether to immediately apply plugin behavior to all [BlockBreaker]s on the server.
- * If this is false, this plugin will only work if you manually call [registerBlockBreaker].
  * @property config a [Config] object created by the user of this plugin.
- * @property applyBehavior called inside of [registerBlockBreaker] and allows for modifying the initial state of the [BlockBreaker.delegate].
  * @property plugin the [Plugin] using this Blockworks instance.
  * @property logger a [Logger] used for a pass-around debug output, not very necessary in this class itself.
  * This is internal, please use your own logging object.
  * @property breakers a list of [BlockBreaker]s that keeps track of what [BlockBreaker.delegate]s will experience custom behavior.
  */
-class Blockworks(val config: Config, val applyAllBreakers : Boolean = true, val applyBehavior : (BlockBreaker<*>) -> Unit = {})  {
+class Blockworks(val config: Config)  {
 
     val plugin : Plugin = config.plugin
     val logger = Logger(this, source = "Main", level = config.loggingLevel)
@@ -46,7 +43,6 @@ class Blockworks(val config: Config, val applyAllBreakers : Boolean = true, val 
      */
     fun  registerBlockBreaker(breaker : BlockBreaker<*> ) : Boolean {
         val new = breakers.add(breaker)
-        if (!applyAllBreakers && new) applyBehavior(breaker)
         return new
     }
 

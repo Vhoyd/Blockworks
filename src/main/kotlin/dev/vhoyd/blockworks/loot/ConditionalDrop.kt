@@ -2,6 +2,7 @@ package dev.vhoyd.blockworks.loot
 
 import dev.vhoyd.blockworks.block.BlockInstance
 import org.bukkit.inventory.ItemStack
+import java.util.function.Predicate
 
 /**
  * Data class meant to be a framework  for any set of block drops meant to be provided when a block is broken.
@@ -9,9 +10,9 @@ import org.bukkit.inventory.ItemStack
  * All exp and drop entries are treated as exclusive and dependent; you cannot drop more than one item type from a given
  * `ConditionalDrop`. If you want more than one drop, simply make more `ConditionalDrop` objects.
  */
-data class ConditionalDrop(
+data class ConditionalDrop @JvmOverloads constructor(
     val expPool: EntryPool<Int>,
     val dropPool: EntryPool<ItemStack>,
-    val condition: (BlockInstance) -> Boolean = { true },
+    val condition: Predicate<BlockInstance> = Predicate { true },
 
 )

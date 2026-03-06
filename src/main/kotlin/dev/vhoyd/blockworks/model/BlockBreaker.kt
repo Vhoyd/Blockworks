@@ -30,4 +30,14 @@ abstract class BlockBreaker<T>(
 
     inline fun <reified V: AttributedImplement<*>> removeImplement() = implements.remove(V::class.java as Class<*>) as? V
 
+
+
+    fun <V : AttributedImplement<*>> getImplement(type: Class<V>) = implements[type as Class<*>] as V
+
+    fun <V: AttributedImplement<*>> getImplementOrNull(type: Class<V>) = implements[type as Class<*>] as? V
+
+    fun <V : AttributedImplement<*>> setImplement(type: Class<V>, element: V) = implements.set(type as Class<AttributedImplement<*>>, element)
+
+    fun <V: AttributedImplement<*>> removeImplement(type: Class<V>) = implements.remove(type as Class<*>) as? V
+
 }

@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin
 /**
  * Utility class for reading from and writing to [org.bukkit.persistence.PersistentDataContainer]s
  */
-object PersistentDataUtil{
+object PersistenceWriter{
 
     fun <T : Any, Z : Any> setTag(plugin: Plugin, target : PersistentDataHolder, tagName: String, type: PersistentDataType<T, Z>, value: Z) {
         val pdc = target.persistentDataContainer

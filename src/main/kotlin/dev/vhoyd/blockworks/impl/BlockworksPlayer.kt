@@ -4,7 +4,7 @@ import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.model.Attribute
 import dev.vhoyd.blockworks.model.AttributedImplement
 import dev.vhoyd.blockworks.model.BlockBreaker
-import dev.vhoyd.blockworks.nbt.PersistentDataUtil
+import dev.vhoyd.blockworks.nbt.PersistenceWriter
 import org.bukkit.entity.Player
 
 /**
@@ -19,11 +19,11 @@ class BlockworksPlayer(
     ) : BlockBreaker<Player>(delegate, blockworks, data, elements) {
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
-        PersistentDataUtil.setTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType, value)
+        PersistenceWriter.setTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType, value)
     }
 
     override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>) : C {
-        return PersistentDataUtil.getTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType)
+        return PersistenceWriter.getTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType)
     }
 
 }

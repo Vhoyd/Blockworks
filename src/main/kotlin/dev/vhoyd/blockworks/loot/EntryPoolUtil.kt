@@ -8,9 +8,9 @@ object EntryPoolUtil{
     /**
      * Generates a `List<`[WeightedEntry]`>` of size 1. The caller can specify the weight for the created entry.
      */
-    fun <V> single(value : V, weight : Int = 1) : EntryPool<V> {
+    fun <V> single(value : V) : EntryPool<V> {
         val out = ArrayList<WeightedEntry<V>>()
-        out.add(WeightedEntry(value, weight))
+        out.add(WeightedEntry(value, 1))
         return UniformEntryPool(out)
     }
 
@@ -18,10 +18,10 @@ object EntryPoolUtil{
      * Generates a `List<`[WeightedEntry]`>` based on a given `Iterable`, such as a `List`, where
      * each entry has the same exact weight. The caller can specify the weight.
      */
-    fun <V> uniformWeight(data : Iterable<V>, weight : Int = 1) : EntryPool<V> {
+    fun <V> uniformWeight(data : Iterable<V>) : EntryPool<V> {
         val createdList = ArrayList<WeightedEntry<V>>()
         for (entry in data) {
-            createdList.add(WeightedEntry(entry, weight))
+            createdList.add(WeightedEntry(entry, 1))
         }
         return UniformEntryPool(createdList)
     }

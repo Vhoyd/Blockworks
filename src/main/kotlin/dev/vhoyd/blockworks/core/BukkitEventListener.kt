@@ -14,7 +14,7 @@ import kotlin.experimental.and
  * Internal API class for handling most of the server -> plugin interactions. Should not be tinkered with under
  * most circumstances; not inheritable.
  */
-class BukkitEventListener(private val blockworks : Blockworks) : Listener {
+internal class BukkitEventListener(private val blockworks : Blockworks) : Listener {
 
     private val blockDamage = blockworks.logger.context("Bukkit-BlockDamageEvent")
     private val damageAbort = blockworks.logger.context("Bukkit-BlockDamageAbortEvent")

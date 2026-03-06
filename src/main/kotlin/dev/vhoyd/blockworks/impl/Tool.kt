@@ -3,16 +3,19 @@ package dev.vhoyd.blockworks.impl
 import dev.vhoyd.blockworks.core.Blockworks
 import dev.vhoyd.blockworks.model.Attribute
 import dev.vhoyd.blockworks.model.AttributedImplement
-import dev.vhoyd.blockworks.nbt.PersistentDataUtil
+import dev.vhoyd.blockworks.nbt.PersistenceWriter
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 /**
  * Class for adding plugin-unique information about an ItemStack.
  */
-class Tool(val blockworks: Blockworks, item: ItemStack?, data: Map<Attribute<*, *>, Any>, writeData: Boolean = true) : AttributedImplement<ItemStack>(item ?: ItemStack(
-    Material.AIR
-), data) {
+class Tool @JvmOverloads constructor(
+    val blockworks: Blockworks,
+    item: ItemStack?,
+    data: Map<Attribute<*, *>, Any>,
+    writeData: Boolean = true
+) : AttributedImplement<ItemStack>(item ?: ItemStack(Material.AIR), data) {
 
 
     /**
@@ -32,12 +35,12 @@ class Tool(val blockworks: Blockworks, item: ItemStack?, data: Map<Attribute<*, 
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
         val meta = delegate.itemMeta
-        PersistentDataUtil.setTag(blockworks.plugin, meta, "blockworks-${attribute.name}", attribute.persistentDataType, value)
+        PersistenceWriter.setTag(blockworks.plugin, meta, "blockworks-${attribute.name}", attribute.persistentDataType, value)
         delegate.itemMeta = meta
     }
 
     override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>) : C {
-        return PersistentDataUtil.getTag(blockworks.plugin, delegate.itemMeta, "blockworks-${attribute.name}", attribute.persistentDataType)
+        return PersistenceWriter.getTag(blockworks.plugin, delegate.itemMeta, "blockworks-${attribute.name}", attribute.persistentDataType)
     }
 
 }
