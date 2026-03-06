@@ -10,12 +10,14 @@ import org.bukkit.plugin.Plugin
  */
 object PersistenceWriter{
 
+    @JvmStatic
     fun <T : Any, Z : Any> setTag(plugin: Plugin, target : PersistentDataHolder, tagName: String, type: PersistentDataType<T, Z>, value: Z) {
         val pdc = target.persistentDataContainer
         val nsk = NamespacedKey(plugin, tagName)
         pdc.set<T, Z>(nsk, type, value)
     }
 
+    @JvmStatic
     fun <T : Any, Z : Any> getTag(plugin: Plugin, target: PersistentDataHolder, tagName: String, type: PersistentDataType<T, Z>): Z {
         val pdc = target.persistentDataContainer
         val nsk = NamespacedKey(plugin, tagName)

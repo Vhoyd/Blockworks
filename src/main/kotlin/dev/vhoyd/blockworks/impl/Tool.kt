@@ -6,6 +6,8 @@ import dev.vhoyd.blockworks.model.AttributedImplement
 import dev.vhoyd.blockworks.nbt.PersistenceWriter
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import java.util.function.BiFunction
+import java.util.function.Function
 
 /**
  * Class for adding plugin-unique information about an ItemStack.
@@ -14,20 +16,11 @@ class Tool @JvmOverloads constructor(
     val blockworks: Blockworks,
     item: ItemStack?,
     data: Map<Attribute<*, *>, Any>,
-    writeData: Boolean = true
-) : AttributedImplement<ItemStack>(item ?: ItemStack(Material.AIR), data) {
+    overwriteData: Boolean = true
+) : AttributedImplement<ItemStack>(item ?: ItemStack(Material.AIR), data, overwriteData) {
 
-
-    /**
-     * @param delegate the [ItemStack] representation of the item that players will hold when mining blocks.
-     * Should have a count of 1, but do whatever you want IDK
-     * @param data the list of attributes that this MiningItem should have, and what the values should be.
-     * @param writeData whether the constructor should write the provided data to the underlying [ItemStack]'s
-     * [org.bukkit.persistence.PersistentDataContainer]. Recommended for item creation, not recommended if [data]
-     * is empty or when preserving existing data values.
-     */
     init {
-        if (delegate.type != Material.AIR && writeData) {
+        if (delegate.type != Material.AIR && overwriteData) {
             val meta = delegate.itemMeta
             delegate.itemMeta = meta
         }
@@ -41,6 +34,11 @@ class Tool @JvmOverloads constructor(
 
     override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>) : C {
         return PersistenceWriter.getTag(blockworks.plugin, delegate.itemMeta, "blockworks-${attribute.name}", attribute.persistentDataType)
+    }
+
+    companion object {
+        @JvmStatic
+        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, Tool> = BiFunction { blockworks, item -> Tool(blockworks, item, emptyMap(), false) }
     }
 
 }

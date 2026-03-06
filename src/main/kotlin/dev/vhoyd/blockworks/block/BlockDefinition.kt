@@ -53,8 +53,10 @@ data class BlockDefinition private constructor(
         private val airBreak = Material.AIR.createBlockData().soundGroup.breakSound
         private val emptyBreakConsumer = Consumer<BlockInstance> { }
 
+        @JvmStatic
         val VANILLA_BREAK_CONDITION = Predicate<BlockInstance> { false }
 
+        @JvmStatic
         val DEFAULT_DROP_BEHAVIOR : Consumer<DeterminedDrop> = Consumer { drop ->
 
             val world = drop.blockInstance.location.world
@@ -94,6 +96,7 @@ data class BlockDefinition private constructor(
          * (this is instead handled by the client), a breakBehavior of breaking the block as normal gameplay would,
          * and no custom dropBehavior (handled by the `breakNaturally` method called in breakBehavior)
          */
+        @JvmStatic
         fun vanilla(
             requirements: BiPredicate<Block, BlockBreaker<*>>,
         ) : BlockDefinition {
@@ -159,10 +162,10 @@ data class BlockDefinition private constructor(
         private var dropBehavior : Consumer<DeterminedDrop>? = null
         private var breakSound : Sound = airBreak
 
-        fun possibleDrops(drops: List<ConditionalDrop>) = apply { this.possibleDrops = drops }
+        fun drops(drops: List<ConditionalDrop>) = apply { this.possibleDrops = drops }
         fun attributes(attributes: Map<Attribute<*,*>, Any>) = apply { this.attributes = attributes }
         fun breakCondition(breakCondition : Predicate<BlockInstance>) = apply { this.breakCondition = breakCondition}
-        fun brokenMaterial(material : Material) = apply { this.brokenMaterial = material }
+        fun replacementMaterial(material : Material) = apply { this.brokenMaterial = material }
         fun breakBehavior(breakBehavior : Consumer<BlockInstance>) = apply { this.breakBehavior = breakBehavior}
         fun dropBehavior(dropBehavior : Consumer<DeterminedDrop>) = apply {this.dropBehavior = dropBehavior}
         fun breakSound(sound : Sound) = apply { this.breakSound = sound }
@@ -170,6 +173,7 @@ data class BlockDefinition private constructor(
             return BlockDefinition(requirements, possibleDrops, attributes, breakCondition, brokenMaterial, breakBehavior, dropBehavior, breakSound)
         }
     }
+
 
 }
 

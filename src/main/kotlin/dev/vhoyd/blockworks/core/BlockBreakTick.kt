@@ -78,7 +78,7 @@ internal class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
         val sumXp = mutableListOf<Int>()
         instance.drops.forEach {
             log.debug("Checking ConditionalDrop: $it")
-            if (it.condition(instance)) {
+            if (it.condition.test(instance)) {
                 log.debug("Condition passed")
                 val rand = it.dropPool.pickRandom()
                 if (rand.type != Material.AIR) {
