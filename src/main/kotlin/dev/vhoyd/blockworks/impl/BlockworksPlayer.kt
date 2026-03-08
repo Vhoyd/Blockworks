@@ -15,8 +15,8 @@ class BlockworksPlayer(
     delegate: Player,
     blockworks: Blockworks,
     data : Map<Attribute<*, *>, Any>,
-    elements: MutableMap<Class<AttributedImplement<*>>, Any>
-    ) : BlockBreaker<Player>(delegate, blockworks, data, elements) {
+    implements: MutableMap<Class<AttributedImplement<*>>, AttributedImplement<*>>
+    ) : BlockBreaker<Player>(delegate, blockworks, data, implements) {
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
         PersistenceWriter.setTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType, value)

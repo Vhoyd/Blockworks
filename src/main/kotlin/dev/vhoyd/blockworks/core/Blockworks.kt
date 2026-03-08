@@ -22,11 +22,15 @@ class Blockworks(val config: Config)  {
     internal val breakTick = BlockBreakTick(this)
 
     init {
+        logger.info("Creating Blockworks object for plugin ${plugin.name}...")
+    }
+
+
+    fun start() {
         val eventHandler = BukkitEventListener(this)
         breakTick.runTaskTimer(plugin, 0, 0)
         plugin.server.pluginManager.registerEvents(eventHandler, plugin)
         logger.info("Blockworks (via ${plugin.name}) is running!")
-
     }
 
     /**

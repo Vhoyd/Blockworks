@@ -14,12 +14,14 @@ abstract class BlockBreaker<T>(
     delegate : T,
     val blockworks: Blockworks,
     defaultAttributes : Map<Attribute<*,*>, Any>,
-    val implements : MutableMap<Class<AttributedImplement<*>>, Any>,
+    defaultImplements : Map<Class<AttributedImplement<*>>, AttributedImplement<*>>,
 ) : Attributable, Wrapper<T>(delegate) {
     var currentBlock: BlockInstance? = null
+    val implements : MutableMap<Class<AttributedImplement<*>>, AttributedImplement<*>>
 
     init {
         defaultAttributes.forEach { (key, value) -> set(key as Attribute<Any, Any>, value) }
+        implements = defaultImplements.toMutableMap()
         blockworks.registerBlockBreaker(this)
     }
     inline fun <reified V : AttributedImplement<*>> getImplement() = implements[V::class.java as Class<*>] as V

@@ -10,7 +10,8 @@ import java.util.function.BiFunction
 import java.util.function.Function
 
 /**
- * Class for adding plugin-unique information about an ItemStack.
+ * Example implementation of [AttributedImplement] for use with `ItemStack`s. Not required when using the API;
+ * other implementations of `ItemStack`-based `AttributedImplement`s are fully allowed.
  */
 class Tool @JvmOverloads constructor(
     val blockworks: Blockworks,
@@ -24,6 +25,7 @@ class Tool @JvmOverloads constructor(
             val meta = delegate.itemMeta
             delegate.itemMeta = meta
         }
+        applyAttributes()
     }
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
@@ -38,7 +40,8 @@ class Tool @JvmOverloads constructor(
 
     companion object {
         @JvmStatic
-        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, Tool> = BiFunction { blockworks, item -> Tool(blockworks, item, emptyMap(), false) }
+        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, Tool> = BiFunction { blockworks, item ->
+            Tool(blockworks, item, emptyMap(), false) }
     }
 
 }
