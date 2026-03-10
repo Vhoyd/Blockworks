@@ -81,22 +81,22 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
 
     // do all the fun stuff related to breaking the block
     internal fun handleBreakLogic(instance : BlockInstance) {
-        val list = mutableListOf<ItemStack>()
-        val sumXp = mutableListOf<Int>()
+        val set = mutableSetOf<ItemStack>()
+        val sumXp = mutableSetOf<Int>()
         instance.drops.forEach {
             log.debug("Checking ConditionalDrop: $it")
             if (it.condition.test(instance)) {
                 log.debug("Condition passed")
                 val rand = it.dropPool.pickRandom()
                 if (rand.type != Material.AIR) {
-                    list.add(rand)
+                    set.add(rand.clone())
                 } else {
                     log.debug("Drop is of type AIR, ignoring it.")
                 }
                 sumXp += it.expPool.pickRandom()
             } else { log.debug("Condition failed") }
         }
-        val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, list.map { it.clone() }, sumXp))
+        val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, set, sumXp))
         manager.callEvent(event)
         val block = instance.location.block
         block.type = instance.replacementMaterial
