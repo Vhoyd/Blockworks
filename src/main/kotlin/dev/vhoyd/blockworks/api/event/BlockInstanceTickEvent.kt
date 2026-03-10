@@ -1,6 +1,6 @@
-package dev.vhoyd.blockworks.event
+package dev.vhoyd.blockworks.api.event
 
-import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.api.block.BlockInstance
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 

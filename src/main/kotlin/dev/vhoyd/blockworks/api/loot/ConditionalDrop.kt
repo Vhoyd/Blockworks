@@ -1,6 +1,7 @@
-package dev.vhoyd.blockworks.loot
+package dev.vhoyd.blockworks.api.loot
 
-import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.api.block.BlockInstance
+import dev.vhoyd.blockworks.api.loot.entry.EntryPool
 import org.bukkit.inventory.ItemStack
 import java.util.function.Predicate
 
@@ -15,4 +16,4 @@ data class ConditionalDrop @JvmOverloads constructor(
     val dropPool: EntryPool<ItemStack>,
     val condition: Predicate<BlockInstance> = Predicate { true },
 
-)
+    )

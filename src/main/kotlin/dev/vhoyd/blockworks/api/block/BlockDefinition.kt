@@ -1,11 +1,11 @@
-package dev.vhoyd.blockworks.block
+package dev.vhoyd.blockworks.api.block
 
-import dev.vhoyd.blockworks.event.BlockInstanceBrokenEvent
-import dev.vhoyd.blockworks.loot.ConditionalDrop
-import dev.vhoyd.blockworks.loot.DeterminedDrop
-import dev.vhoyd.blockworks.model.Attributable
-import dev.vhoyd.blockworks.model.Attribute
-import dev.vhoyd.blockworks.model.BlockBreaker
+import dev.vhoyd.blockworks.api.event.BlockInstanceBrokenEvent
+import dev.vhoyd.blockworks.api.loot.ConditionalDrop
+import dev.vhoyd.blockworks.api.loot.DeterminedDrop
+import dev.vhoyd.blockworks.api.model.Attributable
+import dev.vhoyd.blockworks.api.model.Attribute
+import dev.vhoyd.blockworks.api.model.BlockBreaker
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -26,32 +26,34 @@ import java.util.function.Predicate
  * block of this definition is broken. For multiple drops at once, use multiple `ConditionalDrop`s.
  * @property attributes a `Map<`[Attribute]`,Any>` that defines the baseline properties for any instance of this
  * block definition. Cannot be modified directly through the definition; instead modify the instance's attributes.
- * @property breakCondition the condition under which this block should be flagged as "broken". This is called
+ * @property breakIf the condition under which this block should be flagged as "broken". This is called
  * by [BlockInstance]s that use this definition, providing themselves as context during evaluation. If left null,
- * instances will assume the default break condition declared via [dev.vhoyd.blockworks.core.Config.defaultBreakCondition]
- * @property replacementMaterial the vanilla [Material] block type to replace this block type when broken. If left null,
- * instances will assume the default material declared via [dev.vhoyd.blockworks.core.Config.defaultReplacementMaterial]
- * @property breakBehavior behavior to be called upon breaking a block of this type. Called
- * after its corresponding [BlockInstanceBrokenEvent] and before its [dropBehavior]
- * @property dropBehavior an optionally overridable behavior for what happens when this `BlockDefinition`
+ * instances will assume the default break condition declared via [dev.vhoyd.blockworks.api.core.Config.defaultBreakCondition]
+ * @property replacement the vanilla [Material] block type to replace this block type when broken. If left null,
+ * instances will assume the default material declared via [dev.vhoyd.blockworks.api.core.Config.defaultReplacementMaterial]
+ * @property onBreak behavior to be called upon breaking a block of this type. Called
+ * after its corresponding [BlockInstanceBrokenEvent] and before its [onDrop]
+ * @property onDrop an optionally overridable behavior for what happens when this `BlockDefinition`
  * generates its reward(s). By default, this mimics vanilla behavior of dropping exp and items at block location;
- * this will be called after its corresponding [BlockInstanceBrokenEvent], and after its [breakBehavior]. If left null,
- * instances will assume the default drop behavior declared via [dev.vhoyd.blockworks.core.Config]
+ * this will be called after its corresponding [BlockInstanceBrokenEvent], and after its [onBreak]. If left null,
+ * instances will assume the default drop behavior declared via [dev.vhoyd.blockworks.api.core.Config]
+ * @property onTick behavior to be called each tick that this block is being broken.
+ * @property sound the Sound to be played when this block is broken.
  */
 @ConsistentCopyVisibility
 data class BlockDefinition private constructor(
     val requirements : BiPredicate<Block, BlockBreaker<*>>,
-    val drops: List<ConditionalDrop>,
+    val drops: Iterable<ConditionalDrop>,
     val attributes: Map<Attribute<*,*>, Any>,
-    val breakCondition : Predicate<BlockInstance>?,
-    val replacementMaterial : Material?,
-    val breakBehavior : Consumer<BlockInstance>,
-    val dropBehavior : Consumer<DeterminedDrop>?,
-    val breakSound : Sound,
+    val breakIf : Predicate<BlockInstance>?,
+    val replacement : Material?,
+    val onTick : Consumer<BlockInstance>,
+    val onBreak : Consumer<BlockInstance>,
+    val onDrop : Consumer<DeterminedDrop>?,
+    val sound : Sound?,
 ) : Attributable {
 
     companion object {
-        private val airBreak = Material.AIR.createBlockData().soundGroup.breakSound
         private val emptyBreakConsumer : Consumer<BlockInstance> = Consumer { }
 
         internal val vanillaDmg = Attribute("internal-dmg", PersistentDataType.FLOAT)
@@ -81,7 +83,7 @@ data class BlockDefinition private constructor(
                     val roll = Math.random() * 2 * Math.PI
 
                     // velocity is in blocks/sec so this throws it ~1.5 blocks in tha direction accounting for friction
-                    val vector = Vector(pitch,yaw, roll).normalize().multiply(0.1)
+                    val vector = Vector(pitch,yaw, roll).normalize().multiply(0.2)
 
 
                     orb.velocity = vector
@@ -115,16 +117,17 @@ data class BlockDefinition private constructor(
                vanillaHaste to ignoreHaste,
                vanillaFatigue to ignoreFatigue,
            ),
-           breakCondition = {
+           breakIf = {
                it[vanillaDmg]!! >= 1f },
-           breakBehavior = { instance ->
+           onBreak = { instance ->
                val player = instance.breaker.delegateAs<Player>()!!
                instance.location.block.breakNaturally(player.equipment.itemInMainHand)
                player.sendBlockDamage(instance.location, 0f, -player.entityId)
            },
-           dropBehavior = { _ -> },
-           replacementMaterial = Material.AIR,
-           breakSound = airBreak
+           onDrop = { _ -> },
+           replacement = Material.AIR,
+           onTick = { _ -> },
+           sound = null
        )
         }
     }
@@ -169,24 +172,35 @@ data class BlockDefinition private constructor(
     class Builder(private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
 
 
-        private var possibleDrops: List<ConditionalDrop> = listOf()
+        private var drops: Iterable<ConditionalDrop> = listOf()
         private var attributes: Map<Attribute<*,*>, Any> = emptyMap()
         private var breakCondition : Predicate<BlockInstance>? = null
-        private var brokenMaterial : Material? = null
+        private var replacement : Material? = null
         private var breakBehavior : Consumer<BlockInstance> = emptyBreakConsumer
         private var dropBehavior : Consumer<DeterminedDrop>? = null
-        private var breakSound : Sound = airBreak
+        private var breakSound : Sound? = null
+        private var tickBehavior : Consumer<BlockInstance> = Consumer {}
 
-        fun drops(drops: List<ConditionalDrop>) = apply { this.possibleDrops = drops }
-        fun attributes(attributes: Map<Attribute<*,*>, Any>) = apply { this.attributes = attributes }
-        fun breakCondition(breakCondition : Predicate<BlockInstance>) = apply { this.breakCondition = breakCondition}
-        fun replacementMaterial(material : Material) = apply { this.brokenMaterial = material }
-        fun breakBehavior(breakBehavior : Consumer<BlockInstance>) = apply { this.breakBehavior = breakBehavior}
-        fun dropBehavior(dropBehavior : Consumer<DeterminedDrop>) = apply {this.dropBehavior = dropBehavior}
-        fun breakSound(sound : Sound) = apply { this.breakSound = sound }
-        fun build() : BlockDefinition {
-            return BlockDefinition(requirements, possibleDrops, attributes, breakCondition, brokenMaterial, breakBehavior, dropBehavior, breakSound)
-        }
+        fun withDrops(drops: Iterable<ConditionalDrop>) = apply { this.drops = drops }
+        fun withAttributes(attributes: Map<Attribute<*,*>, Any>) = apply { this.attributes = attributes }
+        fun breakIf(breakCondition : Predicate<BlockInstance>) = apply { this.breakCondition = breakCondition}
+        fun replaceWith(material : Material) = apply { this.replacement = material }
+        fun onBreak(breakBehavior : Consumer<BlockInstance>) = apply { this.breakBehavior = breakBehavior}
+        fun onDrops(dropBehavior : Consumer<DeterminedDrop>) = apply {this.dropBehavior = dropBehavior}
+        fun playsSound(sound : Sound) = apply { this.breakSound = sound }
+        fun onTick(tickBehavior : Consumer<BlockInstance>) = apply { this.tickBehavior = tickBehavior}
+
+        fun build() = BlockDefinition(
+                requirements,
+                drops,
+                attributes,
+                breakCondition,
+                replacement,
+                tickBehavior,
+                breakBehavior,
+                dropBehavior,
+                breakSound)
+
     }
 
 

@@ -1,7 +1,7 @@
-package dev.vhoyd.blockworks.core
+package dev.vhoyd.blockworks.api.core
 
-import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.model.BlockBreaker
+import dev.vhoyd.blockworks.api.block.BlockDefinition
+import dev.vhoyd.blockworks.api.model.BlockBreaker
 import org.bukkit.block.Block
 import org.bukkit.plugin.Plugin
 

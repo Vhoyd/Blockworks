@@ -1,6 +1,6 @@
-package dev.vhoyd.blockworks.model
+package dev.vhoyd.blockworks.api.model
 
-import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.api.core.Blockworks
 import org.bukkit.persistence.PersistentDataType
 import java.util.function.BiFunction
 
@@ -11,7 +11,7 @@ object ImplementFactory {
     fun <T : Any, V : Implement<T>> of(
         blockworks: Blockworks,
         source : T?,
-        expectedType: Class<out BlockBreaker<V>>,
+        expectedType: Class<out V>,
         constructor: BiFunction<Blockworks, T, V>
     ) : Implement<T>? {
         if (source == null) return null

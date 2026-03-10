@@ -1,9 +1,9 @@
 package dev.vhoyd.blockworks.impl
 
-import dev.vhoyd.blockworks.core.Blockworks
-import dev.vhoyd.blockworks.model.Attribute
-import dev.vhoyd.blockworks.model.Implement
-import dev.vhoyd.blockworks.model.BlockBreaker
+import dev.vhoyd.blockworks.api.core.Blockworks
+import dev.vhoyd.blockworks.api.model.Attribute
+import dev.vhoyd.blockworks.api.model.Implement
+import dev.vhoyd.blockworks.api.model.BlockBreaker
 import org.bukkit.entity.Player
 
 /**

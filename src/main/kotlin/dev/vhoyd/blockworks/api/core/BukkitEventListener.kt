@@ -1,10 +1,10 @@
-package dev.vhoyd.blockworks.core
+package dev.vhoyd.blockworks.api.core
 
-import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.block.BlockInstance
-import dev.vhoyd.blockworks.event.BlockInstanceBreakAbortEvent
-import dev.vhoyd.blockworks.event.BlockInstanceStartBreakEvent
-import dev.vhoyd.blockworks.event.BlockInstanceTickEvent
+import dev.vhoyd.blockworks.api.block.BlockDefinition
+import dev.vhoyd.blockworks.api.block.BlockInstance
+import dev.vhoyd.blockworks.api.event.BlockInstanceBreakAbortEvent
+import dev.vhoyd.blockworks.api.event.BlockInstanceStartBreakEvent
+import dev.vhoyd.blockworks.api.event.BlockInstanceTickEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

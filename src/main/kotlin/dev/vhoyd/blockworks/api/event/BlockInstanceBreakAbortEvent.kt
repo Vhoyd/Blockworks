@@ -1,13 +1,13 @@
-package dev.vhoyd.blockworks.event
+package dev.vhoyd.blockworks.api.event
 
-import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.api.block.BlockInstance
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 /**
- * Event class for when a player starts breaking some [BlockInstance]
+ * Event class for when a player stops breaking some [BlockInstance]
  */
-class BlockInstanceStartBreakEvent(val target: BlockInstance) : Event() {
+class BlockInstanceBreakAbortEvent(val target: BlockInstance) : Event() {
 
     var isCancelled : Boolean = false
 
@@ -24,6 +24,5 @@ class BlockInstanceStartBreakEvent(val target: BlockInstance) : Event() {
     override fun getHandlers(): HandlerList {
         return handlerList
     }
-
 
 }

@@ -1,8 +1,8 @@
 package dev.vhoyd.blockworks.impl
 
-import dev.vhoyd.blockworks.core.Blockworks
-import dev.vhoyd.blockworks.model.Attribute
-import dev.vhoyd.blockworks.model.Implement
+import dev.vhoyd.blockworks.api.core.Blockworks
+import dev.vhoyd.blockworks.api.model.Attribute
+import dev.vhoyd.blockworks.api.model.Implement
 import org.bukkit.inventory.ItemStack
 import java.util.function.BiFunction
 
@@ -32,7 +32,7 @@ class Tool @JvmOverloads constructor(
 
     companion object {
         @JvmStatic
-        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, out Tool> = BiFunction { blockworks, item ->
+        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, Tool> = BiFunction { blockworks, item ->
             val tool = Tool(blockworks, item, emptyMap(), false)
             tool.applyAttributes()
             tool

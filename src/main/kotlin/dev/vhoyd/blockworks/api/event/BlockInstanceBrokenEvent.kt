@@ -1,13 +1,14 @@
-package dev.vhoyd.blockworks.event
+package dev.vhoyd.blockworks.api.event
 
-import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.api.block.BlockInstance
+import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 /**
- * Event class for when a player stops breaking some [BlockInstance]
+ * Event class for when a player breaks some [BlockInstance]
  */
-class BlockInstanceBreakAbortEvent(val target: BlockInstance) : Event() {
+class BlockInstanceBrokenEvent(val drops : DeterminedDrop) : Event() {
 
     var isCancelled : Boolean = false
 
@@ -26,3 +27,5 @@ class BlockInstanceBreakAbortEvent(val target: BlockInstance) : Event() {
     }
 
 }
+
+

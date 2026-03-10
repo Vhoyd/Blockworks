@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.core
+package dev.vhoyd.blockworks.api.core
 
 /**
  * Internal class for debug logging. Uses a source from Blockworks as well as the plugin its spawned from when logging.

@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.model
+package dev.vhoyd.blockworks.api.model
 
 /**
  * Models any "implement" that could be utilized by a [BlockBreaker], based on some delegate such as an `ItemStack`.

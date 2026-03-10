@@ -1,20 +1,20 @@
-package dev.vhoyd.blockworks.loot
+package dev.vhoyd.blockworks.api.loot.entry
 
 import kotlin.random.Random
 
 /**
- * This class takes a `List<`[WeightedEntry]`>` and attaches a few extra methods for getting random/specific
+ * This class takes a `List<`[Entry]`>` and attaches a few extra methods for getting random/specific
  * contents out of that list.
  * When instantiated, an object of this class computes the cumulative weight of all entries and stores it for
  * later use with fetching entries.
  */
 
-class WeightedEntryPool<out T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(entries) {
+class WeightedEntryPool<out T>(entries : List<Entry<T>>) : EntryPool<T>(entries) {
     private val totalWeight : Int
 
     init {
         var sum = 0
-        entries.forEach { sum += it.second }
+        entries.forEach { sum += it.weight }
         totalWeight = sum
     }
 
@@ -28,15 +28,15 @@ class WeightedEntryPool<out T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(
      * underlying `List`, it is necessary to compute the inputted weight based on cumulative weight in
      * ascending index order, 0 -> `list.size`
      */
-    override fun pickExact(value : Int) : T {
-        var number = value
-        var item : WeightedEntry<T> = entries[0]
+    fun pickExact(weight : Int) : T {
+        var number = weight
+        var item : Entry<T> = entries[0]
         val iterator = entries.iterator()
         while (number >= 0) {
             item = iterator.next()
-            number -= item.second
+            number -= item.weight
         }
-        return item.first
+        return item.data
     }
 
 }

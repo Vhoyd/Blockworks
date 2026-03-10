@@ -1,17 +1,17 @@
-package dev.vhoyd.blockworks.core
+package dev.vhoyd.blockworks.api.core
 
-import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.block.BlockInstance
-import dev.vhoyd.blockworks.event.BlockInstanceBrokenEvent
-import dev.vhoyd.blockworks.event.BlockInstanceTickEvent
-import dev.vhoyd.blockworks.loot.DeterminedDrop
+import dev.vhoyd.blockworks.api.block.BlockDefinition
+import dev.vhoyd.blockworks.api.block.BlockInstance
+import dev.vhoyd.blockworks.api.event.BlockInstanceBrokenEvent
+import dev.vhoyd.blockworks.api.event.BlockInstanceTickEvent
+import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 
 /**
- * Internal API class for updating blocks being broken by players each tick, as Minecraft does not natively
+ * Internal API class for updating blocks being broken each tick, as Minecraft does not natively
  * trigger an event each tick for this. Use with caution.
  */
 class BlockInstanceManager internal constructor(val blockworks : Blockworks) : BukkitRunnable() {
@@ -66,7 +66,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
             subscribedInstances.forEach {
 
                 // either block was not meant to be vanilla or it's not at the spot the block was broken
-                if (it.definition.breakCondition != BlockDefinition.VANILLA_BREAK_CONDITION || it.location != location) return@forEach
+                if (it.definition.breakIf != BlockDefinition.VANILLA_BREAK_CONDITION || it.location != location) return@forEach
 
                 // if the above checked didn't return, the block has been found
                 log.debug("Found matching vanilla block break condition at ${location}.")

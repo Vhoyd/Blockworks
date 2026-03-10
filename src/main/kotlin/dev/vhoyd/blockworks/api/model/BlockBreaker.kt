@@ -1,7 +1,7 @@
-package dev.vhoyd.blockworks.model
+package dev.vhoyd.blockworks.api.model
 
-import dev.vhoyd.blockworks.block.BlockInstance
-import dev.vhoyd.blockworks.core.Blockworks
+import dev.vhoyd.blockworks.api.block.BlockInstance
+import dev.vhoyd.blockworks.api.core.Blockworks
 
 
 /**

@@ -1,8 +1,8 @@
-package dev.vhoyd.blockworks.loot
+package dev.vhoyd.blockworks.api.loot
 
 import org.bukkit.inventory.ItemStack
-import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.block.BlockInstance
+import dev.vhoyd.blockworks.api.block.BlockDefinition
+import dev.vhoyd.blockworks.api.block.BlockInstance
 
 /**
  * Data class constructed  after rolling every [ConditionalDrop] in a [BlockDefinition]. Also acts as a pre-deploy wrapper
@@ -15,15 +15,15 @@ import dev.vhoyd.blockworks.block.BlockInstance
  */
 data class DeterminedDrop(
     val blockInstance : BlockInstance,
-    val items: List<ItemStack>,
-    val exp: List<Int>
+    val items: Set<ItemStack>,
+    val exp: Set<Int>
 ) {
 
-    val splitDrops: List<ItemStack> by lazy { processItems() }
+    val splitDrops: Set<ItemStack> by lazy { processItems() }
     private val log = blockInstance.breaker.blockworks.logger.context("DeterminedDrop:${blockInstance.location.block.blockData.material}")
 
-    private fun processItems() : List<ItemStack> {
-        val split = mutableListOf<ItemStack>()
+    private fun processItems() : Set<ItemStack> {
+        val split = mutableSetOf<ItemStack>()
         log.debug("Splitting list of size ${items.size}")
         items.forEach { drop ->
             while (drop.amount > 64) {

@@ -1,9 +1,9 @@
-package dev.vhoyd.blockworks.core
+package dev.vhoyd.blockworks.api.core
 
 import com.google.common.base.Predicate
-import dev.vhoyd.blockworks.block.BlockDefinition
-import dev.vhoyd.blockworks.block.BlockInstance
-import dev.vhoyd.blockworks.loot.DeterminedDrop
+import dev.vhoyd.blockworks.api.block.BlockDefinition
+import dev.vhoyd.blockworks.api.block.BlockInstance
+import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import org.bukkit.Material
 import org.bukkit.plugin.Plugin
 import java.util.function.Consumer
@@ -22,7 +22,7 @@ data class Config @JvmOverloads constructor(
     internal val plugin : Plugin,
     internal val loggingLevel: LoggingLevel = LoggingLevel.WARN,
     internal val eventMask : Byte,
-    internal val blockDefinitions : List<BlockDefinition>,
+    internal val blockDefinitions : Iterable<BlockDefinition>,
     internal val defaultReplacementMaterial : Material = Material.AIR,
     internal val defaultBreakCondition : Predicate<BlockInstance>,
     internal val defaultDropBehavior : Consumer<DeterminedDrop> = BlockDefinition.DEFAULT_DROP_BEHAVIOR,

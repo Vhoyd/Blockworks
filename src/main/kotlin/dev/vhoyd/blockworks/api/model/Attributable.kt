@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.model
+package dev.vhoyd.blockworks.api.model
 
 interface Attributable {
     /**

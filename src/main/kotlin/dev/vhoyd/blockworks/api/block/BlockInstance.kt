@@ -1,8 +1,8 @@
-package dev.vhoyd.blockworks.block
+package dev.vhoyd.blockworks.api.block
 
-import dev.vhoyd.blockworks.model.BlockBreaker
-import dev.vhoyd.blockworks.model.Attributable
-import dev.vhoyd.blockworks.model.Attribute
+import dev.vhoyd.blockworks.api.model.BlockBreaker
+import dev.vhoyd.blockworks.api.model.Attributable
+import dev.vhoyd.blockworks.api.model.Attribute
 import org.bukkit.Location
 
 /**
@@ -21,13 +21,13 @@ class BlockInstance internal constructor(
     val location: Location,
     val breaker : BlockBreaker<*>
 ) : Attributable {
-    val breakCondition = definition.breakCondition ?: breaker.blockworks.config.defaultBreakCondition
-    val replacementMaterial = definition.replacementMaterial ?:
+    val breakCondition = definition.breakIf ?: breaker.blockworks.config.defaultBreakCondition
+    val replacementMaterial = definition.replacement ?:
 
     if (definition.attributes.keys.contains(BlockDefinition.vanillaDmg)) location.block.type
     else breaker.blockworks.config.defaultReplacementMaterial
 
-    val dropBehavior = definition.dropBehavior ?: breaker.blockworks.config.defaultDropBehavior
+    val dropBehavior = definition.onDrop ?: breaker.blockworks.config.defaultDropBehavior
     val broken : Boolean
         get() = breakCondition.test(this)
     val drops = definition.drops
@@ -36,7 +36,7 @@ class BlockInstance internal constructor(
     /**
      * Shorthand for `definition.breakBehavior(this)`; does not set this instance's state to broken.
       */
-    fun breakBlock() = definition.breakBehavior.accept(this)
+    fun breakBlock() = definition.onBreak.accept(this)
 
     override fun <P : Any, C : Any> setAttribute(
         attribute: Attribute<P, C>,
