@@ -20,7 +20,7 @@ data class DeterminedDrop(
 ) {
 
     val splitDrops: List<ItemStack> by lazy { processItems() }
-    val log = blockInstance.breaker.blockworks.logger.context("DeterminedDrop:${blockInstance.location.block.blockData.material}")
+    private val log = blockInstance.breaker.blockworks.logger.context("DeterminedDrop:${blockInstance.location.block.blockData.material}")
 
     private fun processItems() : List<ItemStack> {
         val split = mutableListOf<ItemStack>()

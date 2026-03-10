@@ -3,14 +3,14 @@ package dev.vhoyd.blockworks.core
 /**
  * Internal class for debug logging. Uses a source from Blockworks as well as the plugin its spawned from when logging.
  */
-class Logger(
+internal class Logger(
     private val blockworks : Blockworks,
     source : String?,
     private val level  : Config.LoggingLevel,
 ) {
-    val sourceText = source ?: ""
-    val logger = blockworks.plugin.logger
-    val name = blockworks.plugin.name
+    private val sourceText = source ?: ""
+    private val logger = blockworks.plugin.logger
+    private val name = blockworks.plugin.name
 
     fun <T> info(thing : T) {
         if (level.level < Config.LoggingLevel.INFO.level) return

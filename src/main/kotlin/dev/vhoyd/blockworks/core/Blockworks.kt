@@ -16,10 +16,10 @@ import org.bukkit.plugin.Plugin
  */
 class Blockworks(val config: Config)  {
 
-    val plugin : Plugin = config.plugin
-    val logger = Logger(this, source = "Main", level = config.loggingLevel)
-    val breakers = mutableSetOf<BlockBreaker<*>>()
-    internal val breakTick = BlockBreakTick(this)
+    internal val plugin : Plugin = config.plugin
+    internal val logger = Logger(this, source = "Main", level = config.loggingLevel)
+    internal val breakers = mutableSetOf<BlockBreaker<*>>()
+    val blockInstanceManager = BlockInstanceManager(this)
 
     init {
         logger.info("Creating Blockworks object for plugin ${plugin.name}...")
@@ -28,7 +28,7 @@ class Blockworks(val config: Config)  {
 
     fun start() {
         val eventHandler = BukkitEventListener(this)
-        breakTick.runTaskTimer(plugin, 0, 0)
+        blockInstanceManager.runTaskTimer(plugin, 0, 0)
         plugin.server.pluginManager.registerEvents(eventHandler, plugin)
         logger.info("Blockworks (via ${plugin.name}) is running!")
     }
@@ -45,10 +45,7 @@ class Blockworks(val config: Config)  {
     /**
      * @return `true` if the given [BlockBreaker] was registered, or `false` if it was already registered.
      */
-    fun  registerBlockBreaker(breaker : BlockBreaker<*> ) : Boolean {
-        val new = breakers.add(breaker)
-        return new
-    }
+    fun  registerBlockBreaker(breaker : BlockBreaker<*> ) = breakers.add(breaker)
 
     /**
      * @return the [BlockDefinition] that overrides block behavior of the given [Block], or `null`

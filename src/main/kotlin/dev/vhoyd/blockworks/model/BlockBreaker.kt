@@ -10,23 +10,21 @@ import dev.vhoyd.blockworks.core.Blockworks
  * @see dev.vhoyd.blockworks.impl.BlockworksPlayer
  */
 @Suppress("Unchecked_cast", "unused")
-abstract class BlockBreaker<T>(
+abstract class BlockBreaker<out T>(
     delegate : T,
     val blockworks: Blockworks,
     defaultAttributes : Map<Attribute<*,*>, Any>,
-    defaultImplements : Map<Class<AttributedImplement<*>>, AttributedImplement<*>>,
+    defaultImplements : Map<Class<out AttributedImplement<*>>, AttributedImplement<*>>,
 ) : Attributable, Wrapper<T>(delegate) {
     var currentBlock: BlockInstance? = null
-    val implements : MutableMap<Class<AttributedImplement<*>>, AttributedImplement<*>>
+    val implements : MutableMap<Class<out AttributedImplement<*>>, AttributedImplement<*>>
 
     init {
         defaultAttributes.forEach { (key, value) -> set(key as Attribute<Any, Any>, value) }
         implements = defaultImplements.toMutableMap()
         blockworks.registerBlockBreaker(this)
     }
-    inline fun <reified V : AttributedImplement<*>> getImplement() = implements[V::class.java as Class<*>] as V
-
-    inline fun <reified V: AttributedImplement<*>> getImplementOrNull() = implements[V::class.java as Class<*>] as? V
+    inline fun <reified V : AttributedImplement<*>> getImplement() = implements[V::class.java as Class<*>] as? V
 
     inline fun <reified V : AttributedImplement<*>> setImplement(element : V) = implements.set(V::class.java as Class<AttributedImplement<*>>, element)
 
@@ -34,9 +32,7 @@ abstract class BlockBreaker<T>(
 
 
 
-    fun <V : AttributedImplement<*>> getImplement(type: Class<V>) = implements[type as Class<*>] as V
-
-    fun <V: AttributedImplement<*>> getImplementOrNull(type: Class<V>) = implements[type as Class<*>] as? V
+    fun <V : AttributedImplement<*>> getImplement(type: Class<V>) = implements[type as Class<*>] as? V
 
     fun <V : AttributedImplement<*>> setImplement(type: Class<V>, element: V) = implements.set(type as Class<AttributedImplement<*>>, element)
 

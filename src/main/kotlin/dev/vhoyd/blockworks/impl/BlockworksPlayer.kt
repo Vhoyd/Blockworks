@@ -15,15 +15,15 @@ class BlockworksPlayer(
     delegate: Player,
     blockworks: Blockworks,
     data : Map<Attribute<*, *>, Any>,
-    implements: MutableMap<Class<AttributedImplement<*>>, AttributedImplement<*>>
-    ) : BlockBreaker<Player>(delegate, blockworks, data, implements) {
+    defaultImplements: Map<Class<out AttributedImplement<*>>, AttributedImplement<*>>
+    ) : BlockBreaker<Player>(delegate, blockworks, data, defaultImplements) {
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
-        PersistenceWriter.setTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType, value)
+        PersistenceWriter.setValue(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType, value)
     }
 
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>) : C {
-        return PersistenceWriter.getTag(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType)
+    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
+        return PersistenceWriter.getValue(blockworks.plugin, delegate, "blockworks-${attribute.name}", attribute.persistentDataType)
     }
 
 }

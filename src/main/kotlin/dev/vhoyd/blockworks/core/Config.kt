@@ -19,15 +19,14 @@ import kotlin.experimental.or
 
 
 data class Config @JvmOverloads constructor(
-    val plugin : Plugin,
-    val loggingLevel: LoggingLevel = LoggingLevel.WARN,
-    val eventMask : Byte,
-    val blockDefinitions : List<BlockDefinition>,
-    val defaultReplacementMaterial : Material = Material.AIR,
-    val defaultBreakCondition : Predicate<BlockInstance>,
-    val defaultDropBehavior : Consumer<DeterminedDrop> = BlockDefinition.DEFAULT_DROP_BEHAVIOR,
+    internal val plugin : Plugin,
+    internal val loggingLevel: LoggingLevel = LoggingLevel.WARN,
+    internal val eventMask : Byte,
+    internal val blockDefinitions : List<BlockDefinition>,
+    internal val defaultReplacementMaterial : Material = Material.AIR,
+    internal val defaultBreakCondition : Predicate<BlockInstance>,
+    internal val defaultDropBehavior : Consumer<DeterminedDrop> = BlockDefinition.DEFAULT_DROP_BEHAVIOR,
 ) {
-
 
     companion object {
         /**

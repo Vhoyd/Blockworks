@@ -1,7 +1,7 @@
 package dev.vhoyd.blockworks.loot
 
 
-class UniformEntryPool<T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(entries) {
+class UniformEntryPool<out T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(entries) {
     override fun pickRandom(): T {
         return entries.random().first
     }

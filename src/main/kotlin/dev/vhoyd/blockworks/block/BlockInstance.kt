@@ -16,13 +16,17 @@ import org.bukkit.Location
  * @property drops a shorthand for `definition.possibleDrops`
  * @property attributes the attribute data assigned to this instance. Copies `definition.attributes` initially.
  */
-class BlockInstance(
+class BlockInstance internal constructor(
     val definition: BlockDefinition,
     val location: Location,
     val breaker : BlockBreaker<*>
 ) : Attributable {
     val breakCondition = definition.breakCondition ?: breaker.blockworks.config.defaultBreakCondition
-    val replacementMaterial = definition.replacementMaterial ?: breaker.blockworks.config.defaultReplacementMaterial
+    val replacementMaterial = definition.replacementMaterial ?:
+
+    if (definition.attributes.keys.contains(BlockDefinition.vanillaDmg)) location.block.type
+    else breaker.blockworks.config.defaultReplacementMaterial
+
     val dropBehavior = definition.dropBehavior ?: breaker.blockworks.config.defaultDropBehavior
     val broken : Boolean
         get() = breakCondition.test(this)
@@ -41,9 +45,10 @@ class BlockInstance(
         attributes[attribute] = value
     }
 
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C {
+
+    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
         @Suppress("UNCHECKED_CAST")
-        return attributes[attribute] as C
+        return attributes[attribute] as? C
     }
 
     override fun equals(other: Any?): Boolean {

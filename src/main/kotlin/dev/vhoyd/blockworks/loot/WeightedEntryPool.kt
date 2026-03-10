@@ -9,7 +9,7 @@ import kotlin.random.Random
  * later use with fetching entries.
  */
 
-class WeightedEntryPool<T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(entries) {
+class WeightedEntryPool<out T>(entries : List<WeightedEntry<T>>) : EntryPool<T>(entries) {
     private val totalWeight : Int
 
     init {

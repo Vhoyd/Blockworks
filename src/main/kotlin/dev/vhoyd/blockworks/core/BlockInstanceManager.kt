@@ -12,15 +12,15 @@ import org.bukkit.scheduler.BukkitRunnable
 
 /**
  * Internal API class for updating blocks being broken by players each tick, as Minecraft does not natively
- * trigger an event each tick for this. Attempting to tamper with is ill-advised.
+ * trigger an event each tick for this. Use with caution.
  */
-internal class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
-    val manager = blockworks.plugin.server.pluginManager
+class BlockInstanceManager internal constructor(val blockworks : Blockworks) : BukkitRunnable() {
+    private val manager = blockworks.plugin.server.pluginManager
 
     // set, so that duplicates aren't ticked twice (end-users could implement manually)
-    val subscribedInstances = mutableSetOf<BlockInstance>()
+    private val subscribedInstances = mutableSetOf<BlockInstance>()
 
-    val log = blockworks.logger.context("BlockBreakTick")
+    private val log = blockworks.logger.context("BlockInstanceManager")
 
     override fun run() {
         for (instance : BlockInstance in subscribedInstances) {
@@ -30,25 +30,32 @@ internal class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
 
     }
 
-    // add new instance to set
-    fun subscribe(blockInstance : BlockInstance) {
+    /**
+     * Adds a [BlockInstance] to the set of ones that Blockworks will tick over and dispatch events for.
+     * @return whether the `BlockInstance` was successfully added or not, as defined by [MutableSet.add]
+     */
+    fun subscribe(blockInstance : BlockInstance) : Boolean {
         log.debug("BlockInstance of type ${blockInstance.location.block.blockData.material} subscribed")
-        subscribedInstances.add(blockInstance)
+        return subscribedInstances.add(blockInstance)
     }
 
-    // remove instance from set (probably because it was broken)
-    fun unsubscribe(blockInstance: BlockInstance) {
+    /**
+     * Removes a [BlockInstance] from the set of ones being handled.
+     * @return whether the `BlockInstance` was successfully removed or not, as defined by [MutableSet.remove]
+     */
+    fun unsubscribe(blockInstance: BlockInstance) : Boolean {
         val removed = subscribedInstances.remove(blockInstance)
 
         // TODO: figure out why this happens way more often than it should
         if (!removed) log.warn("Instance was not removed.")
-
         else log.debug("BlockInstance of type ${blockInstance.location.block.blockData.material} unsubscribed")
+        blockInstance.breaker.currentBlock = null
+        return removed
     }
 
 
     // break block like vanilla Minecraft
-    fun applyVanillaBreak(location : Location) : BlockInstance? {
+    internal fun applyVanillaBreak(location : Location) : BlockInstance? {
 
         if (subscribedInstances.isEmpty()) {
             log.warn("No subscribed blocks to break.")
@@ -73,7 +80,7 @@ internal class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
     }
 
     // do all the fun stuff related to breaking the block
-    fun handleBreakLogic(instance : BlockInstance) {
+    internal fun handleBreakLogic(instance : BlockInstance) {
         val list = mutableListOf<ItemStack>()
         val sumXp = mutableListOf<Int>()
         instance.drops.forEach {
@@ -89,9 +96,13 @@ internal class BlockBreakTick(val blockworks : Blockworks) : BukkitRunnable() {
                 sumXp += it.expPool.pickRandom()
             } else { log.debug("Condition failed") }
         }
-        val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, list, sumXp))
+        val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, list.map { it.clone() }, sumXp))
         manager.callEvent(event)
-        instance.location.block.type = instance.replacementMaterial
+        val block = instance.location.block
+        block.type = instance.replacementMaterial
+        blockworks.getDefinition(block, instance.breaker)?.let { definition ->
+            instance.breaker.currentBlock = BlockInstance(definition, block.location, instance.breaker)
+        }
         unsubscribe(instance)
         log.debug("Calling block break behavior.")
         instance.breakBlock()

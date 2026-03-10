@@ -11,6 +11,7 @@ import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
+import org.bukkit.persistence.PersistentDataType
 import org.bukkit.util.Vector
 import java.util.function.BiPredicate
 import java.util.function.Consumer
@@ -51,10 +52,14 @@ data class BlockDefinition private constructor(
 
     companion object {
         private val airBreak = Material.AIR.createBlockData().soundGroup.breakSound
-        private val emptyBreakConsumer = Consumer<BlockInstance> { }
+        private val emptyBreakConsumer : Consumer<BlockInstance> = Consumer { }
+
+        internal val vanillaDmg = Attribute("internal-dmg", PersistentDataType.FLOAT)
+        internal val vanillaHaste = Attribute("internal-haste", PersistentDataType.BOOLEAN)
+        internal val vanillaFatigue = Attribute("internal-fatigue", PersistentDataType.BOOLEAN)
 
         @JvmStatic
-        val VANILLA_BREAK_CONDITION = Predicate<BlockInstance> { false }
+        val VANILLA_BREAK_CONDITION : Predicate<BlockInstance> = Predicate { false }
 
         @JvmStatic
         val DEFAULT_DROP_BEHAVIOR : Consumer<DeterminedDrop> = Consumer { drop ->
@@ -99,14 +104,23 @@ data class BlockDefinition private constructor(
         @JvmStatic
         fun vanilla(
             requirements: BiPredicate<Block, BlockBreaker<*>>,
+            ignoreFatigue: Boolean,
+            ignoreHaste: Boolean,
         ) : BlockDefinition {
        return BlockDefinition(
            requirements,
            listOf(),
-           attributes = emptyMap(),
-           breakCondition = VANILLA_BREAK_CONDITION,
+           attributes = mapOf(
+               vanillaDmg to 0f,
+               vanillaHaste to ignoreHaste,
+               vanillaFatigue to ignoreFatigue,
+           ),
+           breakCondition = {
+               it[vanillaDmg]!! >= 1f },
            breakBehavior = { instance ->
-               instance.location.block.breakNaturally(instance.breaker.delegateAs<Player>().equipment.itemInMainHand)
+               val player = instance.breaker.delegateAs<Player>()!!
+               instance.location.block.breakNaturally(player.equipment.itemInMainHand)
+               player.sendBlockDamage(instance.location, 0f, -player.entityId)
            },
            dropBehavior = { _ -> },
            replacementMaterial = Material.AIR,
@@ -127,11 +141,12 @@ data class BlockDefinition private constructor(
         error("Block definition attributes represent defaults and cannot be modified after creation.")
     }
 
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C {
+    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
 
         @Suppress("UNCHECKED_CAST")
-        return attributes[attribute] as C
+        return attributes[attribute] as? C
     }
+
 
     /**
      * Evaluates the data of the given `Block` and [BlockBreaker] against the settings of this `BlockDefinition` to
