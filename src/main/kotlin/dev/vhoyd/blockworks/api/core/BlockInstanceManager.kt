@@ -34,7 +34,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
             if (added) log.debug("BlockInstance at ${it.location} subscribed")
             else log.warn("BlockInstance at ${it.location} was not subscribed")
         }
-
+        toAdd.clear()
         toDelete.forEach {
             val removed = subscribers.remove(it)
             it.breaker.currentBlock = null
@@ -42,6 +42,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
             if (!removed) log.warn("BlockInstance at ${it.location} was not removed.")
             else log.debug("BlockInstance at ${it.location} unsubscribed")
         }
+        toDelete.clear()
 
     }
 
