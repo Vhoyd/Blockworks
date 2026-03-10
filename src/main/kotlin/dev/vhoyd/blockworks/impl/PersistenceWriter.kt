@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.nbt
+package dev.vhoyd.blockworks.impl
 
 import org.bukkit.NamespacedKey
 import org.bukkit.persistence.PersistentDataHolder
@@ -27,4 +27,3 @@ object PersistenceWriter{
         return pdc.get(nsk, type)
     }
 }
-

@@ -1,22 +1,22 @@
 package dev.vhoyd.blockworks.impl
 
 import dev.vhoyd.blockworks.core.Blockworks
-import dev.vhoyd.blockworks.model.Attribute
-import dev.vhoyd.blockworks.model.AttributedImplement
-import dev.vhoyd.blockworks.nbt.PersistenceWriter
+import dev.vhoyd.blockworks.api.Attribute
+import dev.vhoyd.blockworks.api.Implement
+import dev.vhoyd.blockworks.impl.PersistenceWriter
 import org.bukkit.inventory.ItemStack
 import java.util.function.BiFunction
 
 /**
- * Example implementation of [AttributedImplement] for use with `ItemStack`s. Not required when using the API;
- * other implementations of `ItemStack`-based `AttributedImplement`s are fully allowed.
+ * Example implementation of [Implement] for use with `ItemStack`s. Not required when using the API;
+ * other implementations of `ItemStack`-based `Implement`s are fully allowed.
  */
 class Tool @JvmOverloads constructor(
     val blockworks: Blockworks,
     item: ItemStack?,
     data: Map<Attribute<*, *>, Any>,
     overwriteData: Boolean = true
-) : AttributedImplement<ItemStack>(item ?: ItemStack.empty(), data, overwriteData) {
+) : Implement<ItemStack>(item ?: ItemStack.empty(), data, overwriteData) {
 
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {

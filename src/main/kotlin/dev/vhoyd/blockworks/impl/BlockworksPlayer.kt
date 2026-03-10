@@ -1,10 +1,10 @@
 package dev.vhoyd.blockworks.impl
 
 import dev.vhoyd.blockworks.core.Blockworks
-import dev.vhoyd.blockworks.model.Attribute
-import dev.vhoyd.blockworks.model.AttributedImplement
-import dev.vhoyd.blockworks.model.BlockBreaker
-import dev.vhoyd.blockworks.nbt.PersistenceWriter
+import dev.vhoyd.blockworks.api.Attribute
+import dev.vhoyd.blockworks.api.Implement
+import dev.vhoyd.blockworks.api.BlockBreaker
+import dev.vhoyd.blockworks.impl.PersistenceWriter
 import org.bukkit.entity.Player
 
 /**
@@ -15,7 +15,7 @@ class BlockworksPlayer(
     delegate: Player,
     blockworks: Blockworks,
     data : Map<Attribute<*, *>, Any>,
-    defaultImplements: Map<Class<out AttributedImplement<*>>, AttributedImplement<*>>
+    defaultImplements: Map<Class<out Implement<*>>, Implement<*>>
     ) : BlockBreaker<Player>(delegate, blockworks, data, defaultImplements) {
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {

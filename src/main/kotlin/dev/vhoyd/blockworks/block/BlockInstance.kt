@@ -1,8 +1,8 @@
 package dev.vhoyd.blockworks.block
 
-import dev.vhoyd.blockworks.model.BlockBreaker
-import dev.vhoyd.blockworks.model.Attributable
-import dev.vhoyd.blockworks.model.Attribute
+import dev.vhoyd.blockworks.api.BlockBreaker
+import dev.vhoyd.blockworks.api.Attributable
+import dev.vhoyd.blockworks.api.Attribute
 import org.bukkit.Location
 
 /**
