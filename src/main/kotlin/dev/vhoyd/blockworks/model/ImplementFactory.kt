@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.api
+package dev.vhoyd.blockworks.model
 
 import dev.vhoyd.blockworks.core.Blockworks
 import org.bukkit.persistence.PersistentDataType

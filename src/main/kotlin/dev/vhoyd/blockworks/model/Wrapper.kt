@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.api
+package dev.vhoyd.blockworks.model
 
 /**
  * Promises some delegate property along with some casting methods.

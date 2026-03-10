@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.api
+package dev.vhoyd.blockworks.model
 
 import dev.vhoyd.blockworks.block.BlockInstance
 import dev.vhoyd.blockworks.core.Blockworks

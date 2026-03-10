@@ -3,9 +3,9 @@ package dev.vhoyd.blockworks.block
 import dev.vhoyd.blockworks.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.loot.ConditionalDrop
 import dev.vhoyd.blockworks.loot.DeterminedDrop
-import dev.vhoyd.blockworks.api.Attributable
-import dev.vhoyd.blockworks.api.Attribute
-import dev.vhoyd.blockworks.api.BlockBreaker
+import dev.vhoyd.blockworks.model.Attributable
+import dev.vhoyd.blockworks.model.Attribute
+import dev.vhoyd.blockworks.model.BlockBreaker
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
