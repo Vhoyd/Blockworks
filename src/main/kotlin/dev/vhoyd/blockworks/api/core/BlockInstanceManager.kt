@@ -18,14 +18,29 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
     private val manager = blockworks.plugin.server.pluginManager
 
     // set, so that duplicates aren't ticked twice (end-users could implement manually)
-    private val subscribedInstances = mutableSetOf<BlockInstance>()
+    private val subscribers = mutableSetOf<BlockInstance>()
+    private val toDelete: MutableSet<BlockInstance> = mutableSetOf()
+    private val toAdd: MutableSet<BlockInstance> = mutableSetOf()
 
     private val log = blockworks.logger.context("BlockInstanceManager")
 
     override fun run() {
-        for (instance : BlockInstance in subscribedInstances) {
+        for (instance : BlockInstance in subscribers) {
             manager.callEvent(BlockInstanceTickEvent(instance))
             if (instance.broken) handleBreakLogic(instance)
+        }
+        toAdd.forEach {
+            val added = subscribers.add(it)
+            if (added) log.debug("BlockInstance at ${it.location} subscribed")
+            else log.warn("BlockInstance at ${it.location} was not subscribed")
+        }
+
+        toDelete.forEach {
+            val removed = subscribers.remove(it)
+            it.breaker.currentBlock = null
+            // TODO: figure out why this happens way more often than it should
+            if (!removed) log.warn("BlockInstance at ${it.location} was not removed.")
+            else log.debug("BlockInstance at ${it.location} unsubscribed")
         }
 
     }
@@ -34,36 +49,29 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
      * Adds a [BlockInstance] to the set of ones that Blockworks will tick over and dispatch events for.
      * @return whether the `BlockInstance` was successfully added or not, as defined by [MutableSet.add]
      */
-    fun subscribe(blockInstance : BlockInstance) : Boolean {
-        log.debug("BlockInstance of type ${blockInstance.location.block.blockData.material} subscribed")
-        return subscribedInstances.add(blockInstance)
+    fun subscribe(blockInstance : BlockInstance) {
+        toAdd.add(blockInstance)
     }
 
     /**
      * Removes a [BlockInstance] from the set of ones being handled.
      * @return whether the `BlockInstance` was successfully removed or not, as defined by [MutableSet.remove]
      */
-    fun unsubscribe(blockInstance: BlockInstance) : Boolean {
-        val removed = subscribedInstances.remove(blockInstance)
-
-        // TODO: figure out why this happens way more often than it should
-        if (!removed) log.warn("Instance was not removed.")
-        else log.debug("BlockInstance of type ${blockInstance.location.block.blockData.material} unsubscribed")
-        blockInstance.breaker.currentBlock = null
-        return removed
+    fun unsubscribe(blockInstance: BlockInstance) {
+        toDelete.add(blockInstance)
     }
 
 
     // break block like vanilla Minecraft
     internal fun applyVanillaBreak(location : Location) : BlockInstance? {
 
-        if (subscribedInstances.isEmpty()) {
+        if (subscribers.isEmpty()) {
             log.warn("No subscribed blocks to break.")
             return null
 
         } else {
             var entry : BlockInstance? = null
-            subscribedInstances.forEach {
+            subscribers.forEach {
 
                 // either block was not meant to be vanilla or it's not at the spot the block was broken
                 if (it.definition.breakIf != BlockDefinition.VANILLA_BREAK_CONDITION || it.location != location) return@forEach
