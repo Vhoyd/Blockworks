@@ -1,10 +1,11 @@
 plugins {
     kotlin("jvm") version "2.2.20"
-    id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("org.jetbrains.dokka") version "2.1.0"
     `maven-publish`
 }
 
+val targetJavaVersion = 21
 group = "dev.vhoyd"
 version = "1.0-SNAPSHOT"
 
@@ -15,65 +16,55 @@ repositories {
     }
 }
 
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
 
-tasks {
-    runServer {
-        minecraftVersion("1.21.11")
-    }
-    shadowJar {
-        archiveClassifier.set("")
-        archiveBaseName.set("Blockworks")
-        archiveVersion.set("1.0-SNAPSHOT")
-        minimize()
-        doLast {
-            println("Shadow jar built at: ${archiveFile.get().asFile.absolutePath}")
-        }
-    }
-}
 afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
-                artifact(tasks.named("shadowJar")) {
-                    builtBy(tasks.named("shadowJar"))
+                artifact(tasks.jar) {
+                    builtBy(tasks.jar)
                 }
             }
         }
     }
 }
 
-val targetJavaVersion = 21
 kotlin {
     jvmToolchain(targetJavaVersion)
+
 }
 
-tasks.build {
-    dependsOn(tasks.shadowJar)
-}
+tasks {
 
-tasks.processResources {
-    val props = mapOf("version" to version)
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
-        expand(props)
+    processResources {
+
+        val props = mapOf("version" to project.version)
+        inputs.properties(props)
+        filteringCharset = "UTF-8"
+        filesMatching("plugin.yml") {
+            expand(props)
+        }
+    }
+
+    jar {
+        archiveClassifier.set("")
+        archiveBaseName.set(project.name)
+        archiveVersion.set(project.version.toString())
     }
 }
 
-tasks.jar {
-    enabled = false
 
-}
 
 // Hacked this together just so that I can test the plugin quicker without needing a file manager open.
-val exportPluginThingy by tasks.registering(Copy::class) {
-    dependsOn(tasks.build)
-    from(tasks.shadowJar)
+val export by tasks.registering(Copy::class) {
+    dependsOn(listOf(tasks.build, tasks.jar, tasks.publishToMavenLocal))
+    from(tasks.jar)
     into(File(System.getProperty("user.home"), "Desktop/Paper 1.21.11 server/plugins/"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
