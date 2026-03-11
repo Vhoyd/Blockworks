@@ -22,7 +22,7 @@ class BlockInstance internal constructor(
     val breaker : BlockBreaker<*>
 ) : Attributable {
     val breakCondition = definition.breakIf ?: breaker.blockworks.config.defaultBreakCondition
-    val replacementMaterial = definition.replacement ?:
+    val replacement = definition.replacement ?:
 
     if (definition.attributes.keys.contains(BlockDefinition.vanillaDmg)) location.block.type
     else breaker.blockworks.config.defaultReplacementMaterial

@@ -25,9 +25,9 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
     private val log = blockworks.logger.context("BlockInstanceManager")
 
     override fun run() {
-        for (instance : BlockInstance in subscribers) {
-            manager.callEvent(BlockInstanceTickEvent(instance))
-            if (instance.broken) handleBreakLogic(instance)
+        subscribers.forEach {
+            manager.callEvent(BlockInstanceTickEvent(it))
+            if (it.broken) handleBreakLogic(it)
         }
         toAdd.forEach {
             val added = subscribers.add(it)
@@ -51,6 +51,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
      * @return whether the `BlockInstance` was successfully added or not, as defined by [MutableSet.add]
      */
     fun subscribe(blockInstance : BlockInstance) {
+        log.debug("BlockInstance at ${blockInstance.location} queued for subscription ")
         toAdd.add(blockInstance)
     }
 
@@ -59,6 +60,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
      * @return whether the `BlockInstance` was successfully removed or not, as defined by [MutableSet.remove]
      */
     fun unsubscribe(blockInstance: BlockInstance) {
+        log.debug("BlockInstance at ${blockInstance.location} queued for removal ")
         toDelete.add(blockInstance)
     }
 
@@ -108,9 +110,11 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
         val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, set, sumXp))
         manager.callEvent(event)
         val block = instance.location.block
-        block.type = instance.replacementMaterial
+        block.type = instance.replacement
         blockworks.getDefinition(block, instance.breaker)?.let { definition ->
-            instance.breaker.currentBlock = BlockInstance(definition, block.location, instance.breaker)
+            val new = BlockInstance(definition, block.location, instance.breaker)
+            instance.breaker.currentBlock = new
+            subscribe(new)
         }
         unsubscribe(instance)
         log.debug("Calling block break behavior.")
