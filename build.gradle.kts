@@ -1,7 +1,9 @@
 plugins {
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm") version "2.3.10"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.dokka") version "2.1.0"
+    id("org.jetbrains.dokka-javadoc") version "2.1.0"
+    id("com.gradleup.shadow") version  "9.3.0"
     `maven-publish`
 }
 
@@ -19,7 +21,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
 
@@ -27,9 +29,9 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
-                artifact(tasks.jar) {
-                    builtBy(tasks.jar)
-                }
+                artifact(tasks.shadowJar)
+                 artifact(dokkaJavadocJar)
+                artifact(sources.get())
             }
         }
     }
@@ -53,18 +55,38 @@ tasks {
     }
 
     jar {
+        enabled = false
+    }
+
+    build {
+        dependsOn(publishToMavenLocal)
+    }
+
+    shadowJar {
+        dependsOn("compileKotlin")
         archiveClassifier.set("")
         archiveBaseName.set(project.name)
         archiveVersion.set(project.version.toString())
     }
 }
 
+val sources by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
 
 
 // Hacked this together just so that I can test the plugin quicker without needing a file manager open.
 val export by tasks.registering(Copy::class) {
-    dependsOn(listOf(tasks.build, tasks.jar, tasks.publishToMavenLocal))
-    from(tasks.jar)
+    dependsOn(tasks.build)
+    from(tasks.shadowJar)
     into(File(System.getProperty("user.home"), "Desktop/Paper 1.21.11 server/plugins/"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+val dokkaJavadocJar by tasks.registering(Jar::class) {
+    description = "A Javadoc JAR containing Dokka Javadoc"
+    from(tasks.dokkaGeneratePublicationJavadoc.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
 }
