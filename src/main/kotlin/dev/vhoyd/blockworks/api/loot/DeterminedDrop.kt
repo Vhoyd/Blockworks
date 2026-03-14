@@ -3,6 +3,7 @@ package dev.vhoyd.blockworks.api.loot
 import org.bukkit.inventory.ItemStack
 import dev.vhoyd.blockworks.api.block.BlockDefinition
 import dev.vhoyd.blockworks.api.block.BlockInstance
+import dev.vhoyd.blockworks.api.core.appendIterable
 
 /**
  * Data class constructed  after rolling every [ConditionalDrop] in a [BlockDefinition]. Also acts as a pre-deploy wrapper
@@ -19,10 +20,12 @@ data class DeterminedDrop(
     val exp: Set<Int>
 ) {
 
+    private var split : Boolean = false
     val splitDrops: Set<ItemStack> by lazy { processItems() }
     private val log = blockInstance.breaker.blockworks.logger.context("DeterminedDrop:${blockInstance.location.block.blockData.material}")
 
     private fun processItems() : Set<ItemStack> {
+        split = true
         val split = mutableSetOf<ItemStack>()
         log.debug("Splitting list of size ${items.size}")
         items.forEach { drop ->
@@ -74,4 +77,17 @@ data class DeterminedDrop(
      * Integer-divides the amount of every [ItemStack] in [items] by the given `amount`. Supports `/=` operator.
      */
     fun divideAll(amount : Int) = divAssign(amount)
+
+    override fun toString() : String {
+        return StringBuilder("DeterminedDrop(exp: ")
+            .appendIterable(exp)
+            .append(", items: ")
+            .apply {
+                if (split) appendIterable(splitDrops.map { it.displayName() })
+                else appendIterable(items.map { it.displayName() })
+            }
+            .append(", split : $split")
+            .append(")")
+            .toString()
+    }
 }

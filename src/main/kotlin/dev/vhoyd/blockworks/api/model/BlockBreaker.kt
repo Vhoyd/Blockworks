@@ -2,6 +2,7 @@ package dev.vhoyd.blockworks.api.model
 
 import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.core.Blockworks
+import dev.vhoyd.blockworks.api.core.appendClassMap
 
 
 /**
@@ -20,8 +21,6 @@ abstract class BlockBreaker<out T>(
     val implements : MutableMap<Class<out Implement<*>>, Implement<*>>
 
     init {
-        defaultAttributes.forEach { (key, value) -> set(key as Attribute<Any, Any>, value) }
-        implements = defaultImplements.toMutableMap()
         blockworks.registerBlockBreaker(this)
     }
     inline fun <reified V : Implement<*>> getImplement() = implements[V::class.java as Class<*>] as? V

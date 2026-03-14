@@ -7,6 +7,10 @@ abstract class Wrapper<out T>(val delegate: T) {
     inline fun <reified V> delegateAs() = delegate as? V
 
 
-    @Suppress("UNCHECKED_CAST")
-    fun <V> delegateAs(type : Class<V>) = delegate as? V
+    fun <V> delegateAs(type: Class<V>) = if (type.isInstance(delegate)) type.cast(delegate) else null
+
+    override fun toString(): String {
+        return "${this::class.java.simpleName}(delegate: $delegate)"
+    }
+
 }

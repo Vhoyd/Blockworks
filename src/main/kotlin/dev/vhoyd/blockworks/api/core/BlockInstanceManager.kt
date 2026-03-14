@@ -50,7 +50,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
      * Adds a [BlockInstance] to the set of ones that Blockworks will tick over and dispatch events for.
      * @return whether the `BlockInstance` was successfully added or not, as defined by [MutableSet.add]
      */
-    fun subscribe(blockInstance : BlockInstance) {
+    infix fun subscribe(blockInstance : BlockInstance) {
         log.debug("BlockInstance at ${blockInstance.location} queued for subscription ")
         toAdd.add(blockInstance)
     }
@@ -59,7 +59,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
      * Removes a [BlockInstance] from the set of ones being handled.
      * @return whether the `BlockInstance` was successfully removed or not, as defined by [MutableSet.remove]
      */
-    fun unsubscribe(blockInstance: BlockInstance) {
+    infix fun unsubscribe(blockInstance: BlockInstance) {
         log.debug("BlockInstance at ${blockInstance.location} queued for removal ")
         toDelete.add(blockInstance)
     }
@@ -98,13 +98,13 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
             log.debug("Checking ConditionalDrop: $it")
             if (it.condition.test(instance)) {
                 log.debug("Condition passed")
-                val rand = it.dropPool.pickRandom()
+                val rand = it.drops.pickRandom()
                 if (rand.type != Material.AIR) {
                     set.add(rand.clone())
                 } else {
                     log.debug("Drop is of type AIR, ignoring it.")
                 }
-                sumXp += it.expPool.pickRandom()
+                sumXp += it.exp.pickRandom()
             } else { log.debug("Condition failed") }
         }
         val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, set, sumXp))

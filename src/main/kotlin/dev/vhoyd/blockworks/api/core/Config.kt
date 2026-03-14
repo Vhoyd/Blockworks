@@ -56,4 +56,15 @@ data class Config @JvmOverloads constructor(
         BLOCK_BREAK(1), // 001
         NONE(0); // 000
     }
+
+    override fun toString(): String {
+        return StringBuilder("Config(")
+            .append("plugin: ${plugin.name},\n")
+            .append("logging level: ${loggingLevel.name},\n")
+            .append("event mask byte: $eventMask,\n")
+            .append(" block definitions: ")
+            .appendIterable(blockDefinitions)
+            .append(", default replacement material: $defaultReplacementMaterial,\n")
+            .toString()
+    }
 }

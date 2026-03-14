@@ -8,12 +8,12 @@ package dev.vhoyd.blockworks.api.model
  */
 abstract class Implement<out T>(
     delegate: T,
-    private val data : Map<Attribute<*,*>, Any>,
+    protected val data : Map<Attribute<*,*>, Any>,
     private var overwriteData: Boolean
 ) : Attributable, Wrapper<T>(delegate) {
 
     /**
-     * Loads attributues into this Implement. Since the Attributable methods are abstract, this cannot be called
+     * Loads attributes into this Implement. Since the Attributable methods are abstract, this cannot be called
      * during init.
      */
     fun applyAttributes() {
@@ -24,5 +24,7 @@ abstract class Implement<out T>(
             setAttribute(ImplementFactory.INTERNAL_CLASS_FLAG, this::class.java.simpleName)
         }
     }
+
+
 
 }

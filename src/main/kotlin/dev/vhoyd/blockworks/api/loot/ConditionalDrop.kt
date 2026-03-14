@@ -12,8 +12,18 @@ import java.util.function.Predicate
  * `ConditionalDrop`. If you want more than one drop, simply make more `ConditionalDrop` objects.
  */
 data class ConditionalDrop @JvmOverloads constructor(
-    val expPool: EntryPool<Int>,
-    val dropPool: EntryPool<ItemStack>,
+    val exp: EntryPool<Int>,
+    val drops: EntryPool<ItemStack>,
     val condition: Predicate<BlockInstance> = Predicate { true },
 
-    )
+    ) {
+
+    override fun toString(): String {
+        return StringBuilder("ConditionalDrop(")
+            .append("exp: ")
+            .append(exp)
+            .append(", items: ")
+            .append(drops)
+            .toString()
+    }
+}

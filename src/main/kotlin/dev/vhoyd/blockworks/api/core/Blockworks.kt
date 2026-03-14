@@ -6,6 +6,37 @@ import org.bukkit.block.Block
 import org.bukkit.plugin.Plugin
 
 
+internal fun StringBuilder.appendIterable(data : Iterable<*>) : StringBuilder {
+    append("[\n")
+    apply { data.forEach {
+        append("  $it,\n")
+    } }
+    apply { removeSuffix(",\n") }
+    append("\n]")
+    return this
+}
+
+internal fun StringBuilder.appendMap(data : Map<*,*>) : StringBuilder {
+    append("{\n")
+    apply { data.forEach { (k, v) ->
+        append("  $k : $v,\n")
+    } }
+    apply { removeSuffix(",\n") }
+    append("\n}")
+    return this
+}
+
+internal fun <T> StringBuilder.appendClassMap(data : Map<Class<out T>,T>) : StringBuilder {
+    append("{\n")
+    apply { data.forEach { (k, v) ->
+        append("  ${k.simpleName} : $v,\n")
+    } }
+    apply { removeSuffix(",\n") }
+    append("\n}")
+    return this
+}
+
+
 /**
  * Entry point class for working with the API.
  * @property config a [Config] object created by the user of this plugin.
@@ -38,14 +69,14 @@ class Blockworks(val config: Config)  {
      */
     fun <T> getBlockBreaker(breaker : T) : BlockBreaker<T>? {
         @Suppress("unchecked_cast")
-        return breakers.find { it.delegate == breaker } as BlockBreaker<T>?
+        return breakers.find { it.delegate == breaker } as? BlockBreaker<T>
     }
 
 
     /**
      * @return `true` if the given [BlockBreaker] was registered, or `false` if it was already registered.
      */
-    fun  registerBlockBreaker(breaker : BlockBreaker<*> ) = breakers.add(breaker)
+    fun  registerBlockBreaker(breaker : BlockBreaker<*> ) : Boolean = breakers.add(breaker)
 
     /**
      * @return the [BlockDefinition] that overrides block behavior of the given [Block], or `null`
@@ -53,4 +84,9 @@ class Blockworks(val config: Config)  {
      * on the behavior of [BlockDefinition.isValidInstance]
      */
     fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = config.blockDefinitions.find { it.isValidInstance(block, breaker)}
+
+
+    override fun toString(): String {
+        return "Blockworks(${plugin.name})"
+    }
 }

@@ -1,5 +1,6 @@
 package dev.vhoyd.blockworks.api.block
 
+import dev.vhoyd.blockworks.api.core.appendMap
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
@@ -36,7 +37,7 @@ class BlockInstance internal constructor(
     /**
      * Shorthand for `definition.breakBehavior(this)`; does not set this instance's state to broken.
       */
-    fun breakBlock() = definition.onBreak.accept(this)
+    fun breakBlock() : Unit = definition.onBreak.accept(this)
 
     override fun <P : Any, C : Any> setAttribute(
         attribute: Attribute<P, C>,
@@ -51,13 +52,27 @@ class BlockInstance internal constructor(
         return attributes[attribute] as? C
     }
 
-    override fun equals(other: Any?): Boolean {
+    override infix fun equals(other: Any?): Boolean {
         if (other !is BlockInstance) return false
         return other.location == location
     }
 
     override fun hashCode(): Int {
         return super.hashCode()
+    }
+
+    override fun toString(): String {
+        return StringBuilder("BlockInstance(")
+            .append(location.world.name)
+            .append("@")
+            .append(location.toVector())
+            .append("::")
+            .append(location.block.type)
+            .append(" via ")
+            .append(breaker.delegate!!::class.java.simpleName)
+            .append("; attributes: ")
+            .appendMap(attributes)
+            .toString()
     }
 
 }

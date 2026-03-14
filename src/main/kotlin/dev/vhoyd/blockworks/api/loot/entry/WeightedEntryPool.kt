@@ -21,7 +21,7 @@ class WeightedEntryPool<out T>(entries : List<Entry<T>>) : EntryPool<T>(entries)
     /**
      * Picks a random number from 0 up to the cumulative weight  and uses weighted indexing to return the resulting entry.
      */
-    override fun pickRandom(): T = pickExact(Random.nextInt(totalWeight))
+    override fun pickRandom() : T = pickExact(Random.nextInt(totalWeight))
 
     /**
      * Returns a specific entry for a specific weight. Since weight is handled based on the order of the

@@ -40,8 +40,8 @@ import java.util.function.Predicate
  * @property onTick behavior to be called each tick that this block is being broken.
  * @property sound the Sound to be played when this block is broken.
  */
-@ConsistentCopyVisibility
-data class BlockDefinition private constructor(
+
+class BlockDefinition private constructor(
     val requirements : BiPredicate<Block, BlockBreaker<*>>,
     val drops: Iterable<ConditionalDrop>,
     val attributes: Map<Attribute<*,*>, Any>,
@@ -181,16 +181,16 @@ data class BlockDefinition private constructor(
         private var breakSound : Sound? = null
         private var tickBehavior : Consumer<BlockInstance> = Consumer {}
 
-        fun withDrops(drops: Iterable<ConditionalDrop>) = apply { this.drops = drops }
-        fun withAttributes(attributes: Map<Attribute<*,*>, Any>) = apply { this.attributes = attributes }
-        fun breakIf(breakCondition : Predicate<BlockInstance>) = apply { this.breakCondition = breakCondition}
-        fun replaceWith(material : Material) = apply { this.replacement = material }
-        fun onBreak(breakBehavior : Consumer<BlockInstance>) = apply { this.breakBehavior = breakBehavior}
-        fun onDrops(dropBehavior : Consumer<DeterminedDrop>) = apply {this.dropBehavior = dropBehavior}
-        fun playsSound(sound : Sound) = apply { this.breakSound = sound }
-        fun onTick(tickBehavior : Consumer<BlockInstance>) = apply { this.tickBehavior = tickBehavior}
+        infix fun withDrops(drops: Iterable<ConditionalDrop>) : Builder = apply { this.drops = drops }
+        infix fun withAttributes(attributes: Map<Attribute<*,*>, Any>) : Builder = apply { this.attributes = attributes }
+        infix fun breakIf(breakCondition : Predicate<BlockInstance>) : Builder = apply { this.breakCondition = breakCondition}
+        infix fun replacedWith(material : Material) : Builder = apply { this.replacement = material }
+        infix fun whenBroken(breakBehavior : Consumer<BlockInstance>): Builder = apply { this.breakBehavior = breakBehavior}
+        infix fun whenReward(dropBehavior : Consumer<DeterminedDrop>) : Builder = apply {this.dropBehavior = dropBehavior}
+        infix fun playsSound(sound : Sound) : Builder = apply { this.breakSound = sound }
+        infix fun whenTicked(tickBehavior : Consumer<BlockInstance>) : Builder = apply { this.tickBehavior = tickBehavior}
 
-        fun build() = BlockDefinition(
+        fun build() : BlockDefinition = BlockDefinition(
                 requirements,
                 drops,
                 attributes,
@@ -201,6 +201,16 @@ data class BlockDefinition private constructor(
                 dropBehavior,
                 breakSound)
 
+    }
+
+    override fun toString(): String {
+        return StringBuilder("BlockDefinition(drops: ")
+            .appendIterable(drops)
+            .append(", attributes: ")
+            .appendMap(attributes)
+            .append(", replaced with: ${replacement?.name}")
+            .append(", plays sound when broken: $sound")
+            .toString()
     }
 
 

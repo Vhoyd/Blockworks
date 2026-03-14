@@ -20,14 +20,14 @@ class Tool @JvmOverloads constructor(
 
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value : C) {
         val meta = delegate.itemMeta
-        PersistenceWriter.setValue(blockworks.plugin, meta, "blockworks-${attribute.name}", attribute.persistentDataType, value)
+        PersistenceWriter.setValue(blockworks.plugin, meta, "blockworks-${attribute.name}", attribute.type, value)
         delegate.itemMeta = meta
     }
 
 
     override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
         if (delegate.itemMeta == null) return null
-        return PersistenceWriter.getValue(blockworks.plugin, delegate.itemMeta, "blockworks-${attribute.name}", attribute.persistentDataType)
+        return PersistenceWriter.getValue(blockworks.plugin, delegate.itemMeta, "blockworks-${attribute.name}", attribute.type)
     }
 
     companion object {
