@@ -8,8 +8,11 @@ plugins {
 }
 
 val targetJavaVersion = 21
+
+val versionNumber = 1
+
 group = "dev.vhoyd"
-version = "1.0-SNAPSHOT"
+version = "ALPHA-$versionNumber"
 
 repositories {
     mavenCentral()
