@@ -50,7 +50,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
      * Adds a [BlockInstance] to the set of ones that Blockworks will tick over and dispatch events for.
      * @return whether the `BlockInstance` was successfully added or not, as defined by [MutableSet.add]
      */
-    infix fun subscribe(blockInstance : BlockInstance) {
+    fun subscribe(blockInstance : BlockInstance) {
         log.debug("BlockInstance at ${blockInstance.location} queued for subscription ")
         toAdd.add(blockInstance)
     }
@@ -59,7 +59,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
      * Removes a [BlockInstance] from the set of ones being handled.
      * @return whether the `BlockInstance` was successfully removed or not, as defined by [MutableSet.remove]
      */
-    infix fun unsubscribe(blockInstance: BlockInstance) {
+    fun unsubscribe(blockInstance: BlockInstance) {
         log.debug("BlockInstance at ${blockInstance.location} queued for removal ")
         toDelete.add(blockInstance)
     }

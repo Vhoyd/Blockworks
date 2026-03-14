@@ -1,11 +1,15 @@
 package dev.vhoyd.blockworks.api.block
 
+import dev.vhoyd.blockworks.api.core.appendIterable
+import dev.vhoyd.blockworks.api.core.appendMap
 import dev.vhoyd.blockworks.api.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.api.loot.ConditionalDrop
 import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
+import dev.vhoyd.blockworks.api.model.delegateAs
+import dev.vhoyd.blockworks.internal.InternalAttribute
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -44,7 +48,7 @@ import java.util.function.Predicate
 class BlockDefinition private constructor(
     val requirements : BiPredicate<Block, BlockBreaker<*>>,
     val drops: Iterable<ConditionalDrop>,
-    val attributes: Map<Attribute<*,*>, Any>,
+    override val attributes: MutableMap<Attribute<*,*>, Any>,
     val breakIf : Predicate<BlockInstance>?,
     val replacement : Material?,
     val onTick : Consumer<BlockInstance>,
@@ -56,9 +60,9 @@ class BlockDefinition private constructor(
     companion object {
         private val emptyBreakConsumer : Consumer<BlockInstance> = Consumer { }
 
-        internal val vanillaDmg = Attribute("internal-dmg", PersistentDataType.FLOAT)
-        internal val vanillaHaste = Attribute("internal-haste", PersistentDataType.BOOLEAN)
-        internal val vanillaFatigue = Attribute("internal-fatigue", PersistentDataType.BOOLEAN)
+        internal val vanillaDmg : Attribute<Float, Float> = InternalAttribute("internal-dmg", PersistentDataType.FLOAT)
+        internal val vanillaHaste : Attribute<Byte, Boolean> = InternalAttribute("internal-haste", PersistentDataType.BOOLEAN)
+        internal val vanillaFatigue : Attribute<Byte, Boolean> = InternalAttribute("internal-fatigue", PersistentDataType.BOOLEAN)
 
         @JvmStatic
         val VANILLA_BREAK_CONDITION : Predicate<BlockInstance> = Predicate { false }
@@ -101,7 +105,7 @@ class BlockDefinition private constructor(
         /**
          * Generates a "vanilla" block definition, defined as having no attributes, an always-false break condition
          * (this is instead handled by the client), a breakBehavior of breaking the block as normal gameplay would,
-         * and no custom dropBehavior (handled by the `breakNaturally` method called in breakBehavior)
+         * and no custom dropBehavior (handled by the `breakNaturally` method in breakBehavior)
          */
         @JvmStatic
         fun vanilla(
@@ -112,13 +116,12 @@ class BlockDefinition private constructor(
        return BlockDefinition(
            requirements,
            listOf(),
-           attributes = mapOf(
+           attributes = mutableMapOf(
                vanillaDmg to 0f,
                vanillaHaste to ignoreHaste,
                vanillaFatigue to ignoreFatigue,
            ),
-           breakIf = {
-               it[vanillaDmg]!! >= 1f },
+           breakIf = { it[vanillaDmg]!! >= 1f },
            onBreak = { instance ->
                val player = instance.breaker.delegateAs<Player>()!!
                instance.location.block.breakNaturally(player.equipment.itemInMainHand)
@@ -156,7 +159,7 @@ class BlockDefinition private constructor(
      * evaluate whether the conditions are valid, as determined by the behavior assigned to [requirements]
      * @return `true` if the internal `BiPredicate` assigned at construction passes, otherwise `false`.
      */
-    fun isValidInstance(block : Block, breaker: BlockBreaker<*>) = requirements.test(block, breaker)
+    fun isValidInstance(block : Block, breaker: BlockBreaker<*>) : Boolean = requirements.test(block, breaker)
 
     /**
      * Creates a new [BlockInstance] using data from the provided `Block`, so long as it meets the requirements
@@ -173,7 +176,7 @@ class BlockDefinition private constructor(
 
 
         private var drops: Iterable<ConditionalDrop> = listOf()
-        private var attributes: Map<Attribute<*,*>, Any> = emptyMap()
+        private var attributes: MutableMap<Attribute<*,*>, Any> = mutableMapOf()
         private var breakCondition : Predicate<BlockInstance>? = null
         private var replacement : Material? = null
         private var breakBehavior : Consumer<BlockInstance> = emptyBreakConsumer
@@ -182,7 +185,7 @@ class BlockDefinition private constructor(
         private var tickBehavior : Consumer<BlockInstance> = Consumer {}
 
         infix fun withDrops(drops: Iterable<ConditionalDrop>) : Builder = apply { this.drops = drops }
-        infix fun withAttributes(attributes: Map<Attribute<*,*>, Any>) : Builder = apply { this.attributes = attributes }
+        infix fun withAttributes(attributes: MutableMap<Attribute<*,*>, Any>) : Builder = apply { this.attributes = attributes }
         infix fun breakIf(breakCondition : Predicate<BlockInstance>) : Builder = apply { this.breakCondition = breakCondition}
         infix fun replacedWith(material : Material) : Builder = apply { this.replacement = material }
         infix fun whenBroken(breakBehavior : Consumer<BlockInstance>): Builder = apply { this.breakBehavior = breakBehavior}

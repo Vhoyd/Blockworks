@@ -3,7 +3,7 @@ package dev.vhoyd.blockworks.api.block
 import dev.vhoyd.blockworks.api.core.appendMap
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.Attributable
-import dev.vhoyd.blockworks.api.model.Attribute
+import dev.vhoyd.blockworks.internal.InternalAttributed
 import org.bukkit.Location
 
 /**
@@ -20,8 +20,10 @@ import org.bukkit.Location
 class BlockInstance internal constructor(
     val definition: BlockDefinition,
     val location: Location,
-    val breaker : BlockBreaker<*>
-) : Attributable {
+    val breaker : BlockBreaker<*>,
+    private val attributed: Attributable = InternalAttributed(BlockInstance::class.java, definition.attributes)
+) : Attributable by attributed {
+
     val breakCondition = definition.breakIf ?: breaker.blockworks.config.defaultBreakCondition
     val replacement = definition.replacement ?:
 
@@ -32,34 +34,18 @@ class BlockInstance internal constructor(
     val broken : Boolean
         get() = breakCondition.test(this)
     val drops = definition.drops
-    val attributes: MutableMap<Attribute<*,*>, Any> = definition.attributes.toMutableMap()
 
     /**
      * Shorthand for `definition.breakBehavior(this)`; does not set this instance's state to broken.
       */
     fun breakBlock() : Unit = definition.onBreak.accept(this)
 
-    override fun <P : Any, C : Any> setAttribute(
-        attribute: Attribute<P, C>,
-        value: C
-    ) {
-        attributes[attribute] = value
-    }
-
-
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
-        @Suppress("UNCHECKED_CAST")
-        return attributes[attribute] as? C
-    }
 
     override infix fun equals(other: Any?): Boolean {
         if (other !is BlockInstance) return false
         return other.location == location
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
 
     override fun toString(): String {
         return StringBuilder("BlockInstance(")
@@ -73,6 +59,19 @@ class BlockInstance internal constructor(
             .append("; attributes: ")
             .appendMap(attributes)
             .toString()
+    }
+
+    override fun hashCode(): Int {
+        var result = definition.hashCode()
+        result = 31 * result + location.hashCode()
+        result = 31 * result + breaker.hashCode()
+        result = 31 * result + attributed.hashCode()
+        result = 31 * result + breakCondition.hashCode()
+        result = 31 * result + replacement.hashCode()
+        result = 31 * result + dropBehavior.hashCode()
+        result = 31 * result + drops.hashCode()
+        result = 31 * result + broken.hashCode()
+        return result
     }
 
 }

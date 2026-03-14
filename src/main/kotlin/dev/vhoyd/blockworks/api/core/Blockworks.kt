@@ -26,17 +26,6 @@ internal fun StringBuilder.appendMap(data : Map<*,*>) : StringBuilder {
     return this
 }
 
-internal fun <T> StringBuilder.appendClassMap(data : Map<Class<out T>,T>) : StringBuilder {
-    append("{\n")
-    apply { data.forEach { (k, v) ->
-        append("  ${k.simpleName} : $v,\n")
-    } }
-    apply { removeSuffix(",\n") }
-    append("\n}")
-    return this
-}
-
-
 /**
  * Entry point class for working with the API.
  * @property config a [Config] object created by the user of this plugin.

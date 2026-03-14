@@ -10,7 +10,7 @@ import java.util.function.Consumer
  */
 class SoundEffect(val sound: Sound, val volume: Float, val pitch: Float)  : Consumer<BlockInstance> {
 
-    override infix fun accept(target: BlockInstance) {
+    override fun accept(target: BlockInstance) {
         target.location.world.playSound(target.location, sound, volume, pitch)
     }
 
