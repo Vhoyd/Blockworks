@@ -2,6 +2,7 @@ package dev.vhoyd.blockworks.api.model
 
 import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.core.Blockworks
+import dev.vhoyd.blockworks.internal.InternalBlockBreaker
 
 
 /**
@@ -37,6 +38,37 @@ interface BlockBreaker<out T> : Attributable, Wrapper<T>{
     fun <V: Attributable> removePart(type: Class<V>) : V? {
         val removed = parts.remove(type)
         return if (removed != null && type.isInstance(removed)) type.cast(removed) else null
+    }
+
+    companion object {
+        operator fun <T> invoke(
+            blockworks: Blockworks,
+            delegate : T,
+            defaultParts: Map<Class<out Attributable>, Attributable> = emptyMap(),
+            defaultAttributes: Map<Attribute<*, *>, Any> = emptyMap(),
+
+        ) : BlockBreaker<T> = InternalBlockBreaker(
+            blockworks = blockworks,
+            delegate = delegate,
+            defaultParts = defaultParts,
+            defaultAttributes = defaultAttributes
+        )
+
+
+        @JvmStatic
+        @JvmOverloads
+        fun <T> create(
+            blockworks: Blockworks,
+            delegate : T,
+            defaultParts: Map<Class<out Attributable>, Attributable> = emptyMap(),
+            defaultAttributes: Map<Attribute<*, *>, Any> = emptyMap(),
+
+            ) : BlockBreaker<T> = InternalBlockBreaker(
+            blockworks = blockworks,
+            delegate = delegate,
+            defaultParts = defaultParts,
+            defaultAttributes = defaultAttributes
+        )
     }
 
 

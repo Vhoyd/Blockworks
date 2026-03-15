@@ -4,7 +4,7 @@ import dev.vhoyd.blockworks.api.core.Blockworks
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
 import dev.vhoyd.blockworks.api.model.Wrapper
-import dev.vhoyd.blockworks.internal.InternalItemStackWrapper
+import dev.vhoyd.blockworks.internal.InternalWrapper
 import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
 import org.bukkit.inventory.ItemStack
 import java.util.function.BiFunction
@@ -27,7 +27,7 @@ class Tool private constructor(
         overwriteAttributes : Boolean = true
     ) : this(
         InternalPersistentAttributed(blockworks, delegate.itemMeta, Tool::class.java, defaultAttributes, overwriteAttributes),
-        InternalItemStackWrapper(delegate)
+        InternalWrapper(delegate)
         )
 
     companion object {

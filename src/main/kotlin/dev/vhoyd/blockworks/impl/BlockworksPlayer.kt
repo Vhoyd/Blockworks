@@ -6,9 +6,8 @@ import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
-import dev.vhoyd.blockworks.api.model.Wrapper
+import dev.vhoyd.blockworks.internal.InternalBlockBreaker
 import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
-import dev.vhoyd.blockworks.internal.InternalPlayerWrapper
 import org.bukkit.entity.Player
 
 /**
@@ -18,9 +17,10 @@ import org.bukkit.entity.Player
 class BlockworksPlayer private constructor(
     override val blockworks: Blockworks,
     defaultParts: Map<Class<out Attributable>, Attributable>,
+    defaultAttributes: Map<Attribute<*, *>, Any>,
     private val persistentAttributed: PersistentAttributable,
-    private val playerWrapper: Wrapper<Player>
-) : PersistentAttributable by persistentAttributed, Wrapper<Player> by playerWrapper, BlockBreaker<Player> {
+    private val breaker: BlockBreaker<Player>,
+) : PersistentAttributable by persistentAttributed, BlockBreaker<Player> by breaker {
 
     @JvmOverloads
     constructor(
@@ -31,13 +31,14 @@ class BlockworksPlayer private constructor(
         overwriteAttributes : Boolean = false
 
     ) : this(
-        blockworks,
-        defaultParts,
-        InternalPersistentAttributed(blockworks, delegate, BlockworksPlayer::class.java, defaultAttributes.toMutableMap(), overwriteAttributes),
-        InternalPlayerWrapper(delegate)
+        blockworks = blockworks,
+        defaultParts = defaultParts,
+        defaultAttributes = defaultAttributes,
+        persistentAttributed = InternalPersistentAttributed(blockworks, delegate, BlockworksPlayer::class.java, defaultAttributes.toMutableMap(), overwriteAttributes),
+        breaker = InternalBlockBreaker(blockworks, delegate, defaultAttributes, defaultParts)
         )
 
-
+    override val attributes: MutableMap<Attribute<*, *>, Any> = defaultAttributes.toMutableMap()
     override val parts: MutableMap<Class<out Attributable>, Attributable> = defaultParts.toMutableMap()
     override var currentBlock: BlockInstance? = null
 
@@ -45,11 +46,19 @@ class BlockworksPlayer private constructor(
         attribute: Attribute<P, C>,
         value: C
     ) {
-        attributes[attribute] = value
+        persistentAttributed[attribute] = value
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
-        return attributes[attribute] as? C
+        return persistentAttributed[attribute]
+    }
+
+    override operator fun <P : Any, C : Any> get(attribute: Attribute<P, C>): C? {
+        return persistentAttributed[attribute]
+    }
+
+    override operator fun <P : Any, C : Any> set(attribute: Attribute<P, C>, value: C) {
+        persistentAttributed[attribute] = value
     }
 }

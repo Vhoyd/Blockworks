@@ -2,6 +2,7 @@ package dev.vhoyd.blockworks.api.model
 
 import dev.vhoyd.blockworks.api.core.Blockworks
 import dev.vhoyd.blockworks.internal.InternalAttribute
+import dev.vhoyd.blockworks.internal.InternalAttributed
 import org.bukkit.persistence.PersistentDataType
 import java.util.function.BiFunction
 
@@ -50,6 +51,18 @@ interface Attributable {
             val obj = constructor.apply(blockworks, source)
             return if (obj[INTERNAL_CLASS_FLAG] == V::class.java.simpleName) obj else null
         }
+
+        operator fun invoke(
+            owner : Class<*>,
+            attributes: Map<Attribute<*, *>, Any> = emptyMap()
+        ) : Attributable = InternalAttributed(owner, attributes)
+
+        @JvmStatic
+        @JvmOverloads
+        fun create(
+            owner : Class<*>,
+            attributes: Map<Attribute<*, *>, Any> = emptyMap()
+        ) : Attributable = InternalAttributed(owner, attributes)
     }
 
 }
