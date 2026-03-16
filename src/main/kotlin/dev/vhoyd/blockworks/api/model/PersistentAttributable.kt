@@ -13,31 +13,6 @@ interface PersistentAttributable : Attributable {
     val overwrite: Boolean
 
 
-    fun <P : Any, C : Any> write(
-        plugin: Plugin,
-        attribute: Attribute<P, C>,
-        value: C
-    ): Unit = PersistenceWriter.setValue(
-
-        plugin = plugin,
-        target = persistenceTarget,
-        key = attribute.name,
-        type = attribute.type,
-        value = value
-    )
-
-
-    fun <P : Any, C : Any> read(
-        plugin: Plugin,
-        attribute: Attribute<P, C>
-    ): C? = PersistenceWriter.getValue(
-
-        plugin = plugin,
-        target = persistenceTarget,
-        key = attribute.name,
-        type = attribute.type,
-    )
-
     companion object {
         operator fun invoke(
             blockworks : Blockworks,

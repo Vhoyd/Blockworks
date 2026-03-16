@@ -32,7 +32,8 @@ class Tool private constructor(
 
     companion object {
         @JvmStatic
-        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, Tool> = BiFunction { blockworks, item ->
+        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, Tool?> = BiFunction { blockworks, item ->
+            if (item.itemMeta == null) return@BiFunction null
             Tool(blockworks, item, emptyMap(), false)
         }
     }

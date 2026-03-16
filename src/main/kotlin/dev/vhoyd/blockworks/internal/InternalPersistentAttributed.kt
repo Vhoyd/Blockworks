@@ -19,8 +19,10 @@ internal class InternalPersistentAttributed(
 
     init {
         if (overwrite) {
+
             @Suppress("UNCHECKED_CAST")
-            defaultAttributes.forEach { (key, value) -> setAttribute(key as Attribute<Any, Any>, value) }
+            defaultAttributes.forEach { (key, value) ->
+                setAttribute(key as Attribute<Any, Any>, value) }
         }
     }
 
@@ -30,6 +32,7 @@ internal class InternalPersistentAttributed(
         value: C
     ) {
         attributed.setAttribute(attribute, value)
+        println("Setting key $attribute to $value")
         PersistenceWriter.setValue(blockworks.plugin, persistenceTarget, attribute.name, attribute.type, value)
     }
 

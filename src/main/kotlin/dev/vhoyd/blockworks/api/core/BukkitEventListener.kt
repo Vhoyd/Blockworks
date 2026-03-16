@@ -1,7 +1,6 @@
 package dev.vhoyd.blockworks.api.core
 
 import dev.vhoyd.blockworks.api.block.BlockDefinition
-import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.event.BlockInstanceBreakAbortEvent
 import dev.vhoyd.blockworks.api.event.BlockInstanceStartBreakEvent
 import dev.vhoyd.blockworks.api.event.BlockInstanceTickEvent
@@ -60,7 +59,7 @@ internal class BukkitEventListener(private val blockworks : Blockworks) : Listen
             return
         }
 
-        val blockInstance = BlockInstance(blockDefinition, e.block.location, blockBreaker)
+        val blockInstance = blockDefinition.createInstance(e.block, blockBreaker)
         e.player.server.pluginManager.callEvent(BlockInstanceStartBreakEvent(blockInstance))
         blockBreaker.currentBlock = blockInstance
         blockworks.blockInstanceManager.subscribe(blockInstance)

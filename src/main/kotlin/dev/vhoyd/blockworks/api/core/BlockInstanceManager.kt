@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable
 class BlockInstanceManager internal constructor(val blockworks : Blockworks) : BukkitRunnable() {
     private val manager = blockworks.plugin.server.pluginManager
 
-    // set, so that duplicates aren't ticked twice (end-users could implement manually)
+    // set instead of list, so that duplicates aren't ticked twice (end-users could implement manually)
     private val subscribers = mutableSetOf<BlockInstance>()
     private val toDelete: MutableSet<BlockInstance> = mutableSetOf()
     private val toAdd: MutableSet<BlockInstance> = mutableSetOf()
@@ -94,7 +94,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
     internal fun handleBreakLogic(instance : BlockInstance) {
         val set = mutableSetOf<ItemStack>()
         val sumXp = mutableSetOf<Int>()
-        instance.drops.forEach {
+        instance.definition.drops.forEach {
             log.debug("Checking ConditionalDrop: $it")
             if (it.condition.test(instance)) {
                 log.debug("Condition passed")
@@ -112,7 +112,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
         val block = instance.location.block
         block.type = instance.replacement
         blockworks.getDefinition(block, instance.breaker)?.let { definition ->
-            val new = BlockInstance(definition, block.location, instance.breaker)
+            val new = definition.createInstance(block, instance.breaker)
             instance.breaker.currentBlock = new
             subscribe(new)
         }
@@ -120,7 +120,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
         log.debug("Calling block break behavior.")
         instance.breakBlock()
         log.debug("Calling block drop behavior.")
-        instance.dropBehavior.accept(event.drops)
+        instance.definition.onDrop?.accept(event.drops)
         log.debug("End of break logic.")
     }
 }

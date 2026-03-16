@@ -1,7 +1,5 @@
 package dev.vhoyd.blockworks.api.block
 
-import dev.vhoyd.blockworks.api.core.appendIterable
-import dev.vhoyd.blockworks.api.core.appendMap
 import dev.vhoyd.blockworks.api.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.api.loot.ConditionalDrop
 import dev.vhoyd.blockworks.api.loot.DeterminedDrop
@@ -10,6 +8,7 @@ import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.delegateAs
 import dev.vhoyd.blockworks.internal.InternalAttribute
+import dev.vhoyd.blockworks.internal.InternalBLockDefinition
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -20,6 +19,7 @@ import org.bukkit.util.Vector
 import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.function.Predicate
+import kotlin.collections.listOf
 
 /**
  * Objects of this class act as a blueprint for custom block behavior.
@@ -45,17 +45,17 @@ import java.util.function.Predicate
  * @property sound the Sound to be played when this block is broken.
  */
 
-class BlockDefinition private constructor(
-    val requirements : BiPredicate<Block, BlockBreaker<*>>,
-    val drops: Iterable<ConditionalDrop>,
-    override val attributes: MutableMap<Attribute<*,*>, Any>,
-    val breakIf : Predicate<BlockInstance>?,
-    val replacement : Material?,
-    val onTick : Consumer<BlockInstance>,
-    val onBreak : Consumer<BlockInstance>,
-    val onDrop : Consumer<DeterminedDrop>?,
-    val sound : Sound?,
-) : Attributable {
+interface BlockDefinition : Attributable {
+
+    val requirements : BiPredicate<Block, BlockBreaker<*>>;
+    val drops: Iterable<ConditionalDrop>;
+    override val attributes: MutableMap<Attribute<*,*>, Any>;
+    val breakIf : Predicate<BlockInstance>?;
+    val replacement : Material?;
+    val onTick : Consumer<BlockInstance>;
+    val onBreak : Consumer<BlockInstance>;
+    val onDrop : Consumer<DeterminedDrop>?;
+    val sound : Sound?;
 
     companion object {
         private val emptyBreakConsumer : Consumer<BlockInstance> = Consumer { }
@@ -113,7 +113,7 @@ class BlockDefinition private constructor(
             ignoreFatigue: Boolean,
             ignoreHaste: Boolean,
         ) : BlockDefinition {
-       return BlockDefinition(
+       return InternalBLockDefinition(
            requirements,
            listOf(),
            attributes = mutableMapOf(
@@ -147,11 +147,6 @@ class BlockDefinition private constructor(
         error("Block definition attributes represent defaults and cannot be modified after creation.")
     }
 
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
-
-        @Suppress("UNCHECKED_CAST")
-        return attributes[attribute] as? C
-    }
 
 
     /**
@@ -159,17 +154,15 @@ class BlockDefinition private constructor(
      * evaluate whether the conditions are valid, as determined by the behavior assigned to [requirements]
      * @return `true` if the internal `BiPredicate` assigned at construction passes, otherwise `false`.
      */
-    fun isValidInstance(block : Block, breaker: BlockBreaker<*>) : Boolean = requirements.test(block, breaker)
+    fun isValidInstance(block : Block, breaker: BlockBreaker<*>) : Boolean
 
     /**
      * Creates a new [BlockInstance] using data from the provided `Block`, so long as it meets the requirements
      * outlined in [isValidInstance].
      * @return the created [BlockInstance] if conditions are appropriate, otherwise `null`.
      */
-    fun createInstance(block : Block, breaker: BlockBreaker<*>) : BlockInstance? {
-        if (requirements.test(block, breaker)) return BlockInstance(this, block.location, breaker)
-        return null
-    }
+    fun createInstance(block : Block, breaker: BlockBreaker<*>) : BlockInstance
+
 
     @Suppress("Unused")
     class Builder(private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
@@ -193,7 +186,7 @@ class BlockDefinition private constructor(
         infix fun playsSound(sound : Sound) : Builder = apply { this.breakSound = sound }
         infix fun whenTicked(tickBehavior : Consumer<BlockInstance>) : Builder = apply { this.tickBehavior = tickBehavior}
 
-        fun build() : BlockDefinition = BlockDefinition(
+        fun build() : BlockDefinition = InternalBLockDefinition(
                 requirements,
                 drops,
                 attributes,
@@ -204,16 +197,6 @@ class BlockDefinition private constructor(
                 dropBehavior,
                 breakSound)
 
-    }
-
-    override fun toString(): String {
-        return StringBuilder("BlockDefinition(drops: ")
-            .appendIterable(drops)
-            .append(", attributes: ")
-            .appendMap(attributes)
-            .append(", replaced with: ${replacement?.name}")
-            .append(", plays sound when broken: $sound")
-            .toString()
     }
 
 
