@@ -28,15 +28,20 @@ class BlockworksPlayer private constructor(
         delegate: Player,
         defaultAttributes: Map<Attribute<*, *>, Any>,
         defaultParts: Map<Class<out Attributable>, Attributable>,
-        overwriteAttributes : Boolean = false
+        overwriteAttributes: Boolean = false
 
     ) : this(
         blockworks = blockworks,
         defaultParts = defaultParts,
         defaultAttributes = defaultAttributes,
-        persistentAttributed = InternalPersistentAttributed(blockworks, delegate, BlockworksPlayer::class.java, defaultAttributes.toMutableMap(), overwriteAttributes),
+        persistentAttributed = InternalPersistentAttributed(
+            blockworks,
+            delegate,
+            defaultAttributes.toMutableMap(),
+            overwriteAttributes
+        ),
         breaker = InternalBlockBreaker(blockworks, delegate, defaultAttributes, defaultParts)
-        )
+    )
 
     override val attributes: MutableMap<Attribute<*, *>, Any> = defaultAttributes.toMutableMap()
     override val parts: MutableMap<Class<out Attributable>, Attributable> = defaultParts.toMutableMap()

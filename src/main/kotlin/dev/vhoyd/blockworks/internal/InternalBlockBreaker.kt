@@ -17,10 +17,9 @@ internal class InternalBlockBreaker<T>(
     delegate: T,
     defaultAttributes: Map<Attribute<*, *>, Any>,
     defaultParts: Map<Class<out Attributable>, Attributable>,
-    private val attributed: Attributable = InternalAttributed(InternalBlockBreaker::class.java, defaultAttributes.toMutableMap()),
+    private val attributed: Attributable = InternalAttributed(defaultAttributes.toMutableMap()),
     private val wrapper: Wrapper<T> = InternalWrapper(delegate)
 ) : Attributable by attributed, Wrapper<T> by wrapper, BlockBreaker<T> {
-
 
 
     override val parts: MutableMap<Class<out Attributable>, Attributable> = defaultParts.toMutableMap()

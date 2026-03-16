@@ -15,7 +15,7 @@ import java.util.function.BiFunction
  */
 
 class Tool private constructor(
-    private val persistentAttributed : PersistentAttributable,
+    private val persistentAttributed: PersistentAttributable,
     private val itemstackWrapper: Wrapper<ItemStack>,
 ) : PersistentAttributable by persistentAttributed, Wrapper<ItemStack> by itemstackWrapper {
 
@@ -23,16 +23,16 @@ class Tool private constructor(
     constructor(
         blockworks: Blockworks,
         delegate: ItemStack,
-        defaultAttributes : Map<Attribute<*, *>, Any>,
-        overwriteAttributes : Boolean = true
+        defaultAttributes: Map<Attribute<*, *>, Any>,
+        overwriteAttributes: Boolean = true
     ) : this(
-        InternalPersistentAttributed(blockworks, delegate.itemMeta, Tool::class.java, defaultAttributes, overwriteAttributes),
+        InternalPersistentAttributed(blockworks, delegate.itemMeta, defaultAttributes, overwriteAttributes),
         InternalWrapper(delegate)
-        )
+    )
 
     companion object {
         @JvmStatic
-        val OF_CONSTRUCTOR : BiFunction<Blockworks, ItemStack, Tool?> = BiFunction { blockworks, item ->
+        val OF_CONSTRUCTOR: BiFunction<Blockworks, ItemStack, Tool?> = BiFunction { blockworks, item ->
             if (item.itemMeta == null) return@BiFunction null
             Tool(blockworks, item, emptyMap(), false)
         }

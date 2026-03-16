@@ -10,10 +10,9 @@ import org.bukkit.persistence.PersistentDataHolder
 internal class InternalPersistentAttributed(
     override val blockworks: Blockworks,
     override val persistenceTarget: PersistentDataHolder,
-    owner : Class<*>,
     defaultAttributes: Map<Attribute<*, *>, Any>,
     override val overwrite: Boolean,
-    val attributed : Attributable = InternalAttributed(owner, defaultAttributes)
+    val attributed: Attributable = InternalAttributed(defaultAttributes)
 
 ) : Attributable by attributed, PersistentAttributable {
 
@@ -22,7 +21,8 @@ internal class InternalPersistentAttributed(
 
             @Suppress("UNCHECKED_CAST")
             defaultAttributes.forEach { (key, value) ->
-                setAttribute(key as Attribute<Any, Any>, value) }
+                setAttribute(key as Attribute<Any, Any>, value)
+            }
         }
     }
 

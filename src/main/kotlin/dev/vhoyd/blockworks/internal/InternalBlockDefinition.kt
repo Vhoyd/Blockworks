@@ -16,15 +16,15 @@ import java.util.function.Consumer
 import java.util.function.Predicate
 
 internal class InternalBLockDefinition(
-    override val requirements : BiPredicate<Block, BlockBreaker<*>>,
+    override val requirements: BiPredicate<Block, BlockBreaker<*>>,
     override val drops: Iterable<ConditionalDrop>,
-    override val attributes: MutableMap<Attribute<*,*>, Any>,
-    override val breakIf : Predicate<BlockInstance>?,
-    override val replacement : Material?,
-    override val onTick : Consumer<BlockInstance>,
-    override val onBreak : Consumer<BlockInstance>,
-    override val onDrop : Consumer<DeterminedDrop>?,
-    override val sound : Sound?,
+    override val attributes: MutableMap<Attribute<*, *>, Any>,
+    override val breakIf: Predicate<BlockInstance>?,
+    override val replacement: Material?,
+    override val onTick: Consumer<BlockInstance>,
+    override val onBreak: Consumer<BlockInstance>,
+    override val onDrop: Consumer<DeterminedDrop>?,
+    override val sound: Sound?,
 ) : BlockDefinition {
 
 
@@ -56,9 +56,6 @@ internal class InternalBLockDefinition(
         @Suppress("UNCHECKED_CAST")
         return attributes[attribute] as? C
     }
-
-
-
 
 
     override fun toString(): String {

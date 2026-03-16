@@ -17,10 +17,9 @@ interface PersistentAttributable : Attributable {
         operator fun invoke(
             blockworks : Blockworks,
             persistenceTarget: PersistentDataHolder,
-            owner: Class<*>,
             attributes: Map<Attribute<*, *>, Any> = emptyMap(),
             overwrite: Boolean = false,
-        ): PersistentAttributable = InternalPersistentAttributed(blockworks, persistenceTarget, owner, attributes, overwrite)
+        ): PersistentAttributable = InternalPersistentAttributed(blockworks, persistenceTarget, attributes, overwrite)
 
         @JvmStatic
         @JvmOverloads
@@ -30,6 +29,6 @@ interface PersistentAttributable : Attributable {
             owner: Class<*>,
             attributes: Map<Attribute<*, *>, Any> = emptyMap(),
             overwrite: Boolean = false,
-        ): PersistentAttributable = InternalPersistentAttributed(blockworks, persistenceTarget, owner, attributes, overwrite)
+        ): PersistentAttributable = InternalPersistentAttributed(blockworks, persistenceTarget, attributes, overwrite)
     }
 }

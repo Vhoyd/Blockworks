@@ -3,7 +3,7 @@ package dev.vhoyd.blockworks.api.loot.entry
 import dev.vhoyd.blockworks.api.core.appendIterable
 
 
-sealed class EntryPool<out T>(protected val entries : List<Entry<T>>) : Iterable<Entry<T>> {
+sealed class EntryPool<out T>(val entries : List<Entry<T>>) : Iterable<Entry<T>> {
 
     abstract fun pickRandom(): T
 
