@@ -9,7 +9,7 @@ plugins {
 
 val targetJavaVersion = 21
 
-val versionNumber = 2
+val versionNumber = 3
 
 group = "dev.vhoyd"
 version = "ALPHA-$versionNumber"
