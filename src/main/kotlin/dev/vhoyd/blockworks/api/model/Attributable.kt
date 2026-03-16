@@ -5,6 +5,7 @@ import dev.vhoyd.blockworks.internal.InternalAttribute
 import dev.vhoyd.blockworks.internal.InternalAttributed
 import org.bukkit.persistence.PersistentDataType
 import java.util.function.BiFunction
+import java.util.function.Predicate
 
 interface Attributable {
 
@@ -34,22 +35,12 @@ interface Attributable {
         fun <T : Any, V : Attributable> of(
             blockworks: Blockworks,
             source : T?,
-            expectedType: Class<out V>,
-            constructor: BiFunction<Blockworks, T, V?>
+            constructor: BiFunction<Blockworks, T, V?>,
+            condition: Predicate<V>
         ) : Attributable? {
             if (source == null) return null
             val obj = constructor.apply(blockworks, source) ?: return null
-            return if (obj[INTERNAL_CLASS_FLAG] == expectedType.simpleName) obj else null
-        }
-
-        inline fun <T : Any, reified  V: Attributable> of(
-            blockworks: Blockworks,
-            source : T?,
-            constructor: BiFunction<Blockworks, T, V?>
-        ) : Attributable? {
-            if (source == null) return null
-            val obj = constructor.apply(blockworks, source) ?: return null
-            return if (obj[INTERNAL_CLASS_FLAG] == V::class.java.simpleName) obj else null
+            return if (condition.test(obj)) obj else null
         }
 
         operator fun invoke(
