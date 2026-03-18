@@ -25,7 +25,7 @@ data class Config @JvmOverloads constructor(
     internal val blockDefinitions : Iterable<BlockDefinition>,
     internal val defaultReplacementMaterial : Material = Material.AIR,
     internal val defaultBreakCondition : Predicate<BlockInstance>,
-    internal val defaultDropBehavior : Consumer<DeterminedDrop> = BlockDefinition.DEFAULT_DROP_BEHAVIOR,
+    internal val defaultDropBehavior : Consumer<DeterminedDrop> = BlockDefinition.defaultDropBehavior,
 ) {
 
     companion object {

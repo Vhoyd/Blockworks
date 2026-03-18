@@ -3,6 +3,9 @@ package dev.vhoyd.blockworks.api.loot.entry
 import dev.vhoyd.blockworks.api.core.appendIterable
 
 
+/**
+ * Models a collection of [Entry]s and provides methods for selecting them.
+ */
 sealed class EntryPool<out T>(val entries : List<Entry<T>>) : Iterable<Entry<T>> {
 
     abstract fun pickRandom(): T

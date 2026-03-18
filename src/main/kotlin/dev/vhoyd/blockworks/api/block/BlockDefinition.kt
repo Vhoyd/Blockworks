@@ -1,5 +1,6 @@
 package dev.vhoyd.blockworks.api.block
 
+import dev.vhoyd.blockworks.api.core.Blockworks
 import dev.vhoyd.blockworks.api.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.api.loot.ConditionalDrop
 import dev.vhoyd.blockworks.api.loot.DeterminedDrop
@@ -10,7 +11,6 @@ import dev.vhoyd.blockworks.api.model.delegateAs
 import dev.vhoyd.blockworks.internal.InternalAttribute
 import dev.vhoyd.blockworks.internal.InternalBLockDefinition
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
@@ -24,6 +24,7 @@ import kotlin.collections.listOf
 /**
  * Objects of this class act as a blueprint for custom block behavior.
  * This acts like a behavior change towards a block with the matching material and conditions.
+ *
  * @property requirements the conditions under which a valid [BlockInstance] is allowed, provided context of its `Block`
  * and the `BlockBreaker` attempting to mine it.
  * @property drops a `List<`[ConditionalDrop]`>` used to determine what could drop when a
@@ -42,7 +43,6 @@ import kotlin.collections.listOf
  * this will be called after its corresponding [BlockInstanceBrokenEvent], and after its [onBreak]. If left null,
  * instances will assume the default drop behavior declared via [dev.vhoyd.blockworks.api.core.Config]
  * @property onTick behavior to be called each tick that this block is being broken.
- * @property sound the Sound to be played when this block is broken.
  */
 
 interface BlockDefinition : Attributable {
@@ -50,12 +50,11 @@ interface BlockDefinition : Attributable {
     val requirements : BiPredicate<Block, BlockBreaker<*>>;
     val drops: Iterable<ConditionalDrop>;
     override val attributes: MutableMap<Attribute<*,*>, Any>;
-    val breakIf : Predicate<BlockInstance>?;
-    val replacement : Material?;
-    val onTick : Consumer<BlockInstance>;
-    val onBreak : Consumer<BlockInstance>;
-    val onDrop : Consumer<DeterminedDrop>?;
-    val sound : Sound?;
+    val breakIf : Predicate<BlockInstance>
+    val replacement : Material
+    val onTick : Consumer<BlockInstance>
+    val onBreak : Consumer<BlockInstance>
+    val onDrop : Consumer<DeterminedDrop>
 
     companion object {
         private val emptyBreakConsumer : Consumer<BlockInstance> = Consumer { }
@@ -64,11 +63,18 @@ interface BlockDefinition : Attributable {
         internal val vanillaHaste : Attribute<Byte, Boolean> = InternalAttribute("internal-haste", PersistentDataType.BOOLEAN)
         internal val vanillaFatigue : Attribute<Byte, Boolean> = InternalAttribute("internal-fatigue", PersistentDataType.BOOLEAN)
 
+        /**
+         * A Predicate that always returns false, since the server should not be the one doing the breaking
+         * for completely vanilla blocks.
+         */
         @JvmStatic
-        val VANILLA_BREAK_CONDITION : Predicate<BlockInstance> = Predicate { false }
+        val vanillaBreakPredicate : Predicate<BlockInstance> = Predicate { false }
 
+        /**
+         * Spawns every rolled drop and experience orb at the center of the block, with some randomized velocity.
+         */
         @JvmStatic
-        val DEFAULT_DROP_BEHAVIOR : Consumer<DeterminedDrop> = Consumer { drop ->
+        val defaultDropBehavior : Consumer<DeterminedDrop> = Consumer { drop ->
 
             val world = drop.blockInstance.location.world
             val location = drop.blockInstance.location.add(0.5, 0.5, 0.5)
@@ -103,9 +109,9 @@ interface BlockDefinition : Attributable {
 
 
         /**
-         * Generates a "vanilla" block definition, defined as having no attributes, an always-false break condition
-         * (this is instead handled by the client), a breakBehavior of breaking the block as normal gameplay would,
-         * and no custom dropBehavior (handled by the `breakNaturally` method in breakBehavior)
+         * Generates a "vanilla" block definition, defined as having no user-provided attributes, breaking speed
+         * determined by the client, break behavior of [Block.breakNaturally] given the held ItemStack,
+         * and no custom drop behavior.
          */
         @JvmStatic
         fun vanilla(
@@ -130,31 +136,29 @@ interface BlockDefinition : Attributable {
            onDrop = { _ -> },
            replacement = Material.AIR,
            onTick = { _ -> },
-           sound = null
        )
         }
     }
 
     /**
-     * Definitions cannot have their attributes modified. This should never be called.
-     * @throws IllegalStateException why did you call it??
+     * Definitions should not have their attributes modified since they are default states.
+     * This should never be called nor overridden.
+     * @throws IllegalStateException when called.
      */
-    @Deprecated("Definitions cannot have their attributes modified. This should never be called.")
+    @Deprecated("Definitions should not have their attributes modified. This should never be called.")
     override fun <P : Any, C : Any> setAttribute(
         attribute: Attribute<P, C>,
         value: C
     ) {
-        error("Block definition attributes represent defaults and cannot be modified after creation.")
+        error("Block definition attributes represent defaults and should not be modified after creation.")
     }
 
-
-
     /**
-     * Evaluates the data of the given `Block` and [BlockBreaker] against the settings of this `BlockDefinition` to
-     * evaluate whether the conditions are valid, as determined by the behavior assigned to [requirements]
-     * @return `true` if the internal `BiPredicate` assigned at construction passes, otherwise `false`.
+     * Evaluates the data of the given `Block` and [BlockBreaker]. By default, this looks at [requirements] to
+     * determine validity.
+     * @return `true` if a new `BlockInstance` is allowed, otherwise false.
      */
-    fun isValidInstance(block : Block, breaker: BlockBreaker<*>) : Boolean
+    fun isValidInstance(block : Block, breaker: BlockBreaker<*>) : Boolean = requirements.test(block, breaker)
 
     /**
      * Creates a new [BlockInstance] using data from the provided `Block`, so long as it meets the requirements
@@ -164,27 +168,28 @@ interface BlockDefinition : Attributable {
     fun createInstance(block : Block, breaker: BlockBreaker<*>) : BlockInstance
 
 
+    /**
+     * DefaultImplBuilder class for creating a default BlockDefinition object.
+     */
     @Suppress("Unused")
-    class Builder(private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
+    class DefaultImplBuilder(private val blockworks: Blockworks, private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
 
 
         private var drops: Iterable<ConditionalDrop> = listOf()
         private var attributes: MutableMap<Attribute<*,*>, Any> = mutableMapOf()
-        private var breakCondition : Predicate<BlockInstance>? = null
-        private var replacement : Material? = null
+        private var breakCondition : Predicate<BlockInstance> = blockworks.config.defaultBreakCondition
+        private var replacement : Material = blockworks.config.defaultReplacementMaterial
         private var breakBehavior : Consumer<BlockInstance> = emptyBreakConsumer
-        private var dropBehavior : Consumer<DeterminedDrop>? = null
-        private var breakSound : Sound? = null
+        private var dropBehavior : Consumer<DeterminedDrop> = blockworks.config.defaultDropBehavior
         private var tickBehavior : Consumer<BlockInstance> = Consumer {}
 
-        infix fun withDrops(drops: Iterable<ConditionalDrop>) : Builder = apply { this.drops = drops }
-        infix fun withAttributes(attributes: MutableMap<Attribute<*,*>, Any>) : Builder = apply { this.attributes = attributes }
-        infix fun breakIf(breakCondition : Predicate<BlockInstance>) : Builder = apply { this.breakCondition = breakCondition}
-        infix fun replacedWith(material : Material) : Builder = apply { this.replacement = material }
-        infix fun whenBroken(breakBehavior : Consumer<BlockInstance>): Builder = apply { this.breakBehavior = breakBehavior}
-        infix fun whenReward(dropBehavior : Consumer<DeterminedDrop>) : Builder = apply {this.dropBehavior = dropBehavior}
-        infix fun playsSound(sound : Sound) : Builder = apply { this.breakSound = sound }
-        infix fun whenTicked(tickBehavior : Consumer<BlockInstance>) : Builder = apply { this.tickBehavior = tickBehavior}
+        infix fun withDrops(drops: Iterable<ConditionalDrop>) : DefaultImplBuilder = apply { this.drops = drops }
+        infix fun withAttributes(attributes: MutableMap<Attribute<*,*>, Any>) : DefaultImplBuilder = apply { this.attributes = attributes }
+        infix fun breakIf(breakCondition : Predicate<BlockInstance>) : DefaultImplBuilder = apply { this.breakCondition = breakCondition}
+        infix fun replacedBy(material : Material) : DefaultImplBuilder = apply { this.replacement = material }
+        infix fun whenBroken(breakBehavior : Consumer<BlockInstance>): DefaultImplBuilder = apply { this.breakBehavior = breakBehavior}
+        infix fun whenReward(dropBehavior : Consumer<DeterminedDrop>) : DefaultImplBuilder = apply {this.dropBehavior = dropBehavior}
+        infix fun whenTicked(tickBehavior : Consumer<BlockInstance>) : DefaultImplBuilder = apply { this.tickBehavior = tickBehavior}
 
         fun build() : BlockDefinition = InternalBLockDefinition(
                 requirements,
@@ -195,7 +200,7 @@ interface BlockDefinition : Attributable {
                 tickBehavior,
                 breakBehavior,
                 dropBehavior,
-                breakSound)
+                )
 
     }
 

@@ -12,9 +12,8 @@ import org.bukkit.Material
  * @property location the [Location] of the instance. This is also the only thing used to check if two
  * `BlockInstance`s are equal to each other via [BlockInstance.equals]
  * @property breaker the [BlockBreaker] currently mining this `BlockInstance`.
- * @property broken whether this instance has been broken.
- * @property drops a shorthand for `definition.possibleDrops`
- * @property attributes the attribute data assigned to this instance. Copies `definition.attributes` initially.
+ * @property broken whether this instance has been broken. Default implementation is
+ * `definition.breakIf.test(this)`
  */
 interface BlockInstance : Attributable {
 
@@ -22,11 +21,6 @@ interface BlockInstance : Attributable {
     val location: Location;
     val breaker : BlockBreaker<*>;
     val broken : Boolean
-    val replacement : Material
-
-    /**
-     * Shorthand for `definition.breakBehavior(this)`; does not set this instance's state to broken.
-      */
-    fun breakBlock()
+        get() = definition.breakIf.test(this)
 
 }

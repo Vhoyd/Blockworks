@@ -13,10 +13,16 @@ interface Attribute<P : Any, C : Any> {
 
 
     companion object {
+        /**
+         * Creates a default implementation object.
+         */
         operator fun <P : Any, C : Any> invoke(
             name : String,
             type : PersistentDataType<P, C>): Attribute<P, C> = InternalAttribute(name, type)
 
+        /**
+         * Creates a default implementation object.
+         */
         @JvmStatic
         fun <P : Any, C : Any> create(
             name : String,

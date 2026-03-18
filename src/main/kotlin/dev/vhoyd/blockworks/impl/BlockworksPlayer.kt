@@ -11,8 +11,11 @@ import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
 import org.bukkit.entity.Player
 
 /**
- * Example implementation of [BlockBreaker] for use with [Player]s. Not required when using the API; other implementations
- * of `Player`-based `BlockBreaker`s are fully allowed.
+ * Example implementation of [BlockBreaker] for use with [Player]s.
+ *
+ * Not required when using the API; other implementations of `Player`-based `BlockBreaker`s are fully allowed.
+ * Note: `BlockBreaker`s paired with [PersistentAttributable] will require a method override, and should prefer
+ * persistent behavior.
  */
 class BlockworksPlayer private constructor(
     override val blockworks: Blockworks,
@@ -35,7 +38,7 @@ class BlockworksPlayer private constructor(
         defaultParts = defaultParts,
         defaultAttributes = defaultAttributes,
         persistentAttributed = InternalPersistentAttributed(
-            blockworks,
+            blockworks.plugin,
             delegate,
             defaultAttributes.toMutableMap(),
             overwriteAttributes

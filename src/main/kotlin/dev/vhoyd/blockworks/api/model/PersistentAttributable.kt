@@ -6,29 +6,32 @@ import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.plugin.Plugin
 
+/**
+ * Extension of [Attributable] that promises a [PersistentDataHolder], and a [Plugin] to credit
+ * when reading/writing data with the [persistenceTarget]
+ */
 interface PersistentAttributable : Attributable {
 
     val persistenceTarget: PersistentDataHolder
-    val blockworks: Blockworks
-    val overwrite: Boolean
+    val plugin: Plugin
 
 
     companion object {
         operator fun invoke(
-            blockworks : Blockworks,
+            plugin: Plugin,
             persistenceTarget: PersistentDataHolder,
             attributes: Map<Attribute<*, *>, Any> = emptyMap(),
             overwrite: Boolean = false,
-        ): PersistentAttributable = InternalPersistentAttributed(blockworks, persistenceTarget, attributes, overwrite)
+        ): PersistentAttributable = InternalPersistentAttributed(plugin, persistenceTarget, attributes, overwrite)
 
         @JvmStatic
         @JvmOverloads
         fun create(
-            blockworks : Blockworks,
+            plugin: Plugin,
             persistenceTarget: PersistentDataHolder,
             owner: Class<*>,
             attributes: Map<Attribute<*, *>, Any> = emptyMap(),
             overwrite: Boolean = false,
-        ): PersistentAttributable = InternalPersistentAttributed(blockworks, persistenceTarget, attributes, overwrite)
+        ): PersistentAttributable = InternalPersistentAttributed(plugin, persistenceTarget, attributes, overwrite)
     }
 }

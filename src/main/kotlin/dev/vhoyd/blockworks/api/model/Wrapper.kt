@@ -1,16 +1,26 @@
 package dev.vhoyd.blockworks.api.model
 
+import dev.vhoyd.blockworks.api.core.Blockworks
 import dev.vhoyd.blockworks.internal.InternalWrapper
+import java.util.function.BiFunction
+import java.util.function.Predicate
+
+
 
 /**
- * Promises some delegate property along with some casting methods.
+ * @return the delegate cast to the type, or null if it cannot be cast.
  */
-
 inline fun <reified V> Wrapper<*>.delegateAs() : V? = delegate as? V
 
+/**
+ * Promises some delegate property along with a default casting method.
+ */
 interface Wrapper<out T> {
     val delegate : T
 
+    /**
+     * @return the delegate cast to the type, or null if it cannot be cast.
+     */
     fun <V> delegateAs(type: Class<V>) = if (type.isInstance(delegate)) type.cast(delegate) else null
 
 
@@ -41,6 +51,9 @@ interface Wrapper<out T> {
         ) : Wrapper<T> = InternalWrapper(delegate)
 
 
+        /**
+         * Creates a default implementation object.
+         */
         @JvmStatic
         fun <T> create(
             delegate : T

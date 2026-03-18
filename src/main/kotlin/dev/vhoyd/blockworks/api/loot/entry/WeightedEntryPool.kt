@@ -3,10 +3,7 @@ package dev.vhoyd.blockworks.api.loot.entry
 import kotlin.random.Random
 
 /**
- * This class takes a `List<`[Entry]`>` and attaches a few extra methods for getting random/specific
- * contents out of that list.
- * When instantiated, an object of this class computes the cumulative weight of all entries and stores it for
- * later use with fetching entries.
+ * Extension of [EntryPool] that provides a weight-based getter.
  */
 
 class WeightedEntryPool<out T>(entries : List<Entry<T>>) : EntryPool<T>(entries) {
@@ -19,7 +16,7 @@ class WeightedEntryPool<out T>(entries : List<Entry<T>>) : EntryPool<T>(entries)
     }
 
     /**
-     * Picks a random number from 0 up to the cumulative weight  and uses weighted indexing to return the resulting entry.
+     * Picks a random number from 0 up to the cumulative weight and uses weighted indexing to return the resulting entry.
      */
     override fun pickRandom() : T = pickExact(Random.nextInt(totalWeight))
 
@@ -32,7 +29,7 @@ class WeightedEntryPool<out T>(entries : List<Entry<T>>) : EntryPool<T>(entries)
         var number = weight
         var item : Entry<T> = entries[0]
         val iterator = entries.iterator()
-        while (number >= 0) {
+        while (number >= 0 && iterator.hasNext()) {
             item = iterator.next()
             number -= item.weight
         }

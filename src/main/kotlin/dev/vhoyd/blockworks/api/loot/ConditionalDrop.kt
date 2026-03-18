@@ -6,7 +6,8 @@ import org.bukkit.inventory.ItemStack
 import java.util.function.Predicate
 
 /**
- * Data class meant to be a framework  for any set of block drops meant to be provided when a block is broken.
+ * Models a set of drops and exp meant to be provided when a block is broken.
+ *
  * This allows for a check to happen if the drop(s) should only be rewarded under certain circumstances (hence the name).
  * All exp and drop entries are treated as exclusive and dependent; you cannot drop more than one item type from a given
  * `ConditionalDrop`. If you want more than one drop, simply make more `ConditionalDrop` objects.

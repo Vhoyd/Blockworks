@@ -10,8 +10,10 @@ import org.bukkit.inventory.ItemStack
 import java.util.function.BiFunction
 
 /**
- * Example implementation of [Implement] for use with `ItemStack`s. Not required when using the API;
- * other implementations of `ItemStack`-based `Implement`s are fully allowed.
+ * Example implementation of a `Wrapper`/`PersistentAttributable` pair for use with `ItemStack`s.
+ *
+ * Intended for use with [dev.vhoyd.blockworks.api.model.BlockBreaker.parts].
+ * Not required when using the API; other implementations of `ItemStack`-based classes are fully allowed.
  */
 
 class Tool private constructor(
@@ -26,12 +28,16 @@ class Tool private constructor(
         defaultAttributes: Map<Attribute<*, *>, Any>,
         overwriteAttributes: Boolean = true
     ) : this(
-        InternalPersistentAttributed(blockworks, delegate.itemMeta, defaultAttributes, overwriteAttributes),
+        InternalPersistentAttributed(blockworks.plugin, delegate.itemMeta, defaultAttributes, overwriteAttributes),
         InternalWrapper(delegate)
     )
 
     companion object {
-        @JvmStatic
+
+        /**
+         * This field serves as an example of an argument for [Wrapper.validate]; not required for said method.
+         */
+        @JvmField
         val OF_CONSTRUCTOR: BiFunction<Blockworks, ItemStack, Tool?> = BiFunction { blockworks, item ->
             if (item.itemMeta == null) return@BiFunction null
             Tool(blockworks, item, emptyMap(), false)

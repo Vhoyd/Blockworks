@@ -6,7 +6,7 @@ import dev.vhoyd.blockworks.internal.InternalBlockBreaker
 
 
 /**
- * Defines behavior for anything targeting a [BlockInstance]. Can hold various [Attribute]s and various [Implement]s
+ * Defines behavior for anything targeting a [BlockInstance]. Can hold various [Attribute]s and various [Attributable]s
  * for parsing and logic.
  * @see dev.vhoyd.blockworks.impl.BlockworksPlayer
  */
@@ -22,9 +22,18 @@ inline fun <reified V: Attributable> BlockBreaker<*>.removePart() : V? = removeP
 interface BlockBreaker<out T> : Attributable, Wrapper<T>{
     val blockworks: Blockworks
     var currentBlock: BlockInstance?
+
+    /**
+     * Modifying this map directly should be avoided; use [getPart] and [setPart].
+     */
     val parts : MutableMap<Class<out Attributable>, Attributable>
 
 
+    /**
+     * Calling this method outside of subclass initialization should be done with extreme caution.
+     * If overriding, make sure this object gets passed along to `blockworks.registerBlockBreaker()`
+     * if it should be acknowledged by Blockworks.
+     */
     fun register() = apply { blockworks.registerBlockBreaker(this) }
 
 
@@ -41,6 +50,10 @@ interface BlockBreaker<out T> : Attributable, Wrapper<T>{
     }
 
     companion object {
+
+        /**
+         * Creates a default implementation object.
+         */
         operator fun <T> invoke(
             blockworks: Blockworks,
             delegate : T,
@@ -55,6 +68,9 @@ interface BlockBreaker<out T> : Attributable, Wrapper<T>{
         )
 
 
+        /**
+         * Creates a default implementation object.
+         */
         @JvmStatic
         @JvmOverloads
         fun <T> create(

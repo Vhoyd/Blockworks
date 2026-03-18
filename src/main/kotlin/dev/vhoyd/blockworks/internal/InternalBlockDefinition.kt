@@ -19,12 +19,11 @@ internal class InternalBLockDefinition(
     override val requirements: BiPredicate<Block, BlockBreaker<*>>,
     override val drops: Iterable<ConditionalDrop>,
     override val attributes: MutableMap<Attribute<*, *>, Any>,
-    override val breakIf: Predicate<BlockInstance>?,
-    override val replacement: Material?,
+    override val breakIf: Predicate<BlockInstance>,
+    override val replacement: Material,
     override val onTick: Consumer<BlockInstance>,
     override val onBreak: Consumer<BlockInstance>,
-    override val onDrop: Consumer<DeterminedDrop>?,
-    override val sound: Sound?,
+    override val onDrop: Consumer<DeterminedDrop>,
 ) : BlockDefinition {
 
 
@@ -59,12 +58,12 @@ internal class InternalBLockDefinition(
 
 
     override fun toString(): String {
-        return StringBuilder("BlockDefinition(drops: ")
+        return StringBuilder("InternalBlockDefinition(drops: ")
             .appendIterable(drops)
             .append(", attributes: ")
             .appendMap(attributes)
-            .append(", replaced with: ${replacement?.name}")
-            .append(", plays sound when broken: $sound")
+            .append(", replaced with: ${replacement.name}")
+            .append(")")
             .toString()
     }
 

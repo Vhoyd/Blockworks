@@ -1,24 +1,26 @@
 package dev.vhoyd.blockworks.api.model
 
 import dev.vhoyd.blockworks.api.core.Blockworks
-import dev.vhoyd.blockworks.internal.InternalAttribute
 import dev.vhoyd.blockworks.internal.InternalAttributed
-import org.bukkit.persistence.PersistentDataType
 import java.util.function.BiFunction
 import java.util.function.Predicate
 
+/**
+ * Promises behavior for anything intended to have [Attribute]s.
+ *
+ * Accessing [attributes] (Kotlin) or calling `getAttributes()` (Java)
+ * directly for modification is discouraged and should be left to [getAttribute] and [setAttribute]
+ *
+ * @see dev.vhoyd.blockworks.impl.Tool
+ */
 interface Attributable {
 
     val attributes: MutableMap<Attribute<*, *>, Any>
 
-
-    /**
-     * Assigns the value of the given [Attribute].
-     */
     fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value: C)
 
     /**
-     * @return the value of the given [Attribute]
+     * @return the value of the given [Attribute], or null if it doesn't exist.
      */
     fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C?
 
@@ -27,18 +29,17 @@ interface Attributable {
 
 
     companion object {
-        @JvmStatic
-        val INTERNAL_CLASS_FLAG: Attribute<String, String> =
-            InternalAttribute("internal-class", PersistentDataType.STRING)
 
         /**
          * Creates a default implementation object.
          */
         operator fun invoke(
-            owner: Class<*>,
             attributes: Map<Attribute<*, *>, Any> = emptyMap()
         ): Attributable = InternalAttributed(attributes)
 
+        /**
+         * Creates a default implementation object.
+         */
         @JvmStatic
         @JvmOverloads
         fun create(

@@ -77,7 +77,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
             subscribers.forEach {
 
                 // either block was not meant to be vanilla or it's not at the spot the block was broken
-                if (it.definition.breakIf != BlockDefinition.VANILLA_BREAK_CONDITION || it.location != location) return@forEach
+                if (it.definition.breakIf != BlockDefinition.vanillaBreakPredicate || it.location != location) return@forEach
 
                 // if the above checked didn't return, the block has been found
                 log.debug("Found matching vanilla block break condition at ${location}.")
@@ -110,7 +110,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
         val event = BlockInstanceBrokenEvent(DeterminedDrop(instance, set, sumXp))
         manager.callEvent(event)
         val block = instance.location.block
-        block.type = instance.replacement
+        block.type = instance.definition.replacement
         blockworks.getDefinition(block, instance.breaker)?.let { definition ->
             val new = definition.createInstance(block, instance.breaker)
             instance.breaker.currentBlock = new
@@ -118,7 +118,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
         }
         unsubscribe(instance)
         log.debug("Calling block break behavior.")
-        instance.breakBlock()
+        instance.definition.onBreak.accept(instance)
         log.debug("Calling block drop behavior.")
         instance.definition.onDrop?.accept(event.drops)
         log.debug("End of break logic.")

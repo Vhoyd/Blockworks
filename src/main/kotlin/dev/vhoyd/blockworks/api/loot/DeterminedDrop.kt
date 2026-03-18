@@ -6,8 +6,9 @@ import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.core.appendIterable
 
 /**
- * Data class constructed  after rolling every [ConditionalDrop] in a [BlockDefinition]. Also acts as a pre-deploy wrapper
- * for breaking apart [ItemStack]s with amounts greater than 64. <P>
+ * Holds drops and exp produced by rolling every [ConditionalDrop] in a [BlockDefinition]. Also acts as a pre-deploy wrapper
+ * for breaking apart [ItemStack]s with amounts greater than 64.
+ *
  * Intended use of this class is potentially modifying the amount of any specific [items] entry (with no 64 upper limit),
  * or [exp] amount, then accessing the 64-split version of `items` through [splitDrops]
  * @property splitDrops Returns a version of [items] where any [ItemStack] with an amount greater than 64 is broken into multiple

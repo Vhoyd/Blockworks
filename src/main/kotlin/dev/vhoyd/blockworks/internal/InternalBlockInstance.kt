@@ -7,6 +7,13 @@ import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import org.bukkit.Location
 
+
+/**
+ * Default implementation of [BlockInstance].
+ *
+ * Reads data from config object to determine behavior if corresponding definition behavior is null.
+ * [equals] only compares Locations.
+ */
 internal class InternalBlockInstance(
     override val definition: BlockDefinition,
     override val location: Location,
@@ -15,19 +22,11 @@ internal class InternalBlockInstance(
 ) : Attributable by attributed, BlockInstance {
 
     val breakCondition = definition.breakIf ?: breaker.blockworks.config.defaultBreakCondition
-    override val replacement = definition.replacement
-        ?: if (definition.attributes.keys.contains(BlockDefinition.vanillaDmg)) location.block.type
-        else breaker.blockworks.config.defaultReplacementMaterial
 
     val dropBehavior = definition.onDrop ?: breaker.blockworks.config.defaultDropBehavior
+
     override val broken: Boolean
         get() = breakCondition.test(this)
-    val drops = definition.drops
-
-    /**
-     * Shorthand for `definition.breakBehavior(this)`; does not set this instance's state to broken.
-     */
-    override fun breakBlock(): Unit = definition.onBreak.accept(this)
 
 
     override infix fun equals(other: Any?): Boolean {
@@ -50,15 +49,14 @@ internal class InternalBlockInstance(
             .toString()
     }
 
+    // Thanks to IntelliJ for crying about me not adding this until I let it auto-generate
     override fun hashCode(): Int {
         var result = definition.hashCode()
         result = 31 * result + location.hashCode()
         result = 31 * result + breaker.hashCode()
         result = 31 * result + attributed.hashCode()
         result = 31 * result + breakCondition.hashCode()
-        result = 31 * result + replacement.hashCode()
         result = 31 * result + dropBehavior.hashCode()
-        result = 31 * result + drops.hashCode()
         result = 31 * result + broken.hashCode()
         return result
     }
