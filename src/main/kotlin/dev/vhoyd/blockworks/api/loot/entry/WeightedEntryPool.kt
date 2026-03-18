@@ -5,7 +5,7 @@ import kotlin.random.Random
 /**
  * Extension of [EntryPool] that provides a weight-based getter.
  */
-
+@Suppress("unused") // for external use only
 class WeightedEntryPool<out T>(entries : List<Entry<T>>) : EntryPool<T>(entries) {
     private val totalWeight : Int
 

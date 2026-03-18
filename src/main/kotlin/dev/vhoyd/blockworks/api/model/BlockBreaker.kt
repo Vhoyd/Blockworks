@@ -11,10 +11,13 @@ import dev.vhoyd.blockworks.internal.InternalBlockBreaker
  * @see dev.vhoyd.blockworks.impl.BlockworksPlayer
  */
 
+@Suppress("unused") // for external use only
 inline fun <reified V : Attributable> BlockBreaker<*>.getPart() : V? = getPart(V::class.java)
 
+@Suppress("unused") // for external use only
 inline fun <reified V : Attributable> BlockBreaker<*>.setPart(part : V) : Unit = this.setPart(V::class.java, part)
 
+@Suppress("unused") // for external use only
 inline fun <reified V: Attributable> BlockBreaker<*>.removePart() : V? = removePart(V::class.java)
 
 
@@ -26,14 +29,6 @@ interface BlockBreaker<out T> : Attributable, Wrapper<T>{
      * Modifying this map directly should be avoided; use [getPart] and [setPart].
      */
     val parts : MutableMap<Class<out Attributable>, Attributable>
-
-
-    /**
-     * Calling this method outside of subclass initialization should be done with extreme caution.
-     * If overriding, make sure this object gets passed along to `blockworks.registerBlockBreaker()`
-     * if it should be acknowledged by Blockworks.
-     */
-    fun register() = apply { blockworks.registerBlockBreaker(this) }
 
 
     fun <V : Attributable> getPart(type: Class<V>) : V? {
@@ -72,6 +67,7 @@ interface BlockBreaker<out T> : Attributable, Wrapper<T>{
          */
         @JvmStatic
         @JvmOverloads
+        @Suppress("unused") // for external use only
         fun <T> create(
             blockworks: Blockworks,
             delegate : T,

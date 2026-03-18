@@ -24,6 +24,7 @@ interface PersistentAttributable : Attributable {
 
         @JvmStatic
         @JvmOverloads
+        @Suppress("unused") // for external use only
         fun create(
             plugin: Plugin,
             persistenceTarget: PersistentDataHolder,

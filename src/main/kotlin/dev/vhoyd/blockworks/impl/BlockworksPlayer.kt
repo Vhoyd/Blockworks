@@ -6,9 +6,13 @@ import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
+import dev.vhoyd.blockworks.api.model.Wrapper.Companion
+import dev.vhoyd.blockworks.api.model.Wrapper.Companion.validate
 import dev.vhoyd.blockworks.internal.InternalBlockBreaker
 import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import java.util.function.BiFunction
 
 /**
  * Example implementation of [BlockBreaker] for use with [Player]s.
@@ -69,5 +73,17 @@ class BlockworksPlayer private constructor(
 
     override operator fun <P : Any, C : Any> set(attribute: Attribute<P, C>, value: C) {
         persistentAttributed[attribute] = value
+    }
+
+    companion object {
+
+        /**
+         * This field serves as an example of an argument for [dev.vhoyd.blockworks.api.model.Wrapper.validate]; not required for said method.
+         */
+        @JvmField
+        @Suppress("unused") // for external use only
+        val OF_CONSTRUCTOR: BiFunction<Blockworks, Player, BlockworksPlayer?> = BiFunction { blockworks, player ->
+            BlockworksPlayer(blockworks, player, emptyMap(), emptyMap(), false)
+        }
     }
 }

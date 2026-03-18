@@ -25,6 +25,10 @@ internal class InternalBlockBreaker<T>(
     override val parts: MutableMap<Class<out Attributable>, Attributable> = defaultParts.toMutableMap()
     override var currentBlock: BlockInstance? = null
 
+    init {
+        blockworks.registerBlockBreaker(this)
+    }
+
     override fun <P : Any, C : Any> setAttribute(
         attribute: Attribute<P, C>,
         value: C

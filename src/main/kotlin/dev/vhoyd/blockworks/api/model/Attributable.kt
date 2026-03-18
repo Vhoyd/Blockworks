@@ -39,6 +39,7 @@ interface Attributable {
          */
         @JvmStatic
         @JvmOverloads
+        @Suppress("unused") // for external use only
         fun create(
             attributes: Map<Attribute<*, *>, Any> = emptyMap()
         ): Attributable = InternalAttributed(attributes)

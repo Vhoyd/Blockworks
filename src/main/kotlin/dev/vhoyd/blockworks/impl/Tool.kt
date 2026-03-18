@@ -38,6 +38,7 @@ class Tool private constructor(
          * This field serves as an example of an argument for [Wrapper.validate]; not required for said method.
          */
         @JvmField
+        @Suppress("unused") // for external use only
         val OF_CONSTRUCTOR: BiFunction<Blockworks, ItemStack, Tool?> = BiFunction { blockworks, item ->
             if (item.itemMeta == null) return@BiFunction null
             Tool(blockworks, item, emptyMap(), false)

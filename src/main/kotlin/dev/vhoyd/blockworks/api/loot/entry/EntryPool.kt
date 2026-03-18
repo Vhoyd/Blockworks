@@ -24,6 +24,7 @@ sealed class EntryPool<out T>(val entries : List<Entry<T>>) : Iterable<Entry<T>>
          * Generates a `List<`[Entry]`>` of size 1. The caller can specify the weight for the created entry.
          */
         @JvmStatic
+        @Suppress("unused") // for external use only
         fun <V> single(value: V): EntryPool<V> {
             val out = ArrayList<Entry<V>>()
             out.add(Entry(value, 1))
@@ -35,6 +36,7 @@ sealed class EntryPool<out T>(val entries : List<Entry<T>>) : Iterable<Entry<T>>
          * each entry has the same exact weight. The caller can specify the weight.
          */
         @JvmStatic
+        @Suppress("unused") // for external use only
         fun <V> uniform(data: Iterable<V>): EntryPool<V> {
             val createdList = ArrayList<Entry<V>>()
             for (entry in data) {

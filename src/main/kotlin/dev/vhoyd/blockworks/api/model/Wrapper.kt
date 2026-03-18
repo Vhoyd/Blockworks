@@ -21,6 +21,7 @@ interface Wrapper<out T> {
     /**
      * @return the delegate cast to the type, or null if it cannot be cast.
      */
+    @Suppress("unused") // for external use only
     fun <V> delegateAs(type: Class<V>) = if (type.isInstance(delegate)) type.cast(delegate) else null
 
 
@@ -55,6 +56,7 @@ interface Wrapper<out T> {
          * Creates a default implementation object.
          */
         @JvmStatic
+        @Suppress("unused") // for external use only
         fun <T> create(
             delegate : T
         ) : Wrapper<T> = InternalWrapper(delegate)

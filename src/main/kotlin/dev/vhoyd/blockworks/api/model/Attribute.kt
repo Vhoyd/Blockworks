@@ -24,6 +24,7 @@ interface Attribute<P : Any, C : Any> {
          * Creates a default implementation object.
          */
         @JvmStatic
+        @Suppress("unused") // for external use only
         fun <P : Any, C : Any> create(
             name : String,
             type : PersistentDataType<P, C>): Attribute<P, C> = InternalAttribute(name, type)

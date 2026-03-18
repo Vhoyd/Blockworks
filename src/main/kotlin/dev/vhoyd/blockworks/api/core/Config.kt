@@ -46,14 +46,17 @@ data class Config @JvmOverloads constructor(
         INFO(3),
         WARN(2),
         ERROR(1),
+        @Suppress("unused") // for external use only
         NONE(0)
     }
 
     enum class EventMaskType(internal val mask : Byte) {
+        @Suppress("unused") // for external use only
         ALL(7), // 111
         BLOCK_BREAK_MATCH(4), // 100
         BLOCK_DAMAGE(2), // 010
         BLOCK_BREAK(1), // 001
+        @Suppress("unused") // for external use only
         NONE(0); // 000
     }
 

@@ -114,6 +114,7 @@ interface BlockDefinition : Attributable {
          * and no custom drop behavior.
          */
         @JvmStatic
+        @Suppress("unused") // for external use only
         fun vanilla(
             requirements: BiPredicate<Block, BlockBreaker<*>>,
             ignoreFatigue: Boolean,
