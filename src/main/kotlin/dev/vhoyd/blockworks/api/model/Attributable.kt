@@ -31,18 +31,9 @@ interface Attributable {
         val INTERNAL_CLASS_FLAG: Attribute<String, String> =
             InternalAttribute("internal-class", PersistentDataType.STRING)
 
-        @JvmStatic
-        fun <T : Any, V : Attributable> of(
-            blockworks: Blockworks,
-            source: T?,
-            constructor: BiFunction<Blockworks, T, V?>,
-            condition: Predicate<V>
-        ): Attributable? {
-            if (source == null) return null
-            val obj = constructor.apply(blockworks, source) ?: return null
-            return if (condition.test(obj)) obj else null
-        }
-
+        /**
+         * Creates a default implementation object.
+         */
         operator fun invoke(
             owner: Class<*>,
             attributes: Map<Attribute<*, *>, Any> = emptyMap()

@@ -15,6 +15,27 @@ interface Wrapper<out T> {
 
 
     companion object {
+
+        /**
+         * Provided the given information, validates the given delegate,
+         * @return null if the delegate source is null, if the constructor function returns null, or
+         * if the condition returns false. Otherwise, returns the newly constructed wrapper.
+         */
+        @JvmStatic
+        fun <T : Any, V : Wrapper<T>> validate(
+            blockworks: Blockworks,
+            source: T?,
+            constructor: BiFunction<Blockworks, T, V?>,
+            condition: Predicate<V>
+        ): V? {
+            if (source == null) return null
+            val obj = constructor.apply(blockworks, source) ?: return null
+            return if (condition.test(obj)) obj else null
+        }
+
+        /**
+         * Creates a default implementation object.
+         */
         operator fun <T> invoke(
             delegate : T
         ) : Wrapper<T> = InternalWrapper(delegate)
