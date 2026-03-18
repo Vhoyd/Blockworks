@@ -15,6 +15,7 @@ import dev.vhoyd.blockworks.api.core.appendIterable
  * entries, e.g. a count of 129 -> {64, 64, 1}. Lazy-set; will not change after first call.
  *
  */
+@Suppress("unused") // for external use only
 data class DeterminedDrop(
     val blockInstance : BlockInstance,
     val items: Set<ItemStack>,

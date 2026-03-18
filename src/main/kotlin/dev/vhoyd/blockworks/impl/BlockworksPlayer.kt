@@ -26,6 +26,7 @@ class BlockworksPlayer private constructor(
 ) : PersistentAttributable by persistentAttributed, BlockBreaker<Player> by breaker {
 
     @JvmOverloads
+    @Suppress("unused") // for external use only
     constructor(
         blockworks: Blockworks,
         delegate: Player,

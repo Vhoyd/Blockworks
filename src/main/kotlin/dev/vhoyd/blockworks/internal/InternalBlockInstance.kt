@@ -21,9 +21,9 @@ internal class InternalBlockInstance(
     private val attributed: Attributable = InternalAttributed(definition.attributes)
 ) : Attributable by attributed, BlockInstance {
 
-    val breakCondition = definition.breakIf ?: breaker.blockworks.config.defaultBreakCondition
+    val breakCondition = definition.breakIf
 
-    val dropBehavior = definition.onDrop ?: breaker.blockworks.config.defaultDropBehavior
+    val dropBehavior = definition.onDrop
 
     override val broken: Boolean
         get() = breakCondition.test(this)

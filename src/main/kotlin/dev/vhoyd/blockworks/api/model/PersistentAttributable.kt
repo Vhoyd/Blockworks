@@ -1,7 +1,5 @@
 package dev.vhoyd.blockworks.api.model
 
-import dev.vhoyd.blockworks.api.core.Blockworks
-import dev.vhoyd.blockworks.impl.PersistenceWriter
 import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.plugin.Plugin
