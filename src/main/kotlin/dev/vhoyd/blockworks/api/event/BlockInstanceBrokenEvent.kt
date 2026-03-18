@@ -8,6 +8,7 @@ import org.bukkit.event.HandlerList
 /**
  * Event class for when a player breaks some [BlockInstance]
  */
+@Suppress("unused") // for external use only
 class BlockInstanceBrokenEvent(val drops : DeterminedDrop) : Event() {
 
     var isCancelled : Boolean = false

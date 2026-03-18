@@ -120,7 +120,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
         log.debug("Calling block break behavior.")
         instance.definition.onBreak.accept(instance)
         log.debug("Calling block drop behavior.")
-        instance.definition.onDrop?.accept(event.drops)
+        instance.definition.onDrop.accept(event.drops)
         log.debug("End of break logic.")
     }
 }

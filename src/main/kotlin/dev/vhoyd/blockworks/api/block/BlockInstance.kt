@@ -3,7 +3,6 @@ package dev.vhoyd.blockworks.api.block
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.Attributable
 import org.bukkit.Location
-import org.bukkit.Material
 
 /**
  * Class for handling interaction between a [BlockDefinition]'s data and actual gameplay.
@@ -17,9 +16,9 @@ import org.bukkit.Material
  */
 interface BlockInstance : Attributable {
 
-    val definition: BlockDefinition;
-    val location: Location;
-    val breaker : BlockBreaker<*>;
+    val definition: BlockDefinition
+    val location: Location
+    val breaker : BlockBreaker<*>
     val broken : Boolean
         get() = definition.breakIf.test(this)
 

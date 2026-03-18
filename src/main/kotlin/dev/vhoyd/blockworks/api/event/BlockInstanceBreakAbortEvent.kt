@@ -7,6 +7,7 @@ import org.bukkit.event.HandlerList
 /**
  * Event class for when a player stops breaking some [BlockInstance]
  */
+@Suppress("unused") // for external use only
 class BlockInstanceBreakAbortEvent(val target: BlockInstance) : Event() {
 
     var isCancelled : Boolean = false

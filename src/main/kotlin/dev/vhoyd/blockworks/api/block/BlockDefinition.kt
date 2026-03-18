@@ -47,9 +47,9 @@ import kotlin.collections.listOf
 
 interface BlockDefinition : Attributable {
 
-    val requirements : BiPredicate<Block, BlockBreaker<*>>;
-    val drops: Iterable<ConditionalDrop>;
-    override val attributes: MutableMap<Attribute<*,*>, Any>;
+    val requirements : BiPredicate<Block, BlockBreaker<*>>
+    val drops: Iterable<ConditionalDrop>
+    override val attributes: MutableMap<Attribute<*,*>, Any>
     val breakIf : Predicate<BlockInstance>
     val replacement : Material
     val onTick : Consumer<BlockInstance>
@@ -171,8 +171,8 @@ interface BlockDefinition : Attributable {
     /**
      * DefaultImplBuilder class for creating a default BlockDefinition object.
      */
-    @Suppress("Unused")
-    class DefaultImplBuilder(private val blockworks: Blockworks, private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
+    @Suppress("Unused") // for external use only
+    class DefaultImplBuilder(blockworks: Blockworks, private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
 
 
         private var drops: Iterable<ConditionalDrop> = listOf()

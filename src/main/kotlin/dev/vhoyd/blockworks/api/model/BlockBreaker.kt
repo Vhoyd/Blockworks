@@ -18,7 +18,6 @@ inline fun <reified V : Attributable> BlockBreaker<*>.setPart(part : V) : Unit =
 inline fun <reified V: Attributable> BlockBreaker<*>.removePart() : V? = removePart(V::class.java)
 
 
-@Suppress("unused")
 interface BlockBreaker<out T> : Attributable, Wrapper<T>{
     val blockworks: Blockworks
     var currentBlock: BlockInstance?

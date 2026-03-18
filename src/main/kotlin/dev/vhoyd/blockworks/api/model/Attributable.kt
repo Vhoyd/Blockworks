@@ -1,9 +1,6 @@
 package dev.vhoyd.blockworks.api.model
 
-import dev.vhoyd.blockworks.api.core.Blockworks
 import dev.vhoyd.blockworks.internal.InternalAttributed
-import java.util.function.BiFunction
-import java.util.function.Predicate
 
 /**
  * Promises behavior for anything intended to have [Attribute]s.

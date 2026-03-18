@@ -46,6 +46,7 @@ class Blockworks(val config: Config)  {
     }
 
 
+    @Suppress("unused") // for external use only
     fun start() {
         val eventHandler = BukkitEventListener(this)
         blockInstanceManager.runTaskTimer(plugin, 0, 0)
