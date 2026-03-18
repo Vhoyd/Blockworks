@@ -6,12 +6,9 @@ import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
-import dev.vhoyd.blockworks.api.model.Wrapper.Companion
-import dev.vhoyd.blockworks.api.model.Wrapper.Companion.validate
 import dev.vhoyd.blockworks.internal.InternalBlockBreaker
 import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import java.util.function.BiFunction
 
 /**
