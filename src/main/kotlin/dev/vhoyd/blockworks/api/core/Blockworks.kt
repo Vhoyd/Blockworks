@@ -73,7 +73,7 @@ class Blockworks(val config: Config)  {
      * if no behavior is assigned to it. \nThis method returns a potentially valid [BlockDefinition] based
      * on the behavior of [BlockDefinition.isValidInstance]
      */
-    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = config.blockDefinitions.find { it.isValidInstance(block, breaker)}
+    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = config.definitions.find { it.isValidInstance(block, breaker)}
 
 
     override fun toString(): String {

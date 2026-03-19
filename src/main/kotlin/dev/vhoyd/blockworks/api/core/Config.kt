@@ -18,15 +18,17 @@ import kotlin.experimental.or
  */
 
 
-data class Config @JvmOverloads constructor(
+class Config @JvmOverloads constructor(
     internal val plugin : Plugin,
     internal val loggingLevel: LoggingLevel = LoggingLevel.WARN,
     internal val eventMask : Byte,
-    internal val blockDefinitions : Iterable<BlockDefinition>,
+    definitionProducer: DefinitionProducer,
     internal val defaultReplacementMaterial : Material = Material.AIR,
     internal val defaultBreakCondition : Predicate<BlockInstance>,
     internal val defaultDropBehavior : Consumer<DeterminedDrop> = BlockDefinition.defaultDropBehavior,
 ) {
+
+    val definitions = definitionProducer.produceDefinitions(this)
 
     companion object {
         /**
@@ -66,7 +68,7 @@ data class Config @JvmOverloads constructor(
             .append("logging level: ${loggingLevel.name},\n")
             .append("event mask byte: $eventMask,\n")
             .append(" block definitions: ")
-            .appendIterable(blockDefinitions)
+            .appendIterable(definitions)
             .append(", default replacement material: $defaultReplacementMaterial,\n")
             .toString()
     }
