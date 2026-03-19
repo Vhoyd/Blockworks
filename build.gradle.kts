@@ -7,12 +7,9 @@ plugins {
     `maven-publish`
 }
 
-val targetJavaVersion = 21
+val javaVersion : String by project
 
-val versionNumber = 4
 
-group = "dev.vhoyd"
-version = "ALPHA-$versionNumber"
 
 repositories {
     mavenCentral()
@@ -41,7 +38,7 @@ afterEvaluate {
 }
 
 kotlin {
-    jvmToolchain(targetJavaVersion)
+    jvmToolchain(javaVersion.toInt())
 
 }
 
@@ -77,7 +74,6 @@ val sources by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
 }
-
 
 
 // Hacked this together just so that I can test the plugin quicker without needing a file manager open.
