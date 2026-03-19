@@ -7,7 +7,8 @@ plugins {
     `maven-publish`
 }
 
-val javaVersion : String by project
+
+version = project.property("version_number").toString() + "-" + project.property("build_type")
 
 
 
@@ -38,7 +39,7 @@ afterEvaluate {
 }
 
 kotlin {
-    jvmToolchain(javaVersion.toInt())
+    jvmToolchain(project.property("java_version").toString().toInt())
 
 }
 

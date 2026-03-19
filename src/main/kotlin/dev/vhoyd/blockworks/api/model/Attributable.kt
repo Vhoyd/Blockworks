@@ -14,12 +14,18 @@ interface Attributable {
 
     val attributes: MutableMap<Attribute<*, *>, Any>
 
-    fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value: C)
+    fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value: C) {
+        attributes[attribute] = value
+    }
 
     /**
      * @return the value of the given [Attribute], or null if it doesn't exist.
      */
-    fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C?
+    fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
+        val value = attributes[attribute]
+        val complex = attribute.type.complexType
+        return if (value != null && complex.isInstance(value)) complex.cast(value) else null
+    }
 
     operator fun <P : Any, C : Any> set(attribute: Attribute<P, C>, value: C): Unit = setAttribute(attribute, value)
     operator fun <P : Any, C : Any> get(attribute: Attribute<P, C>): C? = getAttribute(attribute)

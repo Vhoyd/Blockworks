@@ -162,12 +162,23 @@ interface BlockDefinition : Attributable {
     fun isValidInstance(block : Block, breaker: BlockBreaker<*>) : Boolean = requirements.test(block, breaker)
 
     /**
+     * Creates a new [BlockInstance] using data from the provided `Block` and `BlockBreaker`, without validating
+     * whether the requirements are met to create one with that context.
+     */
+    fun createInstance(block : Block, breaker: BlockBreaker<*>) : BlockInstance {
+        return BlockInstance(this, block.location, breaker)
+    }
+
+    /**
      * Creates a new [BlockInstance] using data from the provided `Block`, so long as it meets the requirements
      * outlined in [isValidInstance].
+     * Default implementation returns an appropriate [BlockInstance] or null, based on the return value of [isValidInstance].
      * @return the created [BlockInstance] if conditions are appropriate, otherwise `null`.
      */
-    fun createInstance(block : Block, breaker: BlockBreaker<*>) : BlockInstance
-
+    @Suppress("Unused") // for external use only
+    fun createValidatedInstance(block : Block, breaker: BlockBreaker<*>) : BlockInstance? {
+        return if (isValidInstance(block, breaker)) createInstance(block, breaker) else null
+    }
 
     /**
      * DefaultImplBuilder class for creating a default BlockDefinition object.

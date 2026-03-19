@@ -8,7 +8,7 @@ import org.bukkit.persistence.PersistentDataType
  */
 interface Attribute<P : Any, C : Any> {
     val name : String
-        get() = "blockworks-${toString()}"
+        get() = "blockworks-${toString().lowercase()}"
     val type : PersistentDataType<P, C>
 
 

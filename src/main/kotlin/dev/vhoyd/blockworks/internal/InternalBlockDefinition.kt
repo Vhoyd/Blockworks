@@ -25,37 +25,6 @@ internal class InternalBLockDefinition(
     override val onDrop: Consumer<DeterminedDrop>,
 ) : BlockDefinition {
 
-
-    /**
-     * Definitions cannot have their attributes modified. This should never be called.
-     * @throws IllegalStateException why did you call it??
-     */
-    @Deprecated("Definitions cannot have their attributes modified. This should never be called.")
-    override fun <P : Any, C : Any> setAttribute(
-        attribute: Attribute<P, C>,
-        value: C
-    ) {
-        error("Block definition attributes represent defaults and cannot be modified after creation.")
-    }
-
-    override fun isValidInstance(
-        block: Block,
-        breaker: BlockBreaker<*>
-    ): Boolean = requirements.test(block, breaker)
-
-    override fun createInstance(
-        block: Block,
-        breaker: BlockBreaker<*>
-    ): BlockInstance = InternalBlockInstance(this, block.location, breaker)
-
-
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
-
-        @Suppress("UNCHECKED_CAST")
-        return attributes[attribute] as? C
-    }
-
-
     override fun toString(): String {
         return StringBuilder("InternalBlockDefinition(drops: ")
             .appendIterable(drops)

@@ -19,9 +19,10 @@ internal class InternalPersistentAttributed(
     override val persistenceTarget: PersistentDataHolder,
     defaultAttributes: Map<Attribute<*, *>, Any>,
     overwrite: Boolean,
-    val attributed: Attributable = InternalAttributed(defaultAttributes)
 
-) : Attributable by attributed, PersistentAttributable {
+) :  PersistentAttributable {
+
+    override val attributes = defaultAttributes.toMutableMap()
 
     init {
         if (overwrite) {
@@ -32,20 +33,4 @@ internal class InternalPersistentAttributed(
         }
     }
 
-
-    override fun <P : Any, C : Any> setAttribute(
-        attribute: Attribute<P, C>,
-        value: C
-    ) {
-        attributed.setAttribute(attribute, value)
-        PersistenceWriter.setValue(plugin, persistenceTarget, attribute.name, attribute.type, value)
-    }
-
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
-        val value = attributed.getAttribute(attribute)
-        value?.let { return it }
-        val pValue = PersistenceWriter.getValue(plugin, persistenceTarget, attribute.name, attribute.type)
-        pValue?.let { attributed.setAttribute(attribute, pValue) }
-        return pValue
-    }
 }

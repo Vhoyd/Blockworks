@@ -7,16 +7,4 @@ internal class InternalAttributed(defaultAttributes: Map<Attribute<*, *>, Any>) 
 
     override val attributes: MutableMap<Attribute<*, *>, Any> = defaultAttributes.toMutableMap()
 
-    override fun <P : Any, C : Any> setAttribute(
-        attribute: Attribute<P, C>,
-        value: C
-    ) {
-        attributes[attribute] = value
-    }
-
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
-        val value = attributes[attribute]
-        val c = attribute.type.complexType
-        return if (c.isInstance(value)) c.cast(value) else null
-    }
 }

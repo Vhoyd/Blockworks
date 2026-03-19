@@ -29,15 +29,5 @@ internal class InternalBlockBreaker<T>(
         blockworks.registerBlockBreaker(this)
     }
 
-    override fun <P : Any, C : Any> setAttribute(
-        attribute: Attribute<P, C>,
-        value: C
-    ) {
-        attributes[attribute] = value
-    }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
-        return attributes[attribute] as? C
-    }
 }

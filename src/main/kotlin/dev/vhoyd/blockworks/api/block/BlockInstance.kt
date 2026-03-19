@@ -2,6 +2,7 @@ package dev.vhoyd.blockworks.api.block
 
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.Attributable
+import dev.vhoyd.blockworks.internal.InternalBlockInstance
 import org.bukkit.Location
 
 /**
@@ -21,5 +22,21 @@ interface BlockInstance : Attributable {
     val breaker : BlockBreaker<*>
     val broken : Boolean
         get() = definition.breakIf.test(this)
+
+    companion object {
+        operator fun invoke(
+            definition: BlockDefinition,
+            location: Location,
+            breaker: BlockBreaker<*>,
+        ) : BlockInstance = InternalBlockInstance(definition, location, breaker)
+
+        @JvmStatic
+        @Suppress("unused") // for external use only
+        fun create(
+            definition: BlockDefinition,
+            location: Location,
+            breaker: BlockBreaker<*>,
+        ) : BlockInstance = InternalBlockInstance(definition, location, breaker)
+    }
 
 }
