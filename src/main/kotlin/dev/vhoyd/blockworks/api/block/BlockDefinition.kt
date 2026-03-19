@@ -1,6 +1,6 @@
 package dev.vhoyd.blockworks.api.block
 
-import dev.vhoyd.blockworks.api.core.Blockworks
+import dev.vhoyd.blockworks.api.core.Config
 import dev.vhoyd.blockworks.api.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.api.loot.ConditionalDrop
 import dev.vhoyd.blockworks.api.loot.DeterminedDrop
@@ -184,19 +184,19 @@ interface BlockDefinition : Attributable {
      * DefaultImplBuilder class for creating a default BlockDefinition object.
      */
     @Suppress("Unused") // for external use only
-    class DefaultImplBuilder(blockworks: Blockworks, private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
+    class DefaultImplBuilder(config: Config, private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
 
 
         private var drops: Iterable<ConditionalDrop> = listOf()
         private var attributes: MutableMap<Attribute<*,*>, Any> = mutableMapOf()
-        private var breakCondition : Predicate<BlockInstance> = blockworks.config.defaultBreakCondition
-        private var replacement : Material = blockworks.config.defaultReplacementMaterial
+        private var breakCondition : Predicate<BlockInstance> = config.defaultBreakCondition
+        private var replacement : Material = config.defaultReplacementMaterial
         private var breakBehavior : Consumer<BlockInstance> = emptyBreakConsumer
-        private var dropBehavior : Consumer<DeterminedDrop> = blockworks.config.defaultDropBehavior
+        private var dropBehavior : Consumer<DeterminedDrop> = config.defaultDropBehavior
         private var tickBehavior : Consumer<BlockInstance> = Consumer {}
 
         infix fun withDrops(drops: Iterable<ConditionalDrop>) : DefaultImplBuilder = apply { this.drops = drops }
-        infix fun withAttributes(attributes: MutableMap<Attribute<*,*>, Any>) : DefaultImplBuilder = apply { this.attributes = attributes }
+        infix fun withAttributes(attributes: Map<Attribute<*,*>, Any>) : DefaultImplBuilder = apply { this.attributes = attributes.toMutableMap() }
         infix fun breakIf(breakCondition : Predicate<BlockInstance>) : DefaultImplBuilder = apply { this.breakCondition = breakCondition}
         infix fun replacedBy(material : Material) : DefaultImplBuilder = apply { this.replacement = material }
         infix fun whenBroken(breakBehavior : Consumer<BlockInstance>): DefaultImplBuilder = apply { this.breakBehavior = breakBehavior}
