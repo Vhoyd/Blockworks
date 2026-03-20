@@ -7,14 +7,11 @@ import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
-import dev.vhoyd.blockworks.api.model.delegateAs
-import dev.vhoyd.blockworks.internal.InternalAttribute
 import dev.vhoyd.blockworks.internal.InternalBLockDefinition
+import dev.vhoyd.blockworks.internal.VanillaDefinition
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.ExperienceOrb
-import org.bukkit.entity.Player
-import org.bukkit.persistence.PersistentDataType
 import org.bukkit.util.Vector
 import java.util.function.BiPredicate
 import java.util.function.Consumer
@@ -59,9 +56,6 @@ interface BlockDefinition : Attributable {
     companion object {
         private val emptyBreakConsumer : Consumer<BlockInstance> = Consumer { }
 
-        internal val vanillaDmg : Attribute<Float, Float> = InternalAttribute("internal-dmg", PersistentDataType.FLOAT)
-        internal val vanillaHaste : Attribute<Byte, Boolean> = InternalAttribute("internal-haste", PersistentDataType.BOOLEAN)
-        internal val vanillaFatigue : Attribute<Byte, Boolean> = InternalAttribute("internal-fatigue", PersistentDataType.BOOLEAN)
 
         /**
          * A Predicate that always returns false, since the server should not be the one doing the breaking
@@ -109,9 +103,11 @@ interface BlockDefinition : Attributable {
 
 
         /**
-         * Generates a "vanilla" block definition, defined as having no user-provided attributes, breaking speed
+         * Generates a "vanilla" block definition.
+         *
+         * This is defined as having no user-provided attributes, breaking speed
          * determined by the client, break behavior of [Block.breakNaturally] given the held ItemStack,
-         * and no custom drop behavior.
+         * and no custom drop behavior. Please note that these should only be broken by `BlockBreaker<Player>`s.
          */
         @JvmStatic
         @Suppress("unused") // for external use only
@@ -120,24 +116,7 @@ interface BlockDefinition : Attributable {
             ignoreFatigue: Boolean,
             ignoreHaste: Boolean,
         ) : BlockDefinition {
-       return InternalBLockDefinition(
-           requirements,
-           listOf(),
-           attributes = mutableMapOf(
-               vanillaDmg to 0f,
-               vanillaHaste to ignoreHaste,
-               vanillaFatigue to ignoreFatigue,
-           ),
-           breakIf = { it[vanillaDmg]!! >= 1f },
-           onBreak = { instance ->
-               val player = instance.breaker.delegateAs<Player>()!!
-               instance.location.block.breakNaturally(player.equipment.itemInMainHand)
-               player.sendBlockDamage(instance.location, 0f, -player.entityId)
-           },
-           onDrop = { _ -> },
-           replacement = Material.AIR,
-           onTick = { _ -> },
-       )
+            return VanillaDefinition(requirements, ignoreHaste, ignoreFatigue)
         }
     }
 
