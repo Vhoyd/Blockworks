@@ -2,19 +2,15 @@ package dev.vhoyd.blockworks.api.event
 
 import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.model.BlockBreaker
+import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 /**
- * Event class for when a [BlockBreaker] starts breaking some [BlockInstance].
- *
- * The value of `breaker.currentBlock` at construction is its previous [BlockInstance], not the new one.
+ * Called when a `Player` breaks a "vanilla" [BlockInstance]
  */
 @Suppress("unused") // for external use only
-class BlockInstanceStartBreakEvent internal constructor(
-    val breaker: BlockBreaker<*>,
-    val target: BlockInstance
-) : Event() {
+class VanillaInstanceBrokenEvent(val block: BlockInstance, val breaker: BlockBreaker<Player>) : Event() {
 
     var isCancelled : Boolean = false
 
@@ -30,6 +26,4 @@ class BlockInstanceStartBreakEvent internal constructor(
     override fun getHandlers(): HandlerList {
         return handlerList
     }
-
-
 }

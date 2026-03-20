@@ -5,12 +5,13 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 /**
- * Event class called each tick of a player breaking some [BlockInstance]
+ * Event class called each tick of a [dev.vhoyd.blockworks.api.model.BlockBreaker] breaking some [BlockInstance].
  */
 @Suppress("unused") // for external use only
-class BlockInstanceTickEvent(val target: BlockInstance) : Event() {
+class BlockInstanceTickEvent internal constructor(
+    val block: BlockInstance
+) : Event() {
     var isCancelled : Boolean = false
-
 
     companion object {
         private val handlerList = HandlerList()

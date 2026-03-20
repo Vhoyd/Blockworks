@@ -11,7 +11,6 @@ import org.bukkit.Location
 /**
  * Default implementation of [BlockInstance].
  *
- * Reads data from config object to determine behavior if corresponding definition behavior is null.
  * [equals] only compares Locations.
  */
 internal class InternalBlockInstance(

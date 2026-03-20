@@ -1,6 +1,6 @@
 package dev.vhoyd.blockworks.api.block
 
-import dev.vhoyd.blockworks.api.core.Config
+import dev.vhoyd.blockworks.api.core.BehaviorPolicy
 import dev.vhoyd.blockworks.api.event.BlockInstanceBrokenEvent
 import dev.vhoyd.blockworks.api.loot.ConditionalDrop
 import dev.vhoyd.blockworks.api.loot.DeterminedDrop
@@ -30,15 +30,15 @@ import kotlin.collections.listOf
  * block definition. Cannot be modified directly through the definition; instead modify the instance's attributes.
  * @property breakIf the condition under which this block should be flagged as "broken". This is called
  * by [BlockInstance]s that use this definition, providing themselves as context during evaluation. If left null,
- * instances will assume the default break condition declared via [dev.vhoyd.blockworks.api.core.Config.defaultBreakCondition]
+ * instances will assume the default break condition declared via [dev.vhoyd.blockworks.api.core.BehaviorPolicy.defaultBreakCondition]
  * @property replacement the vanilla [Material] block type to replace this block type when broken. If left null,
- * instances will assume the default material declared via [dev.vhoyd.blockworks.api.core.Config.defaultReplacementMaterial]
+ * instances will assume the default material declared via [dev.vhoyd.blockworks.api.core.BehaviorPolicy.defaultReplacementMaterial]
  * @property onBreak behavior to be called upon breaking a block of this type. Called
  * after its corresponding [BlockInstanceBrokenEvent] and before its [onDrop]
  * @property onDrop an optionally overridable behavior for what happens when this `BlockDefinition`
  * generates its reward(s). By default, this mimics vanilla behavior of dropping exp and items at block location;
  * this will be called after its corresponding [BlockInstanceBrokenEvent], and after its [onBreak]. If left null,
- * instances will assume the default drop behavior declared via [dev.vhoyd.blockworks.api.core.Config]
+ * instances will assume the default drop behavior declared via [dev.vhoyd.blockworks.api.core.BehaviorPolicy]
  * @property onTick behavior to be called each tick that this block is being broken.
  */
 
@@ -70,8 +70,8 @@ interface BlockDefinition : Attributable {
         @JvmStatic
         val defaultDropBehavior : Consumer<DeterminedDrop> = Consumer { drop ->
 
-            val world = drop.blockInstance.location.world
-            val location = drop.blockInstance.location.add(0.5, 0.5, 0.5)
+            val world = drop.block.location.world
+            val location = drop.block.location.add(0.5, 0.5, 0.5)
             drop.exp.forEach {
                 if (it > 0) {
                     val orb = world.spawn(
@@ -163,15 +163,15 @@ interface BlockDefinition : Attributable {
      * DefaultImplBuilder class for creating a default BlockDefinition object.
      */
     @Suppress("Unused") // for external use only
-    class DefaultImplBuilder(config: Config, private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
+    class DefaultImplBuilder(behaviorPolicy: BehaviorPolicy, private val requirements : BiPredicate<Block, BlockBreaker<*>>) {
 
 
         private var drops: Iterable<ConditionalDrop> = listOf()
         private var attributes: MutableMap<Attribute<*,*>, Any> = mutableMapOf()
-        private var breakCondition : Predicate<BlockInstance> = config.defaultBreakCondition
-        private var replacement : Material = config.defaultReplacementMaterial
+        private var breakCondition : Predicate<BlockInstance> = behaviorPolicy.defaultBreakCondition
+        private var replacement : Material = behaviorPolicy.defaultReplacementMaterial
         private var breakBehavior : Consumer<BlockInstance> = emptyBreakConsumer
-        private var dropBehavior : Consumer<DeterminedDrop> = config.defaultDropBehavior
+        private var dropBehavior : Consumer<DeterminedDrop> = behaviorPolicy.defaultDropBehavior
         private var tickBehavior : Consumer<BlockInstance> = Consumer {}
 
         infix fun withDrops(drops: Iterable<ConditionalDrop>) : DefaultImplBuilder = apply { this.drops = drops }

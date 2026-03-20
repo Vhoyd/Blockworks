@@ -17,14 +17,14 @@ import dev.vhoyd.blockworks.api.core.appendIterable
  */
 @Suppress("unused") // for external use only
 data class DeterminedDrop(
-    val blockInstance : BlockInstance,
+    val block : BlockInstance,
     val items: Set<ItemStack>,
     val exp: Set<Int>
 ) {
 
     private var split : Boolean = false
     val splitDrops: Set<ItemStack> by lazy { processItems() }
-    private val log = blockInstance.breaker.blockworks.logger.context("DeterminedDrop:${blockInstance.location.block.blockData.material}")
+    private val log = block.breaker.blockworks.logger.context("DeterminedDrop:${block.location.block.blockData.material}")
 
     private fun processItems() : Set<ItemStack> {
         split = true

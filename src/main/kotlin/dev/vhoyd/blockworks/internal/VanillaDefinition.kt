@@ -40,6 +40,7 @@ internal class VanillaDefinition(
     override val replacement = Material.AIR
     override val onTick : Consumer<BlockInstance> = {
 
+        // TODO: figure out why this doesn't scale properly
         val player = it.breaker.delegateAs<Player>()!!
         val hasteEffect = player.getPotionEffect(PotionEffectType.HASTE)?.amplifier?.let { it + 1} ?: 0
         val fatigueEffect = player.getPotionEffect(PotionEffectType.MINING_FATIGUE)?.amplifier?.let { it + 1} ?: 0

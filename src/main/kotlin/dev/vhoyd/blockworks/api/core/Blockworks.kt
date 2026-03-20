@@ -28,16 +28,15 @@ internal fun StringBuilder.appendMap(data : Map<*,*>) : StringBuilder {
 
 /**
  * Entry point class for working with the API.
- * @property config a [Config] object created by the user of this plugin.
+ * @property behaviorPolicy a [BehaviorPolicy] object created by the user of this plugin.
  * @property plugin the [Plugin] using this Blockworks instance.
  * @property logger a [Logger] used for a pass-around debug output, not very necessary in this class itself.
  * This is internal, please use your own logging object.
  * @property breakers a list of [BlockBreaker]s that keeps track of what [BlockBreaker.delegate]s will experience custom behavior.
  */
-class Blockworks(val config: Config)  {
+class Blockworks(val behaviorPolicy: BehaviorPolicy, internal val plugin: Plugin)  {
 
-    internal val plugin : Plugin = config.plugin
-    internal val logger = Logger(this, source = "Main", level = config.loggingLevel)
+    internal val logger = Logger(this, source = "Main", level = behaviorPolicy.loggingLevel)
     internal val breakers = mutableSetOf<BlockBreaker<*>>()
     val blockInstanceRegistry = BlockInstanceRegistry(this)
 
@@ -73,7 +72,7 @@ class Blockworks(val config: Config)  {
      * if no behavior is assigned to it. \nThis method returns a potentially valid [BlockDefinition] based
      * on the behavior of [BlockDefinition.isValidInstance]
      */
-    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = config.definitions.find { it.isValidInstance(block, breaker)}
+    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = behaviorPolicy.definitions.find { it.isValidInstance(block, breaker)}
 
 
     override fun toString(): String {
