@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable
  * Internal API class for updating blocks being broken each tick, as Minecraft does not natively
  * trigger an event each tick for this. Use with caution.
  */
-class BlockInstanceManager internal constructor(val blockworks : Blockworks) : BukkitRunnable() {
+class BlockInstanceRegistry internal constructor(val blockworks : Blockworks) : BukkitRunnable() {
     private val manager = blockworks.plugin.server.pluginManager
 
     // set instead of list, so that duplicates aren't ticked twice (end-users could implement manually)
@@ -22,7 +22,7 @@ class BlockInstanceManager internal constructor(val blockworks : Blockworks) : B
     private val toDelete: MutableSet<BlockInstance> = mutableSetOf()
     private val toAdd: MutableSet<BlockInstance> = mutableSetOf()
 
-    private val log = blockworks.logger.context("BlockInstanceManager")
+    private val log = blockworks.logger.context("BlockInstanceRegistry")
 
     override fun run() {
         subscribers.forEach {

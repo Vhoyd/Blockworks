@@ -39,7 +39,7 @@ class Blockworks(val config: Config)  {
     internal val plugin : Plugin = config.plugin
     internal val logger = Logger(this, source = "Main", level = config.loggingLevel)
     internal val breakers = mutableSetOf<BlockBreaker<*>>()
-    val blockInstanceManager = BlockInstanceManager(this)
+    val blockInstanceRegistry = BlockInstanceRegistry(this)
 
     init {
         logger.info("Creating Blockworks object for plugin ${plugin.name}...")
@@ -49,7 +49,7 @@ class Blockworks(val config: Config)  {
     @Suppress("unused") // for external use only
     fun start() {
         val eventHandler = BukkitEventListener(this)
-        blockInstanceManager.runTaskTimer(plugin, 0, 0)
+        blockInstanceRegistry.runTaskTimer(plugin, 0, 0)
         plugin.server.pluginManager.registerEvents(eventHandler, plugin)
         logger.info("Blockworks (via ${plugin.name}) is running!")
     }

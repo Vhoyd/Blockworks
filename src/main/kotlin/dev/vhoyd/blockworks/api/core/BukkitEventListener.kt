@@ -41,7 +41,7 @@ internal class BukkitEventListener(private val blockworks : Blockworks) : Listen
 
         if (blockBreaker.currentBlock != null) {
             blockDamage.debug("unsubscribing previous BlockInstance at $blockBreaker")
-            blockworks.blockInstanceManager.unsubscribe(blockBreaker.currentBlock!!)
+            blockworks.blockInstanceRegistry.unsubscribe(blockBreaker.currentBlock!!)
         } else {
             blockDamage.debug("BlockworksPlayer was not previously mining any BlockInstance.")
         }
@@ -55,7 +55,7 @@ internal class BukkitEventListener(private val blockworks : Blockworks) : Listen
         val blockInstance = blockDefinition.createInstance(e.block, blockBreaker)
         e.player.server.pluginManager.callEvent(BlockInstanceStartBreakEvent(blockInstance))
         blockBreaker.currentBlock = blockInstance
-        blockworks.blockInstanceManager.subscribe(blockInstance)
+        blockworks.blockInstanceRegistry.subscribe(blockInstance)
     }
 
     @EventHandler
@@ -70,7 +70,7 @@ internal class BukkitEventListener(private val blockworks : Blockworks) : Listen
             return
         }
         e.player.server.pluginManager.callEvent(BlockInstanceBreakAbortEvent(instance))
-        blockworks.blockInstanceManager.unsubscribe(instance)
+        blockworks.blockInstanceRegistry.unsubscribe(instance)
     }
 
     @EventHandler
@@ -82,7 +82,7 @@ internal class BukkitEventListener(private val blockworks : Blockworks) : Listen
             return
         }
 
-        val foundMatch = blockworks.blockInstanceManager.applyVanillaBreak(e.block.location)
+        val foundMatch = blockworks.blockInstanceRegistry.applyVanillaBreak(e.block.location)
         if (foundMatch != null ) {
             if (eventMask and Config.EventMaskType.BLOCK_BREAK_MATCH.mask == zero) {
                 blockBreak.debug("Event ignored.")
@@ -90,7 +90,7 @@ internal class BukkitEventListener(private val blockworks : Blockworks) : Listen
                 return
             }
             e.isCancelled = true
-            blockworks.blockInstanceManager.handleBreakLogic(foundMatch)
+            blockworks.blockInstanceRegistry.handleBreakLogic(foundMatch)
         } else {
             blockBreak.debug("Event ignored due to no matching vanilla block.")
         }
