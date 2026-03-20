@@ -56,14 +56,6 @@ interface BlockDefinition : Attributable {
     companion object {
         private val emptyBreakConsumer : Consumer<BlockInstance> = Consumer { }
 
-
-        /**
-         * A Predicate that always returns false, since the server should not be the one doing the breaking
-         * for completely vanilla blocks.
-         */
-        @JvmStatic
-        val vanillaBreakPredicate : Predicate<BlockInstance> = Predicate { false }
-
         /**
          * Spawns every rolled drop and experience orb at the center of the block, with some randomized velocity.
          */
