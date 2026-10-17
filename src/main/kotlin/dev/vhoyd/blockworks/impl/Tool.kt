@@ -39,7 +39,7 @@ class Tool private constructor(
          */
         @JvmField
         @Suppress("unused") // for external use only
-        val OF_CONSTRUCTOR: BiFunction<Blockworks, ItemStack, Tool?> = BiFunction { blockworks, item ->
+        val VALIDATOR: BiFunction<Blockworks, ItemStack, Tool?> = BiFunction { blockworks, item ->
             if (item.itemMeta == null) return@BiFunction null
             Tool(blockworks, item, emptyMap(), false)
         }

@@ -80,7 +80,7 @@ class BlockworksPlayer private constructor(
          */
         @JvmField
         @Suppress("unused") // for external use only
-        val CONSTRUCTOR: BiFunction<Blockworks, Player, BlockworksPlayer?> = BiFunction { blockworks, player ->
+        val VALIDATOR: BiFunction<Blockworks, Player, BlockworksPlayer?> = BiFunction { blockworks, player ->
             BlockworksPlayer(blockworks, player, emptyMap(), emptyMap(), false)
         }
     }
