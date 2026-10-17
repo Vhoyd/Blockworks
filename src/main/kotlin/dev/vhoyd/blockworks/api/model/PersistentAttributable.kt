@@ -24,7 +24,9 @@ interface PersistentAttributable : Attributable {
         PersistenceWriter.setValue(plugin, persistenceTarget, attribute.name, attribute.type, value)
     }
 
+
     override fun <P : Any, C : Any> getAttribute(attribute: Attribute<P, C>): C? {
+
         val value = super.getAttribute(attribute)
         value?.let { return it }
         val pValue = PersistenceWriter.getValue(plugin, persistenceTarget, attribute.name, attribute.type)
@@ -34,17 +36,11 @@ interface PersistentAttributable : Attributable {
 
 
     companion object {
-        operator fun invoke(
-            plugin: Plugin,
-            persistenceTarget: PersistentDataHolder,
-            attributes: Map<Attribute<*, *>, Any> = emptyMap(),
-            overwrite: Boolean = false,
-        ): PersistentAttributable = InternalPersistentAttributed(plugin, persistenceTarget, attributes, overwrite)
 
         @JvmStatic
         @JvmOverloads
         @Suppress("unused") // for external use only
-        fun create(
+        fun default(
             plugin: Plugin,
             persistenceTarget: PersistentDataHolder,
             owner: Class<*>,

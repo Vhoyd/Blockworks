@@ -1,4 +1,6 @@
 name: Blockworks
 version: ${version}
 main: dev.vhoyd.blockworks.BlockworksPlugin
-api-version: '1.21'
+author: Vhoyd
+description: A framework for implementing custom mining behavior.
+api-version: '26.3'

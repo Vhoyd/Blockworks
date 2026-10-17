@@ -6,7 +6,11 @@ import dev.vhoyd.blockworks.api.core.appendIterable
 /**
  * Models a collection of [Entry]s and provides methods for selecting them.
  */
-sealed class EntryPool<out T>(val entries : List<Entry<T>>) : Iterable<Entry<T>> {
+sealed class EntryPool<out T>(entries : List<Entry<T>>) : Iterable<Entry<T>> {
+    protected val entries : List<Entry<T>> = entries
+
+    @Suppress("unused")
+    constructor(entries: Map<T, Int>) : this(entries.map { (data, weight) -> Entry(data, weight) })
 
     abstract fun pickRandom(): T
 

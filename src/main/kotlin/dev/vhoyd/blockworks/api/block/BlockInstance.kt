@@ -24,18 +24,13 @@ interface BlockInstance : Attributable {
         get() = definition.breakIf.test(this)
 
     companion object {
-        operator fun invoke(
-            definition: BlockDefinition,
-            location: Location,
-            breaker: BlockBreaker<*>,
-        ) : BlockInstance = InternalBlockInstance(definition, location, breaker)
 
         @JvmStatic
         @Suppress("unused") // for external use only
-        fun create(
+        fun default(
             definition: BlockDefinition,
             location: Location,
-            breaker: BlockBreaker<*>,
+            breaker: BlockBreaker<*>
         ) : BlockInstance = InternalBlockInstance(definition, location, breaker)
     }
 

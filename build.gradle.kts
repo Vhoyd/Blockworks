@@ -1,16 +1,23 @@
 plugins {
     kotlin("jvm") version "2.3.10"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("org.jetbrains.dokka") version "2.1.0"
-    id("org.jetbrains.dokka-javadoc") version "2.1.0"
+    id("org.jetbrains.dokka") version "2.2.0"
+    id("org.jetbrains.dokka-javadoc") version "2.2.0"
     id("com.gradleup.shadow") version  "9.3.0"
     `maven-publish`
 }
 
 
-version = project.property("version_number").toString() + "-" + project.property("build_type")
+version = "${project.property("version_number")}-${project.property("build_type")}"
 
 
+kotlin {
+    jvmToolchain(project.property("java_version").toString().toInt())
+
+}
+
+java {
+    withSourcesJar()
+}
 
 repositories {
     mavenCentral()
@@ -21,26 +28,8 @@ repositories {
 
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.+")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-}
-
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                artifact(tasks.shadowJar)
-                 artifact(dokkaJavadocJar)
-                artifact(sources.get())
-            }
-        }
-    }
-}
-
-kotlin {
-    jvmToolchain(project.property("java_version").toString().toInt())
-
 }
 
 tasks {
@@ -55,38 +44,39 @@ tasks {
         }
     }
 
-    jar {
-        enabled = false
-    }
-
-    build {
-        dependsOn(publishToMavenLocal)
-    }
-
     shadowJar {
-        dependsOn("compileKotlin")
+        dependsOn(compileKotlin, processResources)
         archiveClassifier.set("")
         archiveBaseName.set(project.name)
-        archiveVersion.set(project.version.toString())
+        archiveVersion.set(version.toString())
+    }
+
+    register<Jar>("dokkaDocs") {
+        description = "A Javadoc JAR containing Dokka Javadoc"
+        dependsOn(dokkaGeneratePublicationJavadoc)
+        from(dokkaGeneratePublicationJavadoc.flatMap { it.outputDirectory })
+        archiveClassifier.set("javadoc")
+    }
+
+    register<Copy>("Export") {
+        description = "Exports the plugin into my testing directory. I don't care if it's ugly."
+        from(shadowJar)
+        into(File(System.getProperty("user.home"), "Desktop/Paper 26.3/plugins/"))
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
+}
+
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifact(tasks.shadowJar)
+            artifact(tasks.named("dokkaDocs"))
+            groupId = "dev.vhoyd"
+            artifactId = "blockworks"
+            version = project.version.toString()
+        }
     }
 }
 
-val sources by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
-}
-
-
-// Hacked this together just so that I can test the plugin quicker without needing a file manager open.
-val export by tasks.registering(Copy::class) {
-    dependsOn(tasks.build)
-    from(tasks.shadowJar)
-    into(File(System.getProperty("user.home"), "Desktop/Paper 1.21.11 server/plugins/"))
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
-val dokkaJavadocJar by tasks.registering(Jar::class) {
-    description = "A Javadoc JAR containing Dokka Javadoc"
-    from(tasks.dokkaGeneratePublicationJavadoc.flatMap { it.outputDirectory })
-    archiveClassifier.set("javadoc")
-}

@@ -51,6 +51,7 @@ data class DeterminedDrop(
     operator fun divAssign(amount : Int) = items.forEach { it.amount /= amount }
     operator fun remAssign(amount : Int) = items.forEach { it.amount %= amount }
 
+
     /**
      * Increases the amount of every [ItemStack] in [items] by the given `amount`. Supports `+=` operator.
      */

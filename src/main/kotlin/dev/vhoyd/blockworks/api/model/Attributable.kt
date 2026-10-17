@@ -36,17 +36,10 @@ interface Attributable {
         /**
          * Creates a default implementation object.
          */
-        operator fun invoke(
-            attributes: Map<Attribute<*, *>, Any> = emptyMap()
-        ): Attributable = InternalAttributed(attributes)
-
-        /**
-         * Creates a default implementation object.
-         */
         @JvmStatic
         @JvmOverloads
         @Suppress("unused") // for external use only
-        fun create(
+        fun default(
             attributes: Map<Attribute<*, *>, Any> = emptyMap()
         ): Attributable = InternalAttributed(attributes)
     }

@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable
  * Internal API class for updating blocks being broken each tick, as Minecraft does not natively
  * trigger an event each tick for this. Use with caution.
  */
-class BlockInstanceRegistry internal constructor(val blockworks : Blockworks) : BukkitRunnable() {
+internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnable() {
     private val dispatcher = blockworks.plugin.server.pluginManager
 
     // set instead of list, so that duplicates aren't ticked twice (end-users could implement manually)
@@ -30,7 +30,13 @@ class BlockInstanceRegistry internal constructor(val blockworks : Blockworks) : 
 
     override fun run() {
         subscribers.forEach {
-            dispatcher.callEvent(BlockInstanceTickEvent(it))
+            val tickEvent = BlockInstanceTickEvent(it)
+            dispatcher.callEvent(tickEvent)
+            if (tickEvent.isCancelled) {
+                log.debug("Tick event cancelled, skipping.")
+                return@forEach
+            }
+            it.definition.onTick.accept(it)
             if (it.broken) breakBlock(it)
         }
         toAdd.forEach {
@@ -50,26 +56,19 @@ class BlockInstanceRegistry internal constructor(val blockworks : Blockworks) : 
 
     }
 
-    /**
-     * Adds a [BlockInstance] to the set of ones that Blockworks will tick over and dispatch events for.
-     * @return whether the `BlockInstance` was successfully added or not, as defined by [MutableSet.add]
-     */
+
     fun subscribe(blockInstance : BlockInstance) {
         log.debug("BlockInstance at ${blockInstance.location} queued for subscription ")
         toAdd.add(blockInstance)
     }
 
-    /**
-     * Removes a [BlockInstance] from the set of ones being handled.
-     * @return whether the `BlockInstance` was successfully removed or not, as defined by [MutableSet.remove]
-     */
     fun unsubscribe(blockInstance: BlockInstance) {
         log.debug("BlockInstance at ${blockInstance.location} queued for removal ")
         toDelete.add(blockInstance)
     }
 
 
-    internal fun findVanilla(location : Location) : BlockInstance? {
+    fun findVanilla(location : Location) : BlockInstance? {
 
         if (subscribers.isEmpty()) {
             log.warn("No subscribed blocks to break.")
@@ -92,7 +91,7 @@ class BlockInstanceRegistry internal constructor(val blockworks : Blockworks) : 
     }
 
     // do all the fun stuff related to breaking the block
-    internal fun breakBlock(instance : BlockInstance) {
+    fun breakBlock(instance : BlockInstance) {
         val drop = createDrop(instance)
         val brokenEvent = BlockInstanceBrokenEvent(drop, instance, instance.definition.replacement)
 
@@ -127,24 +126,17 @@ class BlockInstanceRegistry internal constructor(val blockworks : Blockworks) : 
         log.debug("End of break logic.")
     }
 
-    internal fun vanillaBreak(instance : BlockInstance, breaker: BlockBreaker<Player>) {
+    fun vanillaBreak(instance : BlockInstance, breaker: BlockBreaker<Player>) {
         val brokenEvent = VanillaInstanceBrokenEvent( instance, breaker)
         dispatcher.callEvent(brokenEvent)
         if (brokenEvent.isCancelled) {
             log.info("Vanilla break event canceled, aborting.")
             return
         }
-
         unsubscribe(instance)
-
-        log.debug("Calling block break behavior.")
         instance.definition.onBreak.accept(instance)
-
         val block = instance.location.block
         block.type = Material.AIR
-
-
-        log.debug("End of vanilla break logic.")
 
     }
 

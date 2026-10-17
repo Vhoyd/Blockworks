@@ -1,9 +1,7 @@
 package dev.vhoyd.blockworks.internal
 
-import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
-import dev.vhoyd.blockworks.impl.PersistenceWriter
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.plugin.Plugin
 

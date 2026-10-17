@@ -1,6 +1,7 @@
 package dev.vhoyd.blockworks.api.core
 
 import dev.vhoyd.blockworks.api.block.BlockDefinition
+import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import org.bukkit.block.Block
 import org.bukkit.plugin.Plugin
@@ -28,17 +29,28 @@ internal fun StringBuilder.appendMap(data : Map<*,*>) : StringBuilder {
 
 /**
  * Entry point class for working with the API.
- * @property behaviorPolicy a [BehaviorPolicy] object created by the user of this plugin.
  * @property plugin the [Plugin] using this Blockworks instance.
- * @property logger a [Logger] used for a pass-around debug output, not very necessary in this class itself.
- * This is internal, please use your own logging object.
- * @property breakers a list of [BlockBreaker]s that keeps track of what [BlockBreaker.delegate]s will experience custom behavior.
+ * @property blockDefinitions some `Iterable<`[BlockDefinition]`>` that outlines every condition under which
+ * Blockworks should handle custom behavior.
+ * @property blockDefinitionBehavior a "configuration" of what behavior to default to if left unspecified.
+ * This field itself defaults to [BlockDefinition.EMPTY_BEHAVIOR], which is a `BlockDefinition` with no defined
+ * behavior whatsoever. It is recommended to override this with a custom configuration.
+ * @property loggingLevel The level of logging that Blockworks should perform, ignoring anything with a lower
+ * priority than the provided one.
+ * @see BlockDefinition
+ * @see Blockworks.LoggingLevel
  */
-class Blockworks(val behaviorPolicy: BehaviorPolicy, internal val plugin: Plugin)  {
+class Blockworks(
+    internal val plugin: Plugin,
+    internal val blockDefinitions: Iterable<BlockDefinition>,
+    internal val blockDefinitionBehavior: BlockDefinition = BlockDefinition.EMPTY_BEHAVIOR,
+    internal val loggingLevel: LoggingLevel = LoggingLevel.WARN
 
-    internal val logger = Logger(this, source = "Main", level = behaviorPolicy.loggingLevel)
+)  {
+
+    internal val logger = Logger(this, source = "Main", level = loggingLevel)
     internal val breakers = mutableSetOf<BlockBreaker<*>>()
-    val blockInstanceRegistry = BlockInstanceRegistry(this)
+    internal val blockInstanceRegistry = BlockInstanceRegistry(this)
 
     init {
         logger.info("Creating Blockworks object for plugin ${plugin.name}...")
@@ -69,13 +81,38 @@ class Blockworks(val behaviorPolicy: BehaviorPolicy, internal val plugin: Plugin
 
     /**
      * @return the [BlockDefinition] that overrides block behavior of the given [Block], or `null`
-     * if no behavior is assigned to it. \nThis method returns a potentially valid [BlockDefinition] based
+     * if no behavior is assigned to it. This method returns a potentially valid [BlockDefinition] based
      * on the behavior of [BlockDefinition.isValidInstance]
      */
-    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = behaviorPolicy.definitions.find { it.isValidInstance(block, breaker)}
+    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = blockDefinitions.find { it.isValidInstance(block, breaker)}
 
 
     override fun toString(): String {
-        return "Blockworks(${plugin.name})"
+        return "Blockworks (${plugin.name})"
+    }
+
+    /**
+     * Queues a [BlockInstance]'s addition to the set of ones that Blockworks will tick over and dispatch events for.
+     *
+     * The addition will take place after every existing `BlockInstance` has been ticked.
+     */
+    fun subscribe(block : BlockInstance) = blockInstanceRegistry.subscribe(block)
+
+    /**
+     * Removes a [BlockInstance] from the set of ones being handled.
+     *
+     * The removal will take place after all queued additions are processed.
+     */
+    fun unsubscribe(block : BlockInstance) = blockInstanceRegistry.unsubscribe(block)
+
+
+    enum class LoggingLevel(internal val level : Byte) {
+        DEBUG(4),
+        INFO(3),
+        WARN(2),
+        ERROR(1),
+
+        @Suppress("unused") // for external use only
+        NONE(0)
     }
 }

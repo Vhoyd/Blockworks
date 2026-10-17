@@ -35,5 +35,12 @@ internal class InternalBLockDefinition(
             .toString()
     }
 
+    override fun createInstance(
+        block: Block,
+        breaker: BlockBreaker<*>
+    ): BlockInstance {
+        return InternalBlockInstance(this, block.location, breaker)
+    }
+
 
 }

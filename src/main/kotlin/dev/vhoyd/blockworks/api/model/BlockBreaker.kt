@@ -48,27 +48,10 @@ interface BlockBreaker<out T> : Attributable, Wrapper<T>{
         /**
          * Creates a default implementation object.
          */
-        operator fun <T> invoke(
-            blockworks: Blockworks,
-            delegate : T,
-            defaultParts: Map<Class<out Attributable>, Attributable> = emptyMap(),
-            defaultAttributes: Map<Attribute<*, *>, Any> = emptyMap(),
-
-        ) : BlockBreaker<T> = InternalBlockBreaker(
-            blockworks = blockworks,
-            delegate = delegate,
-            defaultParts = defaultParts,
-            defaultAttributes = defaultAttributes
-        )
-
-
-        /**
-         * Creates a default implementation object.
-         */
         @JvmStatic
         @JvmOverloads
         @Suppress("unused") // for external use only
-        fun <T> create(
+        fun <T> default(
             blockworks: Blockworks,
             delegate : T,
             defaultParts: Map<Class<out Attributable>, Attributable> = emptyMap(),

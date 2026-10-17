@@ -20,17 +20,13 @@ internal class InternalBlockInstance(
     private val attributed: Attributable = InternalAttributed(definition.attributes)
 ) : Attributable by attributed, BlockInstance {
 
-    val breakCondition = definition.breakIf
-
-    val dropBehavior = definition.onDrop
 
     override val broken: Boolean
-        get() = breakCondition.test(this)
+        get() = definition.breakIf.test(this)
 
 
     override infix fun equals(other: Any?): Boolean {
-        if (other !is BlockInstance) return false
-        return other.location == location
+        return other is BlockInstance && other.location == location
     }
 
 
@@ -54,8 +50,6 @@ internal class InternalBlockInstance(
         result = 31 * result + location.hashCode()
         result = 31 * result + breaker.hashCode()
         result = 31 * result + attributed.hashCode()
-        result = 31 * result + breakCondition.hashCode()
-        result = 31 * result + dropBehavior.hashCode()
         result = 31 * result + broken.hashCode()
         return result
     }

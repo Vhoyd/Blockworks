@@ -37,6 +37,13 @@ internal class VanillaDefinition(
         player.sendBlockDamage(instance.location, 0f, -player.entityId)
     }
     override val onDrop : Consumer<DeterminedDrop> = { _ -> }
+    override fun createInstance(
+        block: Block,
+        breaker: BlockBreaker<*>
+    ): BlockInstance {
+        return InternalBlockInstance(this, block.location, breaker)
+    }
+
     override val replacement = Material.AIR
     override val onTick : Consumer<BlockInstance> = {
 

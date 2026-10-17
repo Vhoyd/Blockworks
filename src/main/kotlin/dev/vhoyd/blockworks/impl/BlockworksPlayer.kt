@@ -26,6 +26,7 @@ class BlockworksPlayer private constructor(
     private val breaker: BlockBreaker<Player>,
 ) : PersistentAttributable by persistentAttributed, BlockBreaker<Player> by breaker {
 
+
     @JvmOverloads
     @Suppress("unused") // for external use only
     constructor(
@@ -79,7 +80,7 @@ class BlockworksPlayer private constructor(
          */
         @JvmField
         @Suppress("unused") // for external use only
-        val OF_CONSTRUCTOR: BiFunction<Blockworks, Player, BlockworksPlayer?> = BiFunction { blockworks, player ->
+        val CONSTRUCTOR: BiFunction<Blockworks, Player, BlockworksPlayer?> = BiFunction { blockworks, player ->
             BlockworksPlayer(blockworks, player, emptyMap(), emptyMap(), false)
         }
     }

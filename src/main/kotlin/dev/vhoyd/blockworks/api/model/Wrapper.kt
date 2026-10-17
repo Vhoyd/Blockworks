@@ -47,17 +47,9 @@ interface Wrapper<out T> {
         /**
          * Creates a default implementation object.
          */
-        operator fun <T> invoke(
-            delegate : T
-        ) : Wrapper<T> = InternalWrapper(delegate)
-
-
-        /**
-         * Creates a default implementation object.
-         */
         @JvmStatic
         @Suppress("unused") // for external use only
-        fun <T> create(
+        fun <T> default(
             delegate : T
         ) : Wrapper<T> = InternalWrapper(delegate)
     }

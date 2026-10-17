@@ -52,7 +52,6 @@ internal class BukkitEventListener(private val blockworks: Blockworks) : Listene
         dispatcher.callEvent(startEvent)
         if (startEvent.isCancelled) run {
             blockDamage.debug("Called event is canceled, aborting.")
-            blockBreaker.currentBlock = null
             return
         }
 
@@ -85,6 +84,7 @@ internal class BukkitEventListener(private val blockworks: Blockworks) : Listene
         }
 
         blockworks.blockInstanceRegistry.unsubscribe(instance)
+        miningPlayer.currentBlock = null
     }
 
     @EventHandler
@@ -95,15 +95,13 @@ internal class BukkitEventListener(private val blockworks: Blockworks) : Listene
             return
         }
 
-
-
         val foundMatch = blockworks.blockInstanceRegistry.findVanilla(e.block.location)
         if (foundMatch != null) {
             val breaker = blockworks.getBlockBreaker(e.player) ?: run {
                 blockBreak.warn("No BlockBreaker object found for ${e.player.name}")
                 return
             }
-
+            e.isCancelled = true
             blockworks.blockInstanceRegistry.vanillaBreak(foundMatch, breaker)
         } else {
             blockBreak.debug("Event ignored due to no matching vanilla block.")
