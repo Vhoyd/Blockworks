@@ -30,7 +30,8 @@ internal fun StringBuilder.appendMap(data : Map<*,*>) : StringBuilder {
 /**
  * Entry point class for working with the API.
  * @property plugin the [Plugin] using this Blockworks instance.
- * @property blockDefinitions some `Iterable<`[BlockDefinition]`>` that outlines every condition under which
+ * @param blockDefinitionSource a `java.util.function.Function` that, given this `Blockworks`, produces
+ * some `Iterable<`[BlockDefinition]`>` that outlines every condition under which
  * Blockworks should handle custom behavior.
  * @property blockDefinitionBehavior a "configuration" of what behavior to default to if left unspecified.
  * This field itself defaults to [BlockDefinition.EMPTY_BEHAVIOR], which is a `BlockDefinition` with no defined
@@ -42,12 +43,13 @@ internal fun StringBuilder.appendMap(data : Map<*,*>) : StringBuilder {
  */
 class Blockworks(
     internal val plugin: Plugin,
-    internal val blockDefinitions: Iterable<BlockDefinition>,
+    blockDefinitionSource: java.util.function.Function<Blockworks, Iterable<BlockDefinition>>,
     internal val blockDefinitionBehavior: BlockDefinition = BlockDefinition.EMPTY_BEHAVIOR,
     internal val loggingLevel: LoggingLevel = LoggingLevel.WARN
 
 )  {
 
+    internal val definitions = blockDefinitionSource.apply(this)
     internal val logger = Logger(this, source = "Main", level = loggingLevel)
     internal val breakers = mutableSetOf<BlockBreaker<*>>()
     internal val blockInstanceRegistry = BlockInstanceRegistry(this)
@@ -84,7 +86,7 @@ class Blockworks(
      * if no behavior is assigned to it. This method returns a potentially valid [BlockDefinition] based
      * on the behavior of [BlockDefinition.isValidInstance]
      */
-    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = blockDefinitions.find { it.isValidInstance(block, breaker)}
+    fun getDefinition(block : Block, breaker: BlockBreaker<*>) : BlockDefinition? = definitions.find { it.isValidInstance(block, breaker)}
 
 
     override fun toString(): String {
