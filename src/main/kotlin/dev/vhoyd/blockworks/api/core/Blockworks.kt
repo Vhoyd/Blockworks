@@ -94,16 +94,12 @@ class Blockworks(
     }
 
     /**
-     * Queues a [BlockInstance]'s addition to the set of ones that Blockworks will tick over and dispatch events for.
-     *
-     * The addition will take place after every existing `BlockInstance` has been ticked.
+     * Adds a [BlockInstance] to the set of ones that Blockworks will tick over and dispatch events for.
      */
     fun subscribe(block : BlockInstance) = blockInstanceRegistry.subscribe(block)
 
     /**
      * Removes a [BlockInstance] from the set of ones being handled.
-     *
-     * The removal will take place after all queued additions are processed.
      */
     fun unsubscribe(block : BlockInstance) = blockInstanceRegistry.unsubscribe(block)
 

@@ -8,6 +8,8 @@ import org.bukkit.Location
 /**
  * Class for handling interaction between a [BlockDefinition]'s data and actual gameplay.
  * Think of it as `BlockDefinition`s being classes while `BlockInstance`s are objects of those classes.
+ * WARNING: instances are processed based on their hash code. If you create a subclass with a custom `hashCode` method,
+ * make sure it will not change its result from the time the object is created to the time it is forgotten.
  * @property definition the [BlockDefinition] that models this custom block instance.
  * @property location the [Location] of the instance. This is also the only thing used to check if two
  * `BlockInstance`s are equal to each other via [BlockInstance.equals]

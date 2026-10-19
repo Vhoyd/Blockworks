@@ -13,6 +13,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Internal API class for updating blocks being broken each tick, as Minecraft does not natively
@@ -22,13 +23,12 @@ internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnab
     private val dispatcher = blockworks.plugin.server.pluginManager
 
     // set instead of list, so that duplicates aren't ticked twice (end-users could implement manually)
-    private val subscribers = mutableSetOf<BlockInstance>()
-    private val toDelete: MutableSet<BlockInstance> = mutableSetOf()
-    private val toAdd: MutableSet<BlockInstance> = mutableSetOf()
+    private val subscribers : MutableSet<BlockInstance> = ConcurrentHashMap.newKeySet()
 
     private val log = blockworks.logger.context("BlockInstanceRegistry")
 
     override fun run() {
+
         subscribers.forEach {
             val tickEvent = BlockInstanceTickEvent(it)
             dispatcher.callEvent(tickEvent)
@@ -39,32 +39,21 @@ internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnab
             it.definition.onTick.accept(it)
             if (it.broken) breakBlock(it)
         }
-        toAdd.forEach {
-            val added = subscribers.add(it)
-            if (added) log.debug("BlockInstance at ${it.location} subscribed")
-            else log.warn("BlockInstance at ${it.location} was not subscribed")
-        }
-        toAdd.clear()
-        toDelete.forEach {
-            val removed = subscribers.remove(it)
-            it.breaker.currentBlock = null
-            // TODO: figure out why this happens way more often than it should
-            if (!removed) log.warn("BlockInstance at ${it.location} was not removed.")
-            else log.debug("BlockInstance at ${it.location} unsubscribed")
-        }
-        toDelete.clear()
 
     }
 
 
     fun subscribe(blockInstance : BlockInstance) {
-        log.debug("BlockInstance at ${blockInstance.location} queued for subscription ")
-        toAdd.add(blockInstance)
+        val added = subscribers.add(blockInstance)
+        if (added) log.debug("BlockInstance at ${blockInstance.location} subscribed")
+        else log.warn("BlockInstance at ${blockInstance.location} was not subscribed")
     }
 
     fun unsubscribe(blockInstance: BlockInstance) {
-        log.debug("BlockInstance at ${blockInstance.location} queued for removal ")
-        toDelete.add(blockInstance)
+        val removed = subscribers.remove(blockInstance)
+        blockInstance.breaker.currentBlock = null
+        if (!removed) log.warn("BlockInstance at ${blockInstance.location} was not removed.")
+        else log.debug("BlockInstance at ${blockInstance.location} unsubscribed")
     }
 
 
@@ -92,6 +81,7 @@ internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnab
 
     // do all the fun stuff related to breaking the block
     fun breakBlock(instance : BlockInstance) {
+        log.debug("Break event requested for instance at ${instance.location}")
         val drop = createDrop(instance)
         val brokenEvent = BlockInstanceBrokenEvent(drop, instance, instance.definition.replacement)
 
@@ -101,6 +91,7 @@ internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnab
             return
         }
 
+        log.debug("Queueing instance for unsubscription.")
         unsubscribe(instance)
         log.debug("Calling block break behavior.")
         instance.definition.onBreak.accept(instance)
@@ -109,7 +100,10 @@ internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnab
         block.type = brokenEvent.replacement
 
         blockworks.getDefinition(block, instance.breaker)?.let { definition ->
-            val new = definition.createInstance(block, instance.breaker)
+            val new = definition.createValidatedInstance(block, instance.breaker) ?: run {
+                log.info("New block at ${block.location} was not valid for a new instance.")
+                return@let
+            }
             val createEvent = BlockInstanceCreateEvent(new)
             dispatcher.callEvent(createEvent)
             if (brokenEvent.isCancelled) {
@@ -124,6 +118,7 @@ internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnab
         log.debug("Calling block drop behavior.")
         instance.definition.onDrop.accept(brokenEvent.drops)
         log.debug("End of break logic.")
+
     }
 
     fun vanillaBreak(instance : BlockInstance, breaker: BlockBreaker<Player>) {

@@ -7,6 +7,7 @@ import dev.vhoyd.blockworks.api.model.Wrapper
 import dev.vhoyd.blockworks.internal.InternalWrapper
 import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import java.util.function.BiFunction
 
 /**
@@ -19,7 +20,18 @@ import java.util.function.BiFunction
 class Tool private constructor(
     private val persistentAttributed: PersistentAttributable,
     private val itemstackWrapper: Wrapper<ItemStack>,
+    private val overwrite: Boolean,
+    private val defaultAttributes: Map<Attribute<*, *>, Any>
 ) : PersistentAttributable by persistentAttributed, Wrapper<ItemStack> by itemstackWrapper {
+
+    init {
+        if (overwrite) {
+            @Suppress("UNCHECKED_CAST")
+            defaultAttributes.forEach { (key, value) ->
+                setAttribute(key as Attribute<Any, Any>, value)
+            }
+        }
+    }
 
     @JvmOverloads
     constructor(
@@ -29,8 +41,19 @@ class Tool private constructor(
         overwriteAttributes: Boolean = true
     ) : this(
         InternalPersistentAttributed(blockworks.plugin, delegate.itemMeta, defaultAttributes, overwriteAttributes),
-        InternalWrapper(delegate)
+        InternalWrapper(delegate),
+        overwriteAttributes,
+        defaultAttributes,
+
     )
+
+
+    override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value: C) {
+        val meta = delegate.itemMeta
+        super.setAttribute(attribute, value)
+        PersistenceWriter.setValue(plugin, meta, attribute.name, attribute.type, value)
+        delegate.itemMeta = meta
+    }
 
     companion object {
 
