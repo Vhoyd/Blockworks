@@ -1,10 +1,11 @@
-package dev.vhoyd.blockworks.internal
+package dev.vhoyd.blockworks.impl.block
 
 import dev.vhoyd.blockworks.api.block.BlockDefinition
 import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.core.appendMap
 import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.BlockBreaker
+import dev.vhoyd.blockworks.impl.attribute.ProvidedAttributed
 import org.bukkit.Location
 
 
@@ -13,11 +14,11 @@ import org.bukkit.Location
  *
  * [equals] only compares Locations.
  */
-internal class InternalBlockInstance(
+internal class ProvidedBlockInstance(
     override val definition: BlockDefinition,
     override val location: Location,
     override val breaker: BlockBreaker<*>,
-    private val attributed: Attributable = InternalAttributed(definition.attributes)
+    private val attributed: Attributable = ProvidedAttributed(definition.attributes)
 ) : Attributable by attributed, BlockInstance {
 
 

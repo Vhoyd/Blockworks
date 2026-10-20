@@ -7,11 +7,9 @@ import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
-import dev.vhoyd.blockworks.internal.InternalBLockDefinition
+import dev.vhoyd.blockworks.impl.block.ProvidedBlockDefinition
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.entity.ExperienceOrb
-import org.bukkit.util.Vector
 import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -62,7 +60,7 @@ interface BlockDefinition : Attributable {
 
     companion object {
 
-        val EMPTY_BEHAVIOR : BlockDefinition = InternalBLockDefinition(
+        val EMPTY_BEHAVIOR : BlockDefinition = ProvidedBlockDefinition(
             requirements = { _ , _ -> true },
             drops = listOf(),
             attributes = mutableMapOf(),
@@ -189,7 +187,7 @@ interface BlockDefinition : Attributable {
         infix fun whenTicked(tickBehavior : Consumer<BlockInstance>) : DefaultDefinitionBuilder = apply { this.tickBehavior = tickBehavior}
 
 
-        fun build() : BlockDefinition = InternalBLockDefinition(
+        fun build() : BlockDefinition = ProvidedBlockDefinition(
                 requirements,
                 drops,
                 attributes,

@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.internal
+package dev.vhoyd.blockworks.impl.block
 
 import dev.vhoyd.blockworks.api.block.BlockDefinition
 import dev.vhoyd.blockworks.api.block.BlockInstance
@@ -14,7 +14,7 @@ import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.function.Predicate
 
-internal class InternalBLockDefinition(
+internal class ProvidedBlockDefinition(
     override val requirements: BiPredicate<Block, BlockBreaker<*>>,
     override val drops: Iterable<ConditionalDrop>,
     override val attributes: MutableMap<Attribute<*, *>, Any>,
@@ -39,7 +39,7 @@ internal class InternalBLockDefinition(
         block: Block,
         breaker: BlockBreaker<*>
     ): BlockInstance {
-        return InternalBlockInstance(this, block.location, breaker)
+        return ProvidedBlockInstance(this, block.location, breaker)
     }
 
 

@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.impl
+package dev.vhoyd.blockworks.impl.core
 
 import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.core.Blockworks
@@ -6,8 +6,7 @@ import dev.vhoyd.blockworks.api.model.Attributable
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
-import dev.vhoyd.blockworks.internal.InternalBlockBreaker
-import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
+import dev.vhoyd.blockworks.impl.attribute.ProvidedPersistentAttributed
 import org.bukkit.entity.Player
 import java.util.function.BiFunction
 
@@ -18,7 +17,7 @@ import java.util.function.BiFunction
  * Note: `BlockBreaker`s paired with [PersistentAttributable] will require a method override, and should prefer
  * persistent behavior.
  */
-class BlockworksPlayer private constructor(
+class ProvidedPlayer private constructor(
     override val blockworks: Blockworks,
     defaultParts: Map<Class<out Attributable>, Attributable>,
     defaultAttributes: Map<Attribute<*, *>, Any>,
@@ -40,13 +39,13 @@ class BlockworksPlayer private constructor(
         blockworks = blockworks,
         defaultParts = defaultParts,
         defaultAttributes = defaultAttributes,
-        persistentAttributed = InternalPersistentAttributed(
+        persistentAttributed = ProvidedPersistentAttributed(
             blockworks.plugin,
             delegate,
             defaultAttributes.toMutableMap(),
             overwriteAttributes
         ),
-        breaker = InternalBlockBreaker(blockworks, delegate, defaultAttributes, defaultParts)
+        breaker = ProvidedBreaker(blockworks, delegate, defaultAttributes, defaultParts)
     )
 
     override val attributes: MutableMap<Attribute<*, *>, Any> = defaultAttributes.toMutableMap()
@@ -80,8 +79,8 @@ class BlockworksPlayer private constructor(
          */
         @JvmField
         @Suppress("unused") // for external use only
-        val VALIDATOR: BiFunction<Blockworks, Player, BlockworksPlayer?> = BiFunction { blockworks, player ->
-            BlockworksPlayer(blockworks, player, emptyMap(), emptyMap(), false)
+        val VALIDATOR: BiFunction<Blockworks, Player, ProvidedPlayer?> = BiFunction { blockworks, player ->
+            ProvidedPlayer(blockworks, player, emptyMap(), emptyMap(), false)
         }
     }
 }

@@ -1,6 +1,6 @@
 package dev.vhoyd.blockworks.api.model
 
-import dev.vhoyd.blockworks.internal.InternalAttribute
+import dev.vhoyd.blockworks.impl.attribute.ProvidedAttribute
 import org.bukkit.persistence.PersistentDataType
 
 /**
@@ -22,7 +22,7 @@ interface Attribute<P : Any, C : Any> {
         @Suppress("unused") // for external use only
         fun <P : Any, C : Any> default(
             name : String,
-            type : PersistentDataType<P, C>): Attribute<P, C> = InternalAttribute(name, type)
+            type : PersistentDataType<P, C>): Attribute<P, C> = ProvidedAttribute(name, type)
     }
 
 }

@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.internal
+package dev.vhoyd.blockworks.impl.attribute
 
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin
  * Intended for single-entity use only.
  *
  */
-internal class InternalPersistentAttributed(
+internal class ProvidedPersistentAttributed(
     override val plugin: Plugin,
     override val persistenceTarget: PersistentDataHolder,
     defaultAttributes: Map<Attribute<*, *>, Any>,

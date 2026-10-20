@@ -2,13 +2,13 @@ package dev.vhoyd.blockworks.api.model
 
 import dev.vhoyd.blockworks.api.block.BlockInstance
 import dev.vhoyd.blockworks.api.core.Blockworks
-import dev.vhoyd.blockworks.internal.InternalBlockBreaker
+import dev.vhoyd.blockworks.impl.core.ProvidedBreaker
 
 
 /**
  * Defines behavior for anything targeting a [BlockInstance]. Can hold various [Attribute]s and various [Attributable]s
  * for parsing and logic.
- * @see dev.vhoyd.blockworks.impl.BlockworksPlayer
+ * @see dev.vhoyd.blockworks.impl.core.ProvidedPlayer
  */
 
 @Suppress("unused") // for external use only
@@ -57,7 +57,7 @@ interface BlockBreaker<out T> : Attributable, Wrapper<T>{
             defaultParts: Map<Class<out Attributable>, Attributable> = emptyMap(),
             defaultAttributes: Map<Attribute<*, *>, Any> = emptyMap(),
 
-            ) : BlockBreaker<T> = InternalBlockBreaker(
+            ) : BlockBreaker<T> = ProvidedBreaker(
             blockworks = blockworks,
             delegate = delegate,
             defaultParts = defaultParts,

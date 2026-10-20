@@ -2,7 +2,7 @@ package dev.vhoyd.blockworks.api.block
 
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.Attributable
-import dev.vhoyd.blockworks.internal.InternalBlockInstance
+import dev.vhoyd.blockworks.impl.block.ProvidedBlockInstance
 import org.bukkit.Location
 
 /**
@@ -33,7 +33,7 @@ interface BlockInstance : Attributable {
             definition: BlockDefinition,
             location: Location,
             breaker: BlockBreaker<*>
-        ) : BlockInstance = InternalBlockInstance(definition, location, breaker)
+        ) : BlockInstance = ProvidedBlockInstance(definition, location, breaker)
     }
 
 }

@@ -1,13 +1,12 @@
-package dev.vhoyd.blockworks.impl
+package dev.vhoyd.blockworks.impl.core
 
 import dev.vhoyd.blockworks.api.core.Blockworks
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.PersistentAttributable
 import dev.vhoyd.blockworks.api.model.Wrapper
-import dev.vhoyd.blockworks.internal.InternalWrapper
-import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
+import dev.vhoyd.blockworks.api.pdc.PersistenceWriter
+import dev.vhoyd.blockworks.impl.attribute.ProvidedPersistentAttributed
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import java.util.function.BiFunction
 
 /**
@@ -40,8 +39,8 @@ class Tool private constructor(
         defaultAttributes: Map<Attribute<*, *>, Any>,
         overwriteAttributes: Boolean = true
     ) : this(
-        InternalPersistentAttributed(blockworks.plugin, delegate.itemMeta, defaultAttributes, overwriteAttributes),
-        InternalWrapper(delegate),
+        ProvidedPersistentAttributed(blockworks.plugin, delegate.itemMeta, defaultAttributes, overwriteAttributes),
+        ProvidedWrapper(delegate),
         overwriteAttributes,
         defaultAttributes,
 
@@ -51,7 +50,7 @@ class Tool private constructor(
     override fun <P : Any, C : Any> setAttribute(attribute: Attribute<P, C>, value: C) {
         val meta = delegate.itemMeta
         super.setAttribute(attribute, value)
-        PersistenceWriter.setValue(plugin, meta, attribute.name, attribute.type, value)
+        PersistenceWriter.setValue(plugin, meta, attribute, value)
         delegate.itemMeta = meta
     }
 

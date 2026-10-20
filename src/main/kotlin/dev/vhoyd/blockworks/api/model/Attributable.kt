@@ -1,6 +1,6 @@
 package dev.vhoyd.blockworks.api.model
 
-import dev.vhoyd.blockworks.internal.InternalAttributed
+import dev.vhoyd.blockworks.impl.attribute.ProvidedAttributed
 
 /**
  * Promises behavior for anything intended to have [Attribute]s.
@@ -8,7 +8,7 @@ import dev.vhoyd.blockworks.internal.InternalAttributed
  * Accessing [attributes] (Kotlin) or calling `getAttributes()` (Java)
  * directly for modification is discouraged and should be left to [getAttribute] and [setAttribute]
  *
- * @see dev.vhoyd.blockworks.impl.Tool
+ * @see dev.vhoyd.blockworks.impl.core.Tool
  */
 interface Attributable {
 
@@ -41,7 +41,7 @@ interface Attributable {
         @Suppress("unused") // for external use only
         fun default(
             attributes: Map<Attribute<*, *>, Any> = emptyMap()
-        ): Attributable = InternalAttributed(attributes)
+        ): Attributable = ProvidedAttributed(attributes)
     }
 
 }

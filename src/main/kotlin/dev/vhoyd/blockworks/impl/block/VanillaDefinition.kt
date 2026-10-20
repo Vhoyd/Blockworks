@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.internal
+package dev.vhoyd.blockworks.impl.block
 
 import dev.vhoyd.blockworks.api.block.BlockDefinition
 import dev.vhoyd.blockworks.api.block.BlockInstance
@@ -7,6 +7,7 @@ import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import dev.vhoyd.blockworks.api.model.Attribute
 import dev.vhoyd.blockworks.api.model.BlockBreaker
 import dev.vhoyd.blockworks.api.model.delegateAs
+import dev.vhoyd.blockworks.impl.attribute.ProvidedAttribute
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -41,7 +42,7 @@ internal class VanillaDefinition(
         block: Block,
         breaker: BlockBreaker<*>
     ): BlockInstance {
-        return InternalBlockInstance(this, block.location, breaker)
+        return ProvidedBlockInstance(this, block.location, breaker)
     }
 
     override val replacement = Material.AIR
@@ -64,9 +65,11 @@ internal class VanillaDefinition(
 
 
     companion object {
-        private val vanillaDmg : Attribute<Float, Float> = InternalAttribute("internal-dmg", PersistentDataType.FLOAT)
-        private val vanillaHaste : Attribute<Byte, Boolean> = InternalAttribute("internal-haste", PersistentDataType.BOOLEAN)
-        private val vanillaFatigue : Attribute<Byte, Boolean> = InternalAttribute("internal-fatigue", PersistentDataType.BOOLEAN)
+        private val vanillaDmg : Attribute<Float, Float> = ProvidedAttribute("internal-dmg", PersistentDataType.FLOAT)
+        private val vanillaHaste : Attribute<Byte, Boolean> =
+            ProvidedAttribute("internal-haste", PersistentDataType.BOOLEAN)
+        private val vanillaFatigue : Attribute<Byte, Boolean> =
+            ProvidedAttribute("internal-fatigue", PersistentDataType.BOOLEAN)
     }
 
 }

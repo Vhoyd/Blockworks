@@ -1,7 +1,7 @@
 package dev.vhoyd.blockworks.api.model
 
 import dev.vhoyd.blockworks.api.core.Blockworks
-import dev.vhoyd.blockworks.internal.InternalWrapper
+import dev.vhoyd.blockworks.impl.core.ProvidedWrapper
 import java.util.function.BiFunction
 import java.util.function.Predicate
 
@@ -51,6 +51,6 @@ interface Wrapper<out T> {
         @Suppress("unused") // for external use only
         fun <T> default(
             delegate : T
-        ) : Wrapper<T> = InternalWrapper(delegate)
+        ) : Wrapper<T> = ProvidedWrapper(delegate)
     }
 }

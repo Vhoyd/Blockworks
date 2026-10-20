@@ -1,4 +1,4 @@
-package dev.vhoyd.blockworks.impl
+package dev.vhoyd.blockworks.impl.block
 
 import dev.vhoyd.blockworks.api.block.BlockInstance
 import org.bukkit.Sound

@@ -7,7 +7,7 @@ import dev.vhoyd.blockworks.api.event.BlockInstanceTickEvent
 import dev.vhoyd.blockworks.api.event.VanillaInstanceBrokenEvent
 import dev.vhoyd.blockworks.api.loot.DeterminedDrop
 import dev.vhoyd.blockworks.api.model.BlockBreaker
-import dev.vhoyd.blockworks.internal.VanillaDefinition
+import dev.vhoyd.blockworks.impl.block.VanillaDefinition
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player

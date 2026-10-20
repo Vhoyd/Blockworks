@@ -1,7 +1,7 @@
 package dev.vhoyd.blockworks.api.model
 
-import dev.vhoyd.blockworks.impl.PersistenceWriter
-import dev.vhoyd.blockworks.internal.InternalPersistentAttributed
+import dev.vhoyd.blockworks.api.pdc.PersistenceWriter
+import dev.vhoyd.blockworks.impl.attribute.ProvidedPersistentAttributed
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.plugin.Plugin
 
@@ -21,7 +21,7 @@ interface PersistentAttributable : Attributable {
         value: C
     ) {
         super.setAttribute(attribute, value)
-        PersistenceWriter.setValue(plugin, persistenceTarget, attribute.name, attribute.type, value)
+        PersistenceWriter.setValue(plugin, persistenceTarget, attribute, value)
     }
 
 
@@ -29,7 +29,7 @@ interface PersistentAttributable : Attributable {
 
         val value = super.getAttribute(attribute)
         value?.let { return it }
-        val pValue = PersistenceWriter.getValue(plugin, persistenceTarget, attribute.name, attribute.type)
+        val pValue = PersistenceWriter.getValue(plugin, persistenceTarget, attribute)
         pValue?.let { super.setAttribute(attribute, pValue) }
         return pValue
     }
@@ -46,6 +46,6 @@ interface PersistentAttributable : Attributable {
             owner: Class<*>,
             attributes: Map<Attribute<*, *>, Any> = emptyMap(),
             overwrite: Boolean = false,
-        ): PersistentAttributable = InternalPersistentAttributed(plugin, persistenceTarget, attributes, overwrite)
+        ): PersistentAttributable = ProvidedPersistentAttributed(plugin, persistenceTarget, attributes, overwrite)
     }
 }
