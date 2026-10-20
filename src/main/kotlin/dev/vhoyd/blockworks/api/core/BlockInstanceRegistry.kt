@@ -24,59 +24,67 @@ internal class BlockInstanceRegistry(val blockworks : Blockworks) : BukkitRunnab
 
     // set instead of list, so that duplicates aren't ticked twice (end-users could implement manually)
     private val subscribers : MutableSet<BlockInstance> = ConcurrentHashMap.newKeySet()
+    private val updateSync = Any()
 
     private val log = blockworks.logger.context("BlockInstanceRegistry")
 
     override fun run() {
-
-        subscribers.forEach {
-            val tickEvent = BlockInstanceTickEvent(it)
-            dispatcher.callEvent(tickEvent)
-            if (tickEvent.isCancelled) {
-                log.debug("Tick event cancelled, skipping.")
-                return@forEach
+        subscribers.toList().forEach {
+            synchronized(updateSync) {
+                val tickEvent = BlockInstanceTickEvent(it)
+                dispatcher.callEvent(tickEvent)
+                if (tickEvent.isCancelled) {
+                    log.debug("Tick event cancelled, skipping.")
+                    return@forEach
+                }
+                it.definition.onTick.accept(it)
+                if (it.broken) breakBlock(it)
             }
-            it.definition.onTick.accept(it)
-            if (it.broken) breakBlock(it)
+
         }
 
     }
 
 
     fun subscribe(blockInstance : BlockInstance) {
-        val added = subscribers.add(blockInstance)
-        if (added) log.debug("BlockInstance at ${blockInstance.location} subscribed")
-        else log.warn("BlockInstance at ${blockInstance.location} was not subscribed")
+        synchronized(updateSync) {
+            val added = subscribers.add(blockInstance)
+            if (added) log.debug("BlockInstance at ${blockInstance.location} subscribed")
+            else log.warn("BlockInstance at ${blockInstance.location} was not subscribed")
+        }
     }
 
     fun unsubscribe(blockInstance: BlockInstance) {
-        val removed = subscribers.remove(blockInstance)
-        blockInstance.breaker.currentBlock = null
-        if (!removed) log.warn("BlockInstance at ${blockInstance.location} was not removed.")
-        else log.debug("BlockInstance at ${blockInstance.location} unsubscribed")
+        synchronized(updateSync) {
+            val removed = subscribers.remove(blockInstance)
+            blockInstance.breaker.currentBlock = null
+            if (!removed) log.warn("BlockInstance at ${blockInstance.location} was not removed.")
+            else log.debug("BlockInstance at ${blockInstance.location} unsubscribed")
+        }
     }
 
 
     fun findVanilla(location : Location) : BlockInstance? {
+        synchronized(updateSync) {
+            if (subscribers.isEmpty()) {
+                log.warn("No subscribed blocks to break.")
+                return null
 
-        if (subscribers.isEmpty()) {
-            log.warn("No subscribed blocks to break.")
+            }
+
+            subscribers.forEach {
+
+                if (it.location == location && VanillaDefinition::class.java.isInstance(it.definition)) {
+                    log.debug("Found qualifying vanilla block for ${location}.")
+                    return it
+                }
+
+            }
+
+            log.warn("No vanilla BlockInstance found at $location")
             return null
 
         }
-
-        subscribers.forEach {
-
-            if (it.location == location && VanillaDefinition::class.java.isInstance(it.definition)) {
-                log.debug("Found qualifying vanilla block for ${location}.")
-                return it
-            }
-
-        }
-
-        log.warn("No vanilla BlockInstance found at $location")
-        return null
-
     }
 
     // do all the fun stuff related to breaking the block

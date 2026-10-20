@@ -34,7 +34,7 @@ internal class BukkitEventListener(private val blockworks: Blockworks) : Listene
         }
 
         val blockDefinition = blockworks.getDefinition(e.block, blockBreaker) ?: run {
-            blockDamage.warn("Definition for block at ${e.block.location} not found.")
+            blockDamage.info("Definition for block at ${e.block.location} not found.")
             return
         }
 
@@ -72,7 +72,7 @@ internal class BukkitEventListener(private val blockworks: Blockworks) : Listene
             return
         }
         val instance = miningPlayer.currentBlock ?: run {
-            damageAbort.warn("BlockBreaker was not mining any BlockInstance.")
+            damageAbort.info("BlockBreaker was not mining any BlockInstance.")
             return
         }
 
@@ -104,7 +104,7 @@ internal class BukkitEventListener(private val blockworks: Blockworks) : Listene
             e.isCancelled = true
             blockworks.blockInstanceRegistry.vanillaBreak(foundMatch, breaker)
         } else {
-            blockBreak.debug("Event ignored due to no matching vanilla block.")
+            blockBreak.info("Event ignored due to no matching vanilla block.")
         }
     }
 
